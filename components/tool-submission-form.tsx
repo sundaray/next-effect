@@ -34,18 +34,8 @@ import {
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
 
-type FormValidationError = {
-  name: "FormValidationError";
-  issues: { path: string[]; message: string }[];
-};
-
 function isParseError(error: unknown): error is ParseResult.ParseError {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    // The _tag property is the key!
-    (error as any)._tag === "ParseError"
-  );
+  return typeof error === "object" && (error as any)._tag === "ParseError";
 }
 
 export const PREDEFINED_CATEGORIES = [
