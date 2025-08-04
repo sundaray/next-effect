@@ -23,6 +23,7 @@ export type RenderFieldProps<
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
+  fieldErrorId: string;
 };
 
 type FormFieldProps<
@@ -113,6 +114,7 @@ export function FormField<
                   field,
                   fieldState,
                   disabled: !!disabled,
+                  fieldErrorId,
                 })
               ) : (
                 <Input

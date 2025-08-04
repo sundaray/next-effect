@@ -19,17 +19,21 @@ type CategoryInputProps<
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
+  fieldErrorId: string;
 };
 
 export function CategoryInput<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>
->({ field, fieldState, disabled }: CategoryInputProps<TFieldValues, TName>) {
+>({
+  field,
+  fieldState,
+  disabled,
+  fieldErrorId,
+}: CategoryInputProps<TFieldValues, TName>) {
   const [categoryInput, setCategoryInput] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const id = useId();
-  const fieldErrorId = getFieldErrorId(field.name, id);
   const fieldError = fieldState.error;
 
   const selectedCategories = (field.value || []) as string[];
@@ -144,10 +148,10 @@ export function CategoryInput<
                     <button
                       key={suggestion}
                       type="button"
-                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-100 focus:bg-gray-50 focus:outline-none transition-colors"
                       onClick={() => addCategory(suggestion)}
                     >
-                      {suggestion}
+                      {suggestion}x``
                     </button>
                   ))
                 ) : (
@@ -166,7 +170,7 @@ export function CategoryInput<
                   >
                     <button
                       type="button"
-                      className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
+                      className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-100 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
                       onClick={() => addCategory(categoryInput)}
                     >
                       <Plus className="size-4" />
@@ -183,7 +187,7 @@ export function CategoryInput<
                 <button
                   key={category}
                   type="button"
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-100 focus:bg-gray-50 focus:outline-none transition-colors"
                   onClick={() => addCategory(category)}
                 >
                   {category}

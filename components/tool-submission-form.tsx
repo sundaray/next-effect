@@ -55,7 +55,7 @@ export function ToolSubmissionForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { control, handleSubmit, reset, setError } =
+  const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormData>({
       // resolver: effectTsResolver(ToolSubmissionSchema),
       mode: "onTouched",
@@ -164,12 +164,13 @@ export function ToolSubmissionForm() {
         }}
         control={control}
         disabled={isProcessing}
-        renderField={({ id, field, fieldState, disabled }) => (
+        renderField={({ id, field, fieldState, disabled, fieldErrorId }) => (
           <RichTextEditor
             id={id}
             field={field}
             fieldState={fieldState}
             disabled={disabled}
+            fieldErrorId={fieldErrorId}
           />
         )}
       />
@@ -185,11 +186,12 @@ export function ToolSubmissionForm() {
         }}
         control={control}
         disabled={isProcessing}
-        renderField={({ field, fieldState, disabled }) => (
+        renderField={({ field, fieldState, disabled, fieldErrorId }) => (
           <CategoryInput
             field={field}
             fieldState={fieldState}
             disabled={disabled}
+            fieldErrorId={fieldErrorId}
           />
         )}
       />
@@ -238,7 +240,7 @@ export function ToolSubmissionForm() {
         hint="Optional"
         control={control}
         disabled={isProcessing}
-        renderField={({ field, fieldState, disabled }) => (
+        renderField={({ field, fieldState, disabled, fieldErrorId }) => (
           <DropzoneInput
             field={field}
             fieldState={fieldState}
@@ -246,6 +248,9 @@ export function ToolSubmissionForm() {
             maxSizeInMb={LOGO_MAX_SIZE_MB}
             supportedFileTypes={SUPPORTED_FILE_TYPES}
             supportedMimeTypes={SUPPORTED_MIME_TYPES}
+            setError={setError}
+            clearErrors={clearErrors}
+            fieldErrorId={fieldErrorId}
           />
         )}
       />
@@ -256,7 +261,7 @@ export function ToolSubmissionForm() {
         label="Homepage Screenshot"
         control={control}
         disabled={isProcessing}
-        renderField={({ field, fieldState, disabled }) => (
+        renderField={({ field, fieldState, disabled, fieldErrorId }) => (
           <DropzoneInput
             field={field}
             fieldState={fieldState}
@@ -264,6 +269,9 @@ export function ToolSubmissionForm() {
             maxSizeInMb={SCREENSHOT_MAX_SIZE_MB}
             supportedFileTypes={SUPPORTED_FILE_TYPES}
             supportedMimeTypes={SUPPORTED_MIME_TYPES}
+            setError={setError}
+            clearErrors={clearErrors}
+            fieldErrorId={fieldErrorId}
           />
         )}
       />

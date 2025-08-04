@@ -10,7 +10,7 @@ export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
 export const LOGO_MAX_SIZE_MB = 2;
 export const SCREENSHOT_MAX_SIZE_MB = 5;
-export const SUPPORTED_FILE_TYPES = ["JPEG", "PNG", "WEBP"];
+export const SUPPORTED_FILE_TYPES = ["JPEG", "PNG"];
 
 export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
   (format) => `image/${format.toLowerCase()}`

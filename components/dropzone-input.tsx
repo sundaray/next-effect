@@ -1,10 +1,12 @@
-import { useId } from "react";
-import { useDropzone } from "react-dropzone";
+import { useId, useState } from "react";
+import { useDropzone, FileRejection } from "react-dropzone";
 import {
   ControllerRenderProps,
   ControllerFieldState,
   FieldValues,
   FieldPath,
+  UseFormSetError,
+  UseFormClearErrors,
 } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
@@ -14,7 +16,7 @@ import { PhotoIcon } from "@heroicons/react/24/solid";
 
 type DropzoneInputProps<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues>
 > = {
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
@@ -22,11 +24,14 @@ type DropzoneInputProps<
   maxSizeInMb: number;
   supportedFileTypes: string[];
   supportedMimeTypes: string[];
+  setError: UseFormSetError<TFieldValues>;
+  clearErrors: UseFormClearErrors<TFieldValues>;
+  fieldErrorId: string;
 };
 
 export function DropzoneInput<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues>
 >({
   field,
   fieldState,
@@ -34,46 +39,65 @@ export function DropzoneInput<
   maxSizeInMb,
   supportedFileTypes,
   supportedMimeTypes,
+  setError,
+  clearErrors,
+  fieldErrorId,
 }: DropzoneInputProps<TFieldValues, TName>) {
-  const id = useId();
-  const fieldErrorId = getFieldErrorId(field.name, id);
   const fieldError = fieldState.error;
 
-  const onDrop = (acceptedFiles: File[]) => {
+  const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    if (fileRejections.length > 0) {
+      const firstRejection = fileRejections[0];
+      const firstError = firstRejection.errors[0];
+
+      let message = firstError.message;
+      if (firstError.code === "file-too-large") {
+        message = `File is too large. Max size is ${maxSizeInMb}MB.`;
+      } else if (firstError.code === "file-invalid-type") {
+        message = `Invalid file type. Supported: ${supportedFileTypes.join(
+          ", "
+        )}.`;
+      }
+
+      clearErrors(field.name);
+
+      field.onChange(null);
+
+      setTimeout(() => {
+        setError(field.name, { type: "manual", message });
+      }, 0);
+
+      return;
+    }
+
     if (acceptedFiles.length > 0) {
+      clearErrors(field.name);
       field.onChange(acceptedFiles[0]);
     }
   };
 
   const maxSizeInBytes = maxSizeInMb * 1024 * 1024;
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragReject,
-    fileRejections,
-  } = useDropzone({
-    onDrop,
-    maxFiles: 1,
-    multiple: false,
-    disabled,
-    noClick: false,
-    accept: supportedMimeTypes.reduce(
-      (acc, mimeType) => {
+  const { getRootProps, getInputProps, isDragActive, isDragReject } =
+    useDropzone({
+      onDrop,
+      maxFiles: 1,
+      multiple: false,
+      disabled,
+      noClick: false,
+      accept: supportedMimeTypes.reduce((acc, mimeType) => {
         acc[mimeType] = [];
         return acc;
-      },
-      {} as Record<string, string[]>
-    ),
-    maxSize: maxSizeInBytes,
-  });
+      }, {} as Record<string, string[]>),
+      maxSize: maxSizeInBytes,
+    });
 
   const selectedFile: File | null = field.value;
 
   const handleRemoveFile = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     field.onChange(null);
+    clearErrors(field.name);
   };
 
   return (
@@ -85,8 +109,8 @@ export function DropzoneInput<
           "aria-describedby": fieldError ? fieldErrorId : undefined,
           className: cn(
             "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed aria-invalid:border-destructive aria-invalid:ring-destructive/20 border-neutral-300 p-12 text-center transition-colors",
-            isDragActive && "border-green-500 bg-green-50",
-            isDragReject && "border-red-500 bg-red-50",
+            isDragActive && !isDragReject && "border-green-500",
+            isDragReject && "border-red-500",
             disabled && "cursor-not-allowed pointer-events-none opacity-50"
           ),
         })}
