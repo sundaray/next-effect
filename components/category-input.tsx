@@ -1,10 +1,9 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import { X, Plus, Search } from "lucide-react";
 import { PREDEFINED_CATEGORIES } from "@/components/tool-submission-form";
 import { Input } from "@/components/ui/input";
-import { getFieldErrorId } from "@/lib/utils";
 import {
   ControllerRenderProps,
   ControllerFieldState,
