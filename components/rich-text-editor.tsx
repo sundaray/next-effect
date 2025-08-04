@@ -129,7 +129,7 @@ const Toolbar = ({
 
 type RichTextEditorProps<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues>
 > = {
   id: string;
   field: ControllerRenderProps<TFieldValues, TName>;
@@ -139,7 +139,7 @@ type RichTextEditorProps<
 
 export function RichTextEditor<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues>
 >({
   id,
   field,
@@ -171,7 +171,7 @@ export function RichTextEditor<
       attributes: {
         id,
         class: cn(
-          "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[240px] rounded-b-md"
+          "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[120px] rounded-b-md"
         ),
       },
     },
@@ -183,9 +183,12 @@ export function RichTextEditor<
       <Toolbar editor={editor} disabled={!!disabled} />
       <ScrollArea
         className={cn(
-          "h-[240px] w-full text-sm",
-          "border border-neutral-300 rounded-b-md bg-transparent shadow-xs",
+          "min-h-[120px] max-h-[240px] overflow-y-auto w-full text-sm",
+          "border border-neutral-300 bg-transparent shadow-xs",
           "transition-[color,box-shadow]",
+          // Scrollbar styling
+          "scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full",
+          "scrollbar-thumb-neutral-300 scrollbar-track-neutral-100",
           // Normal focus styles
           "has-[.tiptap:focus-visible]:border-ring",
           "has-[.tiptap:focus-visible]:ring-ring/50",
