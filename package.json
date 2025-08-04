@@ -10,8 +10,15 @@
   },
   "dependencies": {
     "@effect/platform": "^0.90.0",
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
+    "@tiptap/pm": "^3.0.9",
+    "@tiptap/react": "^3.0.9",
+    "@tiptap/starter-kit": "^3.0.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.4",
@@ -21,6 +28,8 @@
     "postgres": "^3.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-dropzone": "^14.3.8",
+    "react-hook-form": "^7.62.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
