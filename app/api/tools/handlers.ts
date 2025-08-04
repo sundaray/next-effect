@@ -6,9 +6,9 @@ export const submitToolHandler = HttpApiBuilder.handler(
   toolsApi,
   "tools",
   "submitTool",
-  ({ request }) =>
+  ({ request, payload }) =>
     Effect.gen(function* () {
-      Effect.log("Http Server Request: ", request);
+      Effect.log("Form payload: ", payload);
       return { success: true };
     })
 );

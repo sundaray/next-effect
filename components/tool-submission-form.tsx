@@ -22,6 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getFieldErrorId } from "@/lib/utils";
+import { Effect, Either, ParseResult } from "effect";
+import { FetchHttpClient } from "@effect/platform";
+import { client } from "@/app/api/client";
 
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
@@ -36,12 +39,12 @@ type FormValidationError = {
   issues: { path: string[]; message: string }[];
 };
 
-function isFormValidationError(error: unknown): error is FormValidationError {
+function isParseError(error: unknown): error is ParseResult.ParseError {
   return (
     typeof error === "object" &&
     error !== null &&
-    (error as any).name === "FormValidationError" &&
-    Array.isArray((error as any).issues)
+    // The _tag property is the key!
+    (error as any)._tag === "ParseError"
   );
 }
 
@@ -64,7 +67,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError } =
     useForm<ToolSubmissionFormData>({
-      resolver: effectTsResolver(ToolSubmissionSchema),
+      // resolver: effectTsResolver(ToolSubmissionSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -80,38 +83,44 @@ export function ToolSubmissionForm() {
     });
 
   const onSubmit = async function (data: ToolSubmissionFormData) {
-    console.log("Homepage screenshot value:", data.homepageScreenshot);
-    console.log("Is File instance?", data.homepageScreenshot instanceof File);
-    console.log("Type:", typeof data.homepageScreenshot);
-
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    try {
-      // const result = await submitTool({ data });
+    const submitProgram = Effect.gen(function* () {
+      const apiClient = yield* client;
+      return yield* apiClient.tools.submitTool({ payload: data });
+    });
 
-      console.log("Form data on client: ", data);
+    const result = await submitProgram.pipe(
+      Effect.either,
+      Effect.provide(FetchHttpClient.layer),
+      Effect.runPromise
+    );
 
-      // if (result.success && result.message) {
-      //   setSuccessMessage(result.message);
-      //   reset();
-      // }
-    } catch (error) {
-      if (isFormValidationError(error)) {
-        error.issues.forEach((issue) => {
+    setIsProcessing(false);
+
+    if (Either.isRight(result)) {
+      const response = result.right;
+      Effect.log("Form success response: ", response);
+      reset();
+    } else {
+      const error = result.left;
+
+      console.log("Error", error);
+
+      if (isParseError(error)) {
+        const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
+        console.log("Parse error issues: ", issues);
+
+        issues.forEach((issue) => {
           const fieldName = issue.path[0] as keyof ToolSubmissionFormData;
           setError(fieldName, {
+            type: "server",
             message: issue.message,
           });
         });
-      } else {
-        setErrorMessage(
-          "An unexpected error occured on the server. Please try again."
-        );
       }
-    } finally {
-      setIsProcessing(false);
     }
   };
 

@@ -113,18 +113,19 @@ export const ToolSubmissionSchema = Schema.Struct({
     Schema.Union(validateFileContent(LOGO_MAX_SIZE_MB), Schema.Null)
   ),
   homepageScreenshot: Schema.Union(
-    validateFileContent(SCREENSHOT_MAX_SIZE_MB),
-    Schema.Null,
-    Schema.Undefined
-  ).pipe(
-    Schema.filter(
-      (value): value is { size: number; type: string } =>
-        value !== null && value !== undefined,
-      {
-        message: () => "Homepage screenshot is required.",
-      }
-    )
+    validateFileContent(SCREENSHOT_MAX_SIZE_MB)
+    // Schema.Null,
+    // Schema.Undefined
   ),
+  // ).pipe(
+  //   Schema.filter(
+  //     (value): value is { size: number; type: string } =>
+  //       value !== null && value !== undefined,
+  //     {
+  //       message: () => "Homepage screenshot is required.",
+  //     }
+  //   )
+  // ),
 });
 
 export type ToolSubmissionFormData = Schema.Schema.Encoded<
