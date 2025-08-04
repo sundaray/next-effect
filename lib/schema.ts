@@ -112,11 +112,9 @@ export const ToolSubmissionSchema = Schema.Struct({
   logo: Schema.optional(validateFileContent(LOGO_MAX_SIZE_MB)),
   homepageScreenshot: Schema.Union(
     validateFileContent(SCREENSHOT_MAX_SIZE_MB),
-    // 1. Allow Null and Undefined so the initial decoding doesn't fail with a type error.
     Schema.Null,
     Schema.Undefined
   ).pipe(
-    // 2. Then, immediately filter out the null/undefined values with a custom message.
     Schema.filter(
       (value): value is { size: number; type: string } =>
         value !== null && value !== undefined,
@@ -125,7 +123,6 @@ export const ToolSubmissionSchema = Schema.Struct({
       }
     )
   ),
-  // END of change
 }).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
 
 export type ToolSubmissionFormData = Schema.Schema.Type<
