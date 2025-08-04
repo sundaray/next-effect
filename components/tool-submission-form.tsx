@@ -10,7 +10,6 @@ import {
 } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/form-message";
-// import { submitTool } from "@/lib/submit-tool";
 import { FormField } from "@/components/form-field";
 import { CategoryInput } from "@/components/category-input";
 import { RichTextEditor } from "@/components/rich-text-editor";
@@ -21,8 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getFieldErrorId } from "@/lib/utils";
-import { Effect, Either, ParseResult } from "effect";
+import { Effect, ParseResult } from "effect";
 import { FetchHttpClient } from "@effect/platform";
 import { client } from "@/app/api/client";
 
@@ -57,7 +55,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormData>({
-      // resolver: effectTsResolver(ToolSubmissionSchema),
+      resolver: effectTsResolver(ToolSubmissionSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -72,46 +70,48 @@ export function ToolSubmissionForm() {
       },
     });
 
-  const onSubmit = async function (data: ToolSubmissionFormData) {
+  const onSubmit = async (data: ToolSubmissionFormData) => {
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const submitProgram = Effect.gen(function* () {
+    const program = Effect.gen(function* () {
       const apiClient = yield* client;
       return yield* apiClient.tools.submitTool({ payload: data });
     });
 
-    const result = await submitProgram.pipe(
-      Effect.either,
+    const handledProgram = program.pipe(
       Effect.provide(FetchHttpClient.layer),
-      Effect.runPromise
+
+      Effect.matchEffect({
+        onFailure: (error) =>
+          Effect.sync(() => {
+            console.error("Form submission error:", error);
+            if (isParseError(error)) {
+              const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
+              issues.forEach((issue) => {
+                const fieldName = issue.path[0] as keyof ToolSubmissionFormData;
+                setError(fieldName, { type: "server", message: issue.message });
+              });
+            } else {
+              setErrorMessage(
+                "An unexpected error occurred. Please try again."
+              );
+            }
+          }),
+
+        onSuccess: (response) =>
+          Effect.sync(() => {
+            console.log("Form success response: ", response);
+            setSuccessMessage("Tool submitted successfully!");
+            reset();
+          }),
+      }),
+
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
-    setIsProcessing(false);
-
-    if (Either.isRight(result)) {
-      const response = result.right;
-      Effect.log("Form success response: ", response);
-      reset();
-    } else {
-      const error = result.left;
-
-      console.log("Error", error);
-
-      if (isParseError(error)) {
-        const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-        console.log("Parse error issues: ", issues);
-
-        issues.forEach((issue) => {
-          const fieldName = issue.path[0] as keyof ToolSubmissionFormData;
-          setError(fieldName, {
-            type: "server",
-            message: issue.message,
-          });
-        });
-      }
-    }
+    await Effect.runPromise(handledProgram);
   };
 
   const message = successMessage || errorMessage;
@@ -202,9 +202,7 @@ export function ToolSubmissionForm() {
         label="Pricing"
         control={control}
         disabled={isProcessing}
-        renderField={({ id, field, fieldState, disabled }) => {
-          const randomId = useId();
-          const fieldErrorId = getFieldErrorId(field.name, randomId);
+        renderField={({ id, field, fieldState, disabled, fieldErrorId }) => {
           const fieldError = fieldState.error;
 
           return (
