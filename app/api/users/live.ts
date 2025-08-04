@@ -1,8 +1,8 @@
 import { Layer } from "effect";
 import { HttpApiBuilder } from "@effect/platform";
-import { usersApi } from "./api";
-import { getUsersHandler, getUserHandler } from "./handlers";
-import { UsersLoggerLive } from "./middleware";
+import { usersApi } from "@/app/api/users/api";
+import { getUsersHandler, getUserHandler } from "@/app/api/users/handlers";
+import { UsersLoggerLive } from "@/app/api/users/middleware";
 
 export const usersGroupLive = HttpApiBuilder.group(
   usersApi,
