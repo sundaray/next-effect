@@ -1,10 +1,9 @@
 import { Layer } from "effect";
 import { HttpApiBuilder, HttpServer } from "@effect/platform";
-import { usersApiLive } from "@/app/api/users/live";
-import { toolsApiLive } from "@/app/api/tools/live";
+import { combinedApiLive } from "@/app/api/api";
 
 const { handler } = HttpApiBuilder.toWebHandler(
-  Layer.mergeAll(usersApiLive, toolsApiLive, HttpServer.layerContext)
+  Layer.mergeAll(combinedApiLive, HttpServer.layerContext)
 );
 
 const wrappedHandler = async (request: Request) => {
