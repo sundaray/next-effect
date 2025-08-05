@@ -85,6 +85,8 @@ export function ToolSubmissionForm() {
         onFailure: (error) =>
           Effect.sync(() => {
             console.error("Form submission error:", error);
+            console.log("Error tag: ", error._tag);
+            console.log("Error object type: ", typeof error);
             if (isParseError(error)) {
               const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
               issues.forEach((issue) => {
