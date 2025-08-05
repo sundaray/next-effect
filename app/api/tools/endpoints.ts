@@ -9,4 +9,4 @@ const User = Schema.Struct({
 
 export const submitTool = HttpApiEndpoint.get("submitTool", "/")
   // .setPayload(ToolSubmissionSchema)
-  .addSuccess(Schema.Array(User));
+  .addSuccess(Schema.String);

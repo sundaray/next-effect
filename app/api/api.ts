@@ -1,4 +1,4 @@
-import { HttpApi } from "@effect/platform";
+import { HttpApi, HttpApiBuilder } from "@effect/platform";
 import { usersGroup } from "@/app/api/users/group";
 import { toolsGroup } from "@/app/api/tools/group";
 

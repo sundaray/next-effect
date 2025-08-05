@@ -1,7 +1,7 @@
 import { HttpApiGroup, HttpApiMiddleware } from "@effect/platform";
 
-import { getUsers } from "./endpoints";
-import { getUser } from "./endpoints";
+import { getUsers } from "@/app/api/users/endpoints";
+import { getUser } from "@/app/api/users/endpoints";
 
 class UsersLogger extends HttpApiMiddleware.Tag<UsersLogger>()("UsersLogger") {}
 

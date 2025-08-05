@@ -75,31 +75,17 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const program = Effect.tryPromise({
-      try: () =>
-        fetch("/api/tools/submit", {
-          // Use the known correct URL
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }),
-      catch: (err) => new Error("Network fetch failed"),
-    }).pipe(
-      Effect.flatMap((res) => {
-        if (!res.ok) {
-          return Effect.fail(
-            new Error(`Server responded with status ${res.status}`)
-          );
-        }
-        return Effect.succeed(res); // or res.json() if you expect a body
-      })
-    );
+    const program = Effect.gen(function* () {
+      const apiClient = yield* ApiClientService;
+      return yield* apiClient.tools.submitTool({ payload: data });
+    });
 
     const handledProgram = program.pipe(
       Effect.matchEffect({
         onFailure: (error) =>
           Effect.sync(() => {
             console.error("Form submission error:", error);
+            console.log("Error tag: ", error._tag);
             console.log("Error object type: ", typeof error);
             if (isParseError(error)) {
               const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
