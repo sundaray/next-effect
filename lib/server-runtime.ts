@@ -5,6 +5,9 @@ import { DatabaseService } from "@/lib/services/database-service";
 const ApiClientServiceLayer = ApiClientService.Default;
 const DatabaseServiceLayer = DatabaseService.Default;
 
-const AppLayer = Layer.mergeAll(ApiClientServiceLayer, DatabaseServiceLayer);
+const ServerAppLayer = Layer.mergeAll(
+  ApiClientServiceLayer,
+  DatabaseServiceLayer
+);
 
-export const AppRuntime = ManagedRuntime.make(AppLayer);
+export const ServerAppRuntime = ManagedRuntime.make(ServerAppLayer);
