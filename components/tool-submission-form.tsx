@@ -21,8 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Effect, ParseResult } from "effect";
-import { FetchHttpClient } from "@effect/platform";
-import { client } from "@/app/api/client";
+import { ApiClientService } from "@/lib/services/api-client-service";
+import { AppRuntime } from "@/lib/runtime";
 
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
@@ -76,13 +76,11 @@ export function ToolSubmissionForm() {
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
-      const apiClient = yield* client;
+      const apiClient = yield* ApiClientService;
       return yield* apiClient.tools.submitTool({ payload: data });
     });
 
     const handledProgram = program.pipe(
-      Effect.provide(FetchHttpClient.layer),
-
       Effect.matchEffect({
         onFailure: (error) =>
           Effect.sync(() => {
@@ -111,7 +109,7 @@ export function ToolSubmissionForm() {
       Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
-    await Effect.runPromise(handledProgram);
+    await AppRuntime.runPromise(handledProgram);
   };
 
   const message = successMessage || errorMessage;
