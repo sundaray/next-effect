@@ -1,13 +1,14 @@
 import { HttpApiBuilder } from "@effect/platform";
-import { toolsApi } from "@/app/api/tools/api";
+import { api } from "@/app/api/api";
 import { Effect } from "effect";
 
 export const submitToolHandler = HttpApiBuilder.handler(
-  toolsApi,
+  api,
   "tools",
   "submitTool",
-  ({ request }) =>
+  ({ request, payload }) =>
     Effect.gen(function* () {
-      return { message: "Tool endpoint working correctly." };
+      yield* Effect.log("Form payload", payload);
+      return { message: "Payload received." };
     })
 );

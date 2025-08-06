@@ -1,6 +1,6 @@
 import { Layer } from "effect";
 import { HttpApiBuilder, HttpServer } from "@effect/platform";
-import { apiLive } from "@/app/api/api";
+import { apiLive } from "@/app/api/live";
 
 const { handler } = HttpApiBuilder.toWebHandler(
   Layer.mergeAll(apiLive, HttpServer.layerContext)

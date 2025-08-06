@@ -7,7 +7,7 @@ const User = Schema.Struct({
 });
 
 export const getUsers = HttpApiEndpoint.get("getUsers", "/").addSuccess(
-  Schema.Array(User)
+  Schema.String
 );
 
 export const getUser = HttpApiEndpoint.get("getUser", "/:id")

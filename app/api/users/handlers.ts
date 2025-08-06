@@ -16,7 +16,7 @@ export const getUsersHandler = HttpApiBuilder.handler(
   ({ request }) =>
     Effect.gen(function* () {
       console.log("HttpServerRequest: ", request);
-      return dummyUsers;
+      return "Hello users";
     })
 );
 
