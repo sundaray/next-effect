@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { HttpApiBuilder, HttpApiError } from "@effect/platform";
-import { usersApi } from "./api";
+import { api } from "@/app/api/api";
 
 const dummyUsers = [
   { id: 1, name: "Alice" },
@@ -10,7 +10,7 @@ const dummyUsers = [
 
 // Get users
 export const getUsersHandler = HttpApiBuilder.handler(
-  usersApi,
+  api,
   "users",
   "getUsers",
   ({ request }) =>
@@ -22,7 +22,7 @@ export const getUsersHandler = HttpApiBuilder.handler(
 
 // Get user by id
 export const getUserHandler = HttpApiBuilder.handler(
-  usersApi,
+  api,
   "users",
   "getUser",
   ({ path: { id }, request }) =>

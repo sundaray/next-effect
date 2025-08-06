@@ -1,14 +1,12 @@
 import { HttpApiBuilder } from "@effect/platform";
-import { toolsApi } from "@/app/api/tools/api";
-import { submitToolHandler } from "@/app/api/tools/handlers";
-import { Layer } from "effect";
+import { Effect, Layer } from "effect";
+import { api } from "@/app/api/api";
 
-export const toolsGroupLive = HttpApiBuilder.group(
-  toolsApi,
-  "tools",
-  (handlers) => handlers.handle("submitTool", submitToolHandler)
-);
-
-export const toolsApiLive = HttpApiBuilder.api(toolsApi).pipe(
-  Layer.provide(toolsGroupLive)
+export const toolsGroupLive = HttpApiBuilder.group(api, "tools", (handlers) =>
+  handlers.handle("submitTool", () =>
+    Effect.gen(function* () {
+      console.log("Tools endpoint hit!");
+      return { message: "Tool endpoint working correctly." };
+    })
+  )
 );

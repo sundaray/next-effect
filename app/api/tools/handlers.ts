@@ -8,6 +8,6 @@ export const submitToolHandler = HttpApiBuilder.handler(
   "submitTool",
   ({ request }) =>
     Effect.gen(function* () {
-      return "Tool endpoint working correctly.";
+      return { message: "Tool endpoint working correctly." };
     })
 );

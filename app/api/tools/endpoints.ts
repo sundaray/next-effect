@@ -7,6 +7,6 @@ const User = Schema.Struct({
   name: Schema.String,
 });
 
-export const submitTool = HttpApiEndpoint.get("submitTool", "/")
+export const submitTool = HttpApiEndpoint.get("submitTool", "/submit")
   // .setPayload(ToolSubmissionSchema)
-  .addSuccess(Schema.String);
+  .addSuccess(Schema.Struct({ message: Schema.String }));
