@@ -8,6 +8,7 @@ export const submitToolHandler = HttpApiBuilder.handler(
   "submitTool",
   ({ request, payload }) =>
     Effect.gen(function* () {
+      yield* Effect.log("HTTP request:", request);
       yield* Effect.log("Form payload", payload);
       return { message: "Payload received." };
     })

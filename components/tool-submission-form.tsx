@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import {
-  ToolSubmissionSchema,
+  ToolSubmissionFormSchema,
   type ToolSubmissionFormData,
   pricingOptions,
 } from "@/lib/schema";
@@ -55,7 +55,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormData>({
-      resolver: effectTsResolver(ToolSubmissionSchema),
+      // resolver: effectTsResolver(ToolSubmissionSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -71,13 +71,14 @@ export function ToolSubmissionForm() {
     });
 
   const onSubmit = async (data: ToolSubmissionFormData) => {
+    console.log("Form data: ", data);
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
       const apiClient = yield* ApiClientService;
-      return yield* apiClient.tools.submitTool({ payload: data });
+      return yield* apiClient.tools.submitTool({ payload: data as any });
     });
 
     const handledProgram = program.pipe(

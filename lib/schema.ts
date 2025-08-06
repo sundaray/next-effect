@@ -1,10 +1,4 @@
-import { Schema, type Schema as S } from "effect";
-
-export const ForgotPasswordFormSchema = Schema.Struct({
-  email: Schema.String.pipe(
-    Schema.nonEmptyString({ message: () => "Email is required." })
-  ),
-});
+import { Schema } from "effect";
 
 export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
@@ -15,25 +9,6 @@ export const SUPPORTED_FILE_TYPES = ["JPEG", "PNG", "WEBP"];
 export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
   (format) => `image/${format.toLowerCase()}`
 );
-
-const ValidFileSchema = (maxSizeInMb: number) =>
-  Schema.instanceOf(File).pipe(
-    Schema.filter((file) => file.size <= maxSizeInMb * 1024 * 1024, {
-      message: () => `File cannot exceed ${maxSizeInMb}MB.`,
-    }),
-    Schema.filter((file) => SUPPORTED_MIME_TYPES.includes(file.type), {
-      message: () =>
-        `Invalid file type. Use ${SUPPORTED_FILE_TYPES.join(", ")}.`,
-    })
-  );
-
-const RequiredFileSchema = (maxSizeInMb: number, requiredMessage: string) =>
-  Schema.Unknown.pipe(
-    Schema.filter((u): u is File => u instanceof File, {
-      message: () => requiredMessage,
-    }),
-    Schema.compose(ValidFileSchema(maxSizeInMb))
-  ) as S.Schema<File>;
 
 export const ToolSubmissionSchema = Schema.Struct({
   name: Schema.String.pipe(
@@ -88,11 +63,8 @@ export const ToolSubmissionSchema = Schema.Struct({
       override: true,
     }),
   }),
-  logo: Schema.optional(ValidFileSchema(LOGO_MAX_SIZE_MB)),
-  homepageScreenshot: RequiredFileSchema(
-    SCREENSHOT_MAX_SIZE_MB,
-    "Homepage screenshot is required."
-  ),
+  logo: ,
+  homepageScreenshot: ,
 }).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
 
 export type ToolSubmissionFormData = Schema.Schema.Type<
