@@ -1,17 +1,11 @@
-import { Layer } from "effect";
-import { HttpApiBuilder, HttpServer } from "@effect/platform";
-import { apiLive } from "@/app/api/live";
+import { Hono } from "hono";
+import { handle } from "hono/vercel";
 
-const { handler } = HttpApiBuilder.toWebHandler(
-  Layer.mergeAll(apiLive, HttpServer.layerContext)
-);
+const app = new Hono().basePath("/app");
 
-const wrappedHandler = async (request: Request) => {
-  console.log("Incoming request URL:", request.url);
-  console.log("Incoming request pathname:", new URL(request.url).pathname);
-  return handler(request);
-};
+app.get("/hello", (ctx) => {
+  console.log("Request path: ", ctx.req.path);
+  return ctx.json({ message: "Hello world!" });
+});
 
-export const GET = wrappedHandler;
-export const POST = wrappedHandler;
-export const DELETE = wrappedHandler;
+export const GET = handle(app);

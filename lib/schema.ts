@@ -13,7 +13,6 @@ export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
   (format) => `image/${format.toLowerCase()}`
 );
 
-// Base schema for common fields (shared between client and server)
 const ToolSubmissionBaseSchema = {
   name: Schema.String.pipe(
     Schema.nonEmptyString({
@@ -83,12 +82,14 @@ export const ToolSubmissionFormSchema = Schema.Struct({
         }
       )
     ),
-}).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
+})
+  .annotations({ identifier: "ToolSubmissionFormSchema" })
+  .pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
 
 export const ToolSubmissionApiSchema = Schema.Struct({
   ...ToolSubmissionBaseSchema,
-  logo: Schema.optional(FileSchema),
-  homepageScreenshot: FileSchema,
+  logo: Schema.optional(Schema.Any),
+  homepageScreenshot: Schema.Any,
 }).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
 
 export type ToolSubmissionFormDataType = Schema.Schema.Type<

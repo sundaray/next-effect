@@ -21,8 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Effect, ParseResult } from "effect";
-import { ApiClientService } from "@/lib/services/api-client-service";
-import { ClientAppRuntime } from "@/lib/client-runtime";
 
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
@@ -77,44 +75,36 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const program = Effect.gen(function* () {
-      const apiClient = yield* ApiClientService;
-      return yield* apiClient.tools.submitTool({ payload: data });
-    });
+    // const program = Effect.gen(function* () {});
 
-    const handledProgram = program.pipe(
-      Effect.matchEffect({
-        onFailure: (error) =>
-          Effect.sync(() => {
-            console.error("Form submission error:", error);
-            console.log("Error tag: ", error._tag);
-            console.log("Error object type: ", typeof error);
-            if (isParseError(error)) {
-              const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-              issues.forEach((issue) => {
-                const fieldName = issue
-                  .path[0] as keyof ToolSubmissionFormDataType;
-                setError(fieldName, { type: "server", message: issue.message });
-              });
-            } else {
-              setErrorMessage(
-                "An unexpected error occurred. Please try again."
-              );
-            }
-          }),
+    // const handledProgram = program.pipe(
+    //   Effect.matchEffect({
+    //     onFailure: (error) =>
+    //       Effect.sync(() => {
+    //         if (isParseError(error)) {
+    //           const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
+    //           issues.forEach((issue) => {
+    //             const fieldName = issue
+    //               .path[0] as keyof ToolSubmissionFormDataType;
+    //             setError(fieldName, { type: "server", message: issue.message });
+    //           });
+    //         } else {
+    //           setErrorMessage(
+    //             "An unexpected error occurred. Please try again."
+    //           );
+    //         }
+    //       }),
 
-        onSuccess: (response) =>
-          Effect.sync(() => {
-            console.log("Form success response: ", response);
-            setSuccessMessage("Tool submitted successfully!");
-            reset();
-          }),
-      }),
+    //     onSuccess: (response) =>
+    //       Effect.sync(() => {
+    //         console.log("Form success response: ", response);
+    //         setSuccessMessage("Tool submitted successfully!");
+    //         reset();
+    //       }),
+    //   }),
 
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
-    );
-
-    await ClientAppRuntime.runPromise(handledProgram);
+    //   Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+    // );
   };
 
   const message = successMessage || errorMessage;
