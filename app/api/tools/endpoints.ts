@@ -1,7 +1,7 @@
-import { HttpApiEndpoint } from "@effect/platform";
+import { HttpApiEndpoint, HttpApiSchema, Multipart } from "@effect/platform";
 import { Schema } from "effect";
-import { ToolSubmissionApiSchema } from "@/lib/schema";
+import { ToolSubmissionFormSchema } from "@/lib/schema";
 
 export const submitTool = HttpApiEndpoint.post("submitTool", "/submit")
-  .setPayload(ToolSubmissionApiSchema)
+  .setPayload(ToolSubmissionFormSchema)
   .addSuccess(Schema.Struct({ message: Schema.String }));

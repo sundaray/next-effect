@@ -1,4 +1,4 @@
-import { HttpApiBuilder } from "@effect/platform";
+import { HttpApiBuilder, HttpServerRequest } from "@effect/platform";
 import { api } from "@/app/api/api";
 import { Effect } from "effect";
 

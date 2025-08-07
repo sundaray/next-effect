@@ -1,11 +1,11 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Form, useForm } from "react-hook-form";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import {
   ToolSubmissionFormSchema,
-  type ToolSubmissionFormData,
+  ToolSubmissionFormDataType,
   pricingOptions,
 } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
@@ -54,8 +54,8 @@ export function ToolSubmissionForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, setError, clearErrors } =
-    useForm<ToolSubmissionFormData>({
-      // resolver: effectTsResolver(ToolSubmissionSchema),
+    useForm<ToolSubmissionFormDataType>({
+      resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -70,15 +70,37 @@ export function ToolSubmissionForm() {
       },
     });
 
-  const onSubmit = async (data: ToolSubmissionFormData) => {
-    console.log("Form data: ", data);
+  const onSubmit = async (data: ToolSubmissionFormDataType) => {
+    console.log("Data: ", data);
+
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    const formData = new FormData();
+
+    formData.append("name", data.name);
+    formData.append("website", data.website);
+    formData.append("tagline", data.tagline);
+    formData.append("description", data.description);
+    formData.append("pricing", data.pricing);
+
+    // Add categories as array
+    data.categories.forEach((category) => {
+      formData.append("categories", category);
+    });
+
+    // Add files with their specific field names
+    if (data.logo) {
+      formData.append("logo", data.logo);
+    }
+    formData.append("homepageScreenshot", data.homepageScreenshot);
+
+    console.log("Form data: ", formData);
+
     const program = Effect.gen(function* () {
       const apiClient = yield* ApiClientService;
-      return yield* apiClient.tools.submitTool({ payload: data as any });
+      return yield* apiClient.tools.submitTool({ payload: formData });
     });
 
     const handledProgram = program.pipe(
@@ -91,7 +113,8 @@ export function ToolSubmissionForm() {
             if (isParseError(error)) {
               const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
               issues.forEach((issue) => {
-                const fieldName = issue.path[0] as keyof ToolSubmissionFormData;
+                const fieldName = issue
+                  .path[0] as keyof ToolSubmissionFormDataType;
                 setError(fieldName, { type: "server", message: issue.message });
               });
             } else {

@@ -1,4 +1,7 @@
 import { Schema } from "effect";
+import { Multipart } from "@effect/platform";
+
+const FileSchema = Multipart.FileSchema;
 
 export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
@@ -10,7 +13,8 @@ export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
   (format) => `image/${format.toLowerCase()}`
 );
 
-export const ToolSubmissionSchema = Schema.Struct({
+// Base schema for common fields (shared between client and server)
+const ToolSubmissionBaseSchema = {
   name: Schema.String.pipe(
     Schema.nonEmptyString({
       message: () => "Name is required.",
@@ -63,10 +67,34 @@ export const ToolSubmissionSchema = Schema.Struct({
       override: true,
     }),
   }),
-  logo: ,
-  homepageScreenshot: ,
+};
+
+export const ToolSubmissionFormSchema = Schema.Struct({
+  ...ToolSubmissionBaseSchema,
+  logo: Schema.optional(Schema.instanceOf(File)),
+  homepageScreenshot: Schema.instanceOf(File)
+    .annotations({ message: () => "Homepage screenshot is required." })
+    .pipe(
+      Schema.filter(
+        (file) => file.size <= SCREENSHOT_MAX_SIZE_MB * 1024 * 1024,
+        {
+          message: () =>
+            `Screenshot must be less than ${SCREENSHOT_MAX_SIZE_MB}MB`,
+        }
+      )
+    ),
 }).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
 
-export type ToolSubmissionFormData = Schema.Schema.Type<
-  typeof ToolSubmissionSchema
+export const ToolSubmissionApiSchema = Schema.Struct({
+  ...ToolSubmissionBaseSchema,
+  logo: Schema.optional(FileSchema),
+  homepageScreenshot: FileSchema,
+}).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
+
+export type ToolSubmissionFormDataType = Schema.Schema.Type<
+  typeof ToolSubmissionFormSchema
+>;
+
+export type ToolSubmissionApiDataType = Schema.Schema.Type<
+  typeof ToolSubmissionApiSchema
 >;
