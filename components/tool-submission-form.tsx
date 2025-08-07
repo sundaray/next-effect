@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Effect, ParseResult } from "effect";
+import { Effect, pipe } from "effect";
 import {
   FetchHttpClient,
   HttpClient,
@@ -33,10 +33,6 @@ import {
   SUPPORTED_FILE_TYPES,
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
-
-function isParseError(error: unknown): error is ParseResult.ParseError {
-  return typeof error === "object" && (error as any)._tag === "ParseError";
-}
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -73,8 +69,6 @@ export function ToolSubmissionForm() {
     });
 
   const onSubmit = async (data: ToolSubmissionFormSchemaType) => {
-    console.log("Data: ", data);
-
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -87,9 +81,7 @@ export function ToolSubmissionForm() {
       formData.append("tagline", data.tagline);
       formData.append("description", data.description);
       formData.append("pricing", data.pricing);
-
       formData.append("categories", JSON.stringify(data.categories));
-
       if (data.logo) {
         formData.append("logo", data.logo);
       }
@@ -97,45 +89,16 @@ export function ToolSubmissionForm() {
 
       const client = yield* HttpClient.HttpClient;
 
-      const response = yield* HttpClientRequest.post("/api/tools/submit").pipe(
+      return yield* HttpClientRequest.post("/api/tools/submit").pipe(
         HttpClientRequest.bodyFormData(formData),
         client.execute,
         Effect.flatMap((res) => res.json)
       );
-
-      return response;
     }).pipe(Effect.provide(FetchHttpClient.layer));
 
-    const handledProgram = program.pipe(
-      Effect.matchEffect({
-        onFailure: (error) =>
-          Effect.sync(() => {
-            console.error("Submission error:", error);
-            if (isParseError(error)) {
-              const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-              issues.forEach((issue) => {
-                const fieldName = issue
-                  .path[0] as keyof ToolSubmissionFormSchemaType;
-                setError(fieldName, { type: "server", message: issue.message });
-              });
-            } else {
-              setErrorMessage(
-                "An unexpected error occurred. Please try again."
-              );
-            }
-          }),
+    const handledProgram = pipe(program);
 
-        onSuccess: (response) =>
-          Effect.sync(() => {
-            console.log("Form success response: ", response);
-            setSuccessMessage("Tool submitted successfully!");
-            reset();
-          }),
-      }),
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
-    );
-
-    await Effect.runPromise(handledProgram);
+    await Effect.runPromise(program);
   };
 
   const message = successMessage || errorMessage;
