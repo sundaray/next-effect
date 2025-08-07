@@ -57,7 +57,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
-      resolver: effectTsResolver(ToolSubmissionFormSchema),
+      // resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
