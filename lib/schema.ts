@@ -1,7 +1,4 @@
 import { Schema } from "effect";
-import { Multipart } from "@effect/platform";
-
-const FileSchema = Multipart.FileSchema;
 
 export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
@@ -13,7 +10,7 @@ export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
   (format) => `image/${format.toLowerCase()}`
 );
 
-const ToolSubmissionBaseSchema = {
+export const ToolSubmissionFormSchema = Schema.Struct({
   name: Schema.String.pipe(
     Schema.nonEmptyString({
       message: () => "Name is required.",
@@ -49,7 +46,7 @@ const ToolSubmissionBaseSchema = {
   categories: Schema.Array(
     Schema.Trim.pipe(
       Schema.nonEmptyString({
-        message: () => "At least one category is required.",
+        message: () => "Category cannot be empty.",
       })
     )
   ).pipe(
@@ -66,10 +63,6 @@ const ToolSubmissionBaseSchema = {
       override: true,
     }),
   }),
-};
-
-export const ToolSubmissionFormSchema = Schema.Struct({
-  ...ToolSubmissionBaseSchema,
   logo: Schema.optional(Schema.instanceOf(File)),
   homepageScreenshot: Schema.instanceOf(File)
     .annotations({ message: () => "Homepage screenshot is required." })
@@ -86,16 +79,6 @@ export const ToolSubmissionFormSchema = Schema.Struct({
   .annotations({ identifier: "ToolSubmissionFormSchema" })
   .pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
 
-export const ToolSubmissionApiSchema = Schema.Struct({
-  ...ToolSubmissionBaseSchema,
-  logo: Schema.optional(Schema.Any),
-  homepageScreenshot: Schema.Any,
-}).pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
-
-export type ToolSubmissionFormDataType = Schema.Schema.Type<
+export type ToolSubmissionFormSchemaType = Schema.Schema.Type<
   typeof ToolSubmissionFormSchema
->;
-
-export type ToolSubmissionApiDataType = Schema.Schema.Type<
-  typeof ToolSubmissionApiSchema
 >;

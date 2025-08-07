@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import {
   ToolSubmissionFormSchema,
-  ToolSubmissionFormDataType,
+  ToolSubmissionFormSchemaType,
   pricingOptions,
 } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Effect, ParseResult } from "effect";
-
+import {
+  FetchHttpClient,
+  HttpClient,
+  HttpClientRequest,
+} from "@effect/platform";
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
   LOGO_MAX_SIZE_MB,
@@ -52,7 +56,7 @@ export function ToolSubmissionForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { control, handleSubmit, reset, setError, clearErrors } =
-    useForm<ToolSubmissionFormDataType>({
+    useForm<ToolSubmissionFormSchemaType>({
       resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
@@ -68,43 +72,70 @@ export function ToolSubmissionForm() {
       },
     });
 
-  const onSubmit = async (data: ToolSubmissionFormDataType) => {
+  const onSubmit = async (data: ToolSubmissionFormSchemaType) => {
     console.log("Data: ", data);
 
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    // const program = Effect.gen(function* () {});
+    const program = Effect.gen(function* () {
+      const formData = new FormData();
 
-    // const handledProgram = program.pipe(
-    //   Effect.matchEffect({
-    //     onFailure: (error) =>
-    //       Effect.sync(() => {
-    //         if (isParseError(error)) {
-    //           const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-    //           issues.forEach((issue) => {
-    //             const fieldName = issue
-    //               .path[0] as keyof ToolSubmissionFormDataType;
-    //             setError(fieldName, { type: "server", message: issue.message });
-    //           });
-    //         } else {
-    //           setErrorMessage(
-    //             "An unexpected error occurred. Please try again."
-    //           );
-    //         }
-    //       }),
+      formData.append("name", data.name);
+      formData.append("website", data.website);
+      formData.append("tagline", data.tagline);
+      formData.append("description", data.description);
+      formData.append("pricing", data.pricing);
 
-    //     onSuccess: (response) =>
-    //       Effect.sync(() => {
-    //         console.log("Form success response: ", response);
-    //         setSuccessMessage("Tool submitted successfully!");
-    //         reset();
-    //       }),
-    //   }),
+      formData.append("categories", JSON.stringify(data.categories));
 
-    //   Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
-    // );
+      if (data.logo) {
+        formData.append("logo", data.logo);
+      }
+      formData.append("homepageScreenshot", data.homepageScreenshot);
+
+      const client = yield* HttpClient.HttpClient;
+
+      const response = yield* HttpClientRequest.post("/api/tools/submit").pipe(
+        HttpClientRequest.bodyFormData(formData),
+        client.execute,
+        Effect.flatMap((res) => res.json)
+      );
+
+      return response;
+    }).pipe(Effect.provide(FetchHttpClient.layer));
+
+    const handledProgram = program.pipe(
+      Effect.matchEffect({
+        onFailure: (error) =>
+          Effect.sync(() => {
+            console.error("Submission error:", error);
+            if (isParseError(error)) {
+              const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
+              issues.forEach((issue) => {
+                const fieldName = issue
+                  .path[0] as keyof ToolSubmissionFormSchemaType;
+                setError(fieldName, { type: "server", message: issue.message });
+              });
+            } else {
+              setErrorMessage(
+                "An unexpected error occurred. Please try again."
+              );
+            }
+          }),
+
+        onSuccess: (response) =>
+          Effect.sync(() => {
+            console.log("Form success response: ", response);
+            setSuccessMessage("Tool submitted successfully!");
+            reset();
+          }),
+      }),
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+    );
+
+    await Effect.runPromise(handledProgram);
   };
 
   const message = successMessage || errorMessage;

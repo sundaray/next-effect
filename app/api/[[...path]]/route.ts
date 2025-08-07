@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
+import tools from "@/lib/tools";
 
-const app = new Hono().basePath("/app");
+const app = new Hono().basePath("/api");
 
-app.get("/hello", (ctx) => {
-  console.log("Request path: ", ctx.req.path);
-  return ctx.json({ message: "Hello world!" });
-});
+app.route("/tools", tools);
 
 export const GET = handle(app);
+export const POST = handle(app);
+export const PUT = handle(app);
+export const DELETE = handle(app);
