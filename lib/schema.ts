@@ -43,13 +43,7 @@ export const ToolSubmissionFormSchema = Schema.Struct({
       }
     )
   ),
-  categories: Schema.Array(
-    Schema.Trim.pipe(
-      Schema.nonEmptyString({
-        message: () => "Category cannot be empty.",
-      })
-    )
-  ).pipe(
+  categories: Schema.Array(Schema.String).pipe(
     Schema.minItems(1, {
       message: () => "At least one category is required.",
     }),

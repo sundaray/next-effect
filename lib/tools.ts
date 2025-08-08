@@ -6,8 +6,17 @@ const app = new Hono();
 
 app.post("/submit", async (ctx) => {
   const body = await ctx.req.parseBody();
+  const parsedBody = {
+    ...body,
+    categories: JSON.parse(body.categories as string),
+  };
+
   const program = Effect.gen(function* () {
-    yield* Schema.decodeUnknown(ToolSubmissionFormSchema)(body);
+    yield* Schema.decodeUnknown(ToolSubmissionFormSchema)(parsedBody);
+
+    return ctx.json({
+      message: "Tool submitted successfully!",
+    });
   });
 
   const handledProgram = pipe(

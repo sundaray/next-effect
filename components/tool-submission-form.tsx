@@ -101,24 +101,23 @@ export function ToolSubmissionForm() {
 
     const handledProgram = pipe(
       program,
-      Effect.map((apiResponse): { success: true; response: any } => ({
-        success: true,
-        response: apiResponse,
+      Effect.map((response: any) => ({
+        success: true as const,
+        response,
       })),
-      Effect.catchTag("RequestError", () =>
-        Effect.succeed(
-          setErrorMessage(
-            "A network error occurred. Please check your internet connection and try again."
-          )
-        )
-      ),
-      Effect.catchTag("ResponseError", () =>
-        Effect.succeed(
-          setErrorMessage(
-            "An unexpected server error occurred. Please try again."
-          )
-        )
-      ),
+      Effect.catchTag("RequestError", () => {
+        setErrorMessage(
+          "A network error occurred. Please check your internet connection and try again."
+        );
+        return Effect.succeed({ success: false as const });
+      }),
+      Effect.catchTag("ResponseError", (error) => {
+        console.log("Response error: ", error);
+        setErrorMessage(
+          "An unexpected server error occurred. Please try again."
+        );
+        return Effect.succeed({ success: false as const });
+      }),
       Effect.ensureErrorType<never>(),
       Effect.ensuring(Effect.sync(() => setIsProcessing(false))),
       Effect.provide(FetchHttpClient.layer)
