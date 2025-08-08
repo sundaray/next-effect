@@ -31,7 +31,7 @@ import {
 } from "@/lib/schema";
 import { redirect } from "next/navigation";
 import { ApiClientService } from "@/lib/services/apiClient-service";
-import { appRuntime } from "@/lib/client-runtime";
+import { clientRuntime } from "@/lib/client-runtime";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -119,7 +119,7 @@ export function ToolSubmissionForm() {
       Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
-    const result = await appRuntime.runPromise(handledProgram);
+    const result = await clientRuntime.runPromise(handledProgram);
 
     if (result.success) {
       const response = result.response;

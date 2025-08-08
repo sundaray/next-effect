@@ -5,4 +5,4 @@ const ApiClientServiceLayer = ApiClientService.Default;
 
 const AppLayer = Layer.mergeAll(ApiClientServiceLayer);
 
-export const appRuntime = ManagedRuntime.make(AppLayer);
+export const clientRuntime = ManagedRuntime.make(AppLayer);
