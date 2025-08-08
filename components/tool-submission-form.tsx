@@ -33,6 +33,7 @@ import {
   SUPPORTED_FILE_TYPES,
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
+import { redirect } from "next/navigation";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -89,16 +90,54 @@ export function ToolSubmissionForm() {
 
       const client = yield* HttpClient.HttpClient;
 
-      return yield* HttpClientRequest.post("/api/tools/submit").pipe(
-        HttpClientRequest.bodyFormData(formData),
-        client.execute,
-        Effect.flatMap((res) => res.json)
+      const request = HttpClientRequest.post("/api/tools/submit").pipe(
+        HttpClientRequest.bodyFormData(formData)
       );
-    }).pipe(Effect.provide(FetchHttpClient.layer));
 
-    const handledProgram = pipe(program);
+      const response = yield* client.execute(request);
 
-    await Effect.runPromise(program);
+      return yield* response.json;
+    });
+
+    const handledProgram = pipe(
+      program,
+      Effect.map((apiResponse): { success: true; response: any } => ({
+        success: true,
+        response: apiResponse,
+      })),
+      Effect.catchTag("RequestError", () =>
+        Effect.succeed(
+          setErrorMessage(
+            "A network error occurred. Please check your internet connection and try again."
+          )
+        )
+      ),
+      Effect.catchTag("ResponseError", () =>
+        Effect.succeed(
+          setErrorMessage(
+            "An unexpected server error occurred. Please try again."
+          )
+        )
+      ),
+      Effect.ensureErrorType<never>(),
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false))),
+      Effect.provide(FetchHttpClient.layer)
+    );
+
+    const result = await Effect.runPromise(handledProgram);
+
+    if (result.success) {
+      const response = result.response;
+      if (response.issues) {
+        response.issues.forEach((issue: any) => {
+          const fieldName = issue.path[0] as keyof ToolSubmissionFormSchemaType;
+          setError(fieldName, { type: "server", message: issue.message });
+        });
+      } else {
+        reset();
+        redirect("/submit/success");
+      }
+    }
   };
 
   const message = successMessage || errorMessage;

@@ -1,4 +1,3 @@
-import { useId, useState } from "react";
 import { useDropzone, FileRejection } from "react-dropzone";
 import {
   ControllerRenderProps,
@@ -11,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
 import { FileImage as FileImageIcon, X } from "lucide-react";
-import { getFieldErrorId } from "@/lib/utils";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 
 type DropzoneInputProps<
