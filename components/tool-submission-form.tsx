@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import {
@@ -31,6 +31,7 @@ import {
 } from "@/lib/schema";
 import { redirect } from "next/navigation";
 import { ApiClientService } from "@/lib/services/apiClient-service";
+import { appRuntime } from "@/lib/client-runtime";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -44,7 +45,6 @@ export const PREDEFINED_CATEGORIES = [
 ];
 
 export function ToolSubmissionForm() {
-  const id = useId();
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -119,7 +119,7 @@ export function ToolSubmissionForm() {
       Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
-    const result = await Effect.runPromise(handledProgram);
+    const result = await appRuntime.runPromise(handledProgram);
 
     if (result.success) {
       const response = result.response;
