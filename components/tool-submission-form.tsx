@@ -21,11 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Effect, pipe } from "effect";
-import {
-  FetchHttpClient,
-  HttpClient,
-  HttpClientRequest,
-} from "@effect/platform";
+import { HttpClientRequest } from "@effect/platform";
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
   LOGO_MAX_SIZE_MB,
@@ -34,6 +30,7 @@ import {
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
 import { redirect } from "next/navigation";
+import { ApiClientService } from "@/lib/services/apiClient-service";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -54,7 +51,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
-      // resolver: effectTsResolver(ToolSubmissionFormSchema),
+      resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -88,7 +85,7 @@ export function ToolSubmissionForm() {
       }
       formData.append("homepageScreenshot", data.homepageScreenshot);
 
-      const client = yield* HttpClient.HttpClient;
+      const client = yield* ApiClientService;
 
       const request = HttpClientRequest.post("/api/tools/submit").pipe(
         HttpClientRequest.bodyFormData(formData)
@@ -119,8 +116,7 @@ export function ToolSubmissionForm() {
         return Effect.succeed({ success: false as const });
       }),
       Effect.ensureErrorType<never>(),
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false))),
-      Effect.provide(FetchHttpClient.layer)
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
     const result = await Effect.runPromise(handledProgram);
