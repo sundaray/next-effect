@@ -98,22 +98,17 @@ export function ToolSubmissionForm() {
 
     const handledProgram = pipe(
       program,
-      Effect.map((response: any) => ({
-        success: true as const,
-        response,
-      })),
       Effect.catchTag("RequestError", () => {
         setErrorMessage(
           "A network error occurred. Please check your internet connection and try again."
         );
-        return Effect.succeed({ success: false as const });
+        return Effect.void;
       }),
-      Effect.catchTag("ResponseError", (error) => {
-        console.log("Response error: ", error);
+      Effect.catchTag("ResponseError", () => {
         setErrorMessage(
           "An unexpected server error occurred. Please try again."
         );
-        return Effect.succeed({ success: false as const });
+        return Effect.void;
       }),
       Effect.ensureErrorType<never>(),
       Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
@@ -121,17 +116,9 @@ export function ToolSubmissionForm() {
 
     const result = await clientRuntime.runPromise(handledProgram);
 
-    if (result.success) {
-      const response = result.response;
-      if (response.issues) {
-        response.issues.forEach((issue: any) => {
-          const fieldName = issue.path[0] as keyof ToolSubmissionFormSchemaType;
-          setError(fieldName, { type: "server", message: issue.message });
-        });
-      } else {
-        reset();
-        redirect("/submit/success");
-      }
+    if (result && result.success) {
+      reset();
+      redirect("/submit/success");
     }
   };
 
