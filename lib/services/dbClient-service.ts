@@ -1,23 +1,19 @@
-import { SESClient } from "@aws-sdk/client-ses";
 import { Config, Effect, Redacted } from "effect";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "@/db/schema";
 
 export class DbClientService extends Effect.Service<DbClientService>()(
   "DbClientService",
   {
     effect: Effect.gen(function* () {
-      const config = yield* Config.all({
-        region: Config.string("AWS_REGION"),
-        accessKeyId: Config.string("AWS_ACCESS_KEY_ID"),
-        secretAccessKey: Config.redacted("AWS_SECRET_ACCESS_KEY"),
-      });
+      const databaseUrl = Redacted.value(
+        yield* Config.redacted("DATABASE_URL")
+      );
 
-      return new SESClient({
-        region: config.region,
-        credentials: {
-          accessKeyId: config.accessKeyId,
-          secretAccessKey: Redacted.value(config.secretAccessKey),
-        },
-      });
+      const client = postgres(databaseUrl, { prepare: false });
+
+      return drizzle(client, { schema });
     }),
   }
 ) {}

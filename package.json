@@ -11,6 +11,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",
     "@aws-sdk/client-ses": "^3.863.0",
+    "@aws-sdk/credential-providers": "^3.863.0",
+    "@aws-sdk/s3-request-presigner": "^3.863.0",
     "@effect/platform": "^0.90.0",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.1",

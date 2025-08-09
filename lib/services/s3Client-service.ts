@@ -1,22 +1,23 @@
-import { SESClient } from "@aws-sdk/client-ses";
-import { Config, Effect, Redacted } from "effect";
+import { S3Client } from "@aws-sdk/client-s3";
+import { Config, Effect } from "effect";
+import { fromWebToken } from "@aws-sdk/credential-providers";
 
-export class SesClientService extends Effect.Service<SesClientService>()(
-  "SesClientService",
+export class S3ClientService extends Effect.Service<S3ClientService>()(
+  "S3ClientService",
   {
     effect: Effect.gen(function* () {
       const config = yield* Config.all({
         region: Config.string("AWS_REGION"),
-        accessKeyId: Config.string("AWS_ACCESS_KEY_ID"),
-        secretAccessKey: Config.redacted("AWS_SECRET_ACCESS_KEY"),
+        roleArn: Config.string("AWS_ROLE_ARN"),
+        bucketName: Config.string("S3_BUCKET_NAME"),
       });
 
-      return new SESClient({
+      return new S3Client({
         region: config.region,
-        credentials: {
-          accessKeyId: config.accessKeyId,
-          secretAccessKey: Redacted.value(config.secretAccessKey),
-        },
+        credentials: fromWebToken({
+          roleArn: config.roleArn,
+          webIdentityToken: process.env.VERCEL_OIDC_TOKEN!,
+        }),
       });
     }),
   }
