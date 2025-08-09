@@ -17,14 +17,13 @@ export class StorageService extends Effect.Service<StorageServiceImp>()(
   "EmailService",
   {
     effect: Effect.gen(function* () {
-      const s3Service = yield* S3ClientService;
+      const s3Client = yield* S3ClientService;
 
       return {
         use: (vercelOidcToken, f) =>
           Effect.tryPromise({
             try: () => {
-              const client = s3Service.getclient(vercelOidcToken);
-              return f(client);
+              return f(s3Client);
             },
             catch: (error) => new StorageError({ cause: error }),
           }),

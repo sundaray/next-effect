@@ -1,11 +1,17 @@
 import { Hono } from "hono";
 import { ToolSubmissionFormSchema } from "@/lib/schema";
-import { Effect, Schema, pipe, ParseResult } from "effect";
+import { Effect, Schema, Config, Data, pipe, ParseResult } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
+import { StorageService } from "@/lib/services/storage-service";
 import { serverRuntime } from "@/lib/server-runtime";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
+import { randomUUID } from "node:crypto";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 const app = new Hono();
+
+class PresignedUrlGenerationError extends Data.TaggedError(
+  "PresignedUrlGenerationError"
+)<{ cause: unknown }> {}
 
 // -----------------------------------------------
 
@@ -19,12 +25,40 @@ app.post("/presigned-url", async (ctx) => {
     categories: JSON.parse(body.categories as string),
   };
 
-  console.log("Parsed body: ", parsedBody);
-
   const program = Effect.gen(function* () {
-    yield* Schema.decodeUnknown(ToolSubmissionFormSchema)(parsedBody);
+    const validatedFormData = yield* Schema.decodeUnknown(
+      ToolSubmissionFormSchema
+    )(parsedBody);
 
-    // create presigned URLs
+    const storageService = yield* StorageService;
+    const vercelOicdToken = process.env.VERCEL_OICD_TOKEN!;
+
+    // --- Generate Homepage Screenshot Upload URL (Required) ---
+
+    const homepageScreenshotFile = validatedFormData.homepageScreenshot;
+    const homepageScreenshotKey = `homepage-screenshots/${randomUUID()}.${homepageScreenshotFile.name
+      .split(".")
+      .pop()}`;
+
+    const homepageScreenshotUploadUrl = yield* storageService
+      .use(vercelOicdToken, (client) =>
+        getSignedUrl(
+          client,
+          new PutObjectCommand({
+            Bucket: yield* Config.string("S3_BUCKET_NAME"),
+            Key: homepageScreenshotKey,
+            ContentType: homepageScreenshotFile.type,
+          }),
+          { expiresIn: 600 } // 10 minutes
+        )
+      )
+      .pipe(
+        Effect.mapError(
+          (error) => new PresignedUrlGenerationError({ cause: error })
+        )
+      );
+
+    // --- Generate Logo Upload URL (If logo exists) ---
 
     return ctx.json({
       message: "Tool submitted successfully!",

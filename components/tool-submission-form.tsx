@@ -87,7 +87,7 @@ export function ToolSubmissionForm() {
 
       const client = yield* ApiClientService;
 
-      const request = HttpClientRequest.post("/api/tools/submit").pipe(
+      const request = HttpClientRequest.post("/api/tools/presigned-url").pipe(
         HttpClientRequest.bodyFormData(formData)
       );
 
