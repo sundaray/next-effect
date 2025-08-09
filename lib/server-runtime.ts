@@ -7,4 +7,4 @@ const DbClientServiceLayer = DbClientService.Default;
 
 const AppLayer = Layer.mergeAll(DatabaseServiceLayer, DbClientServiceLayer);
 
-export const serviceRuntime = ManagedRuntime.make(AppLayer);
+export const serverRuntime = ManagedRuntime.make(AppLayer);

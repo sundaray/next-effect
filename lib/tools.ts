@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { ToolSubmissionFormSchema } from "@/lib/schema";
 import { Effect, Schema, pipe, ParseResult } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
-import { serviceRuntime } from "@/lib/service-runtime";
+import { serverRuntime } from "@/lib/server-runtime";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const app = new Hono();
 
@@ -18,10 +19,12 @@ app.post("/presigned-url", async (ctx) => {
     categories: JSON.parse(body.categories as string),
   };
 
+  console.log("Parsed body: ", parsedBody);
+
   const program = Effect.gen(function* () {
     yield* Schema.decodeUnknown(ToolSubmissionFormSchema)(parsedBody);
 
-    // create a presigned URL and send back
+    // create presigned URLs
 
     return ctx.json({
       message: "Tool submitted successfully!",
@@ -37,7 +40,7 @@ app.post("/presigned-url", async (ctx) => {
     Effect.ensureErrorType<never>()
   );
 
-  return await serviceRuntime.runPromise(handledProgram);
+  return await serverRuntime.runPromise(handledProgram);
 });
 
 // -----------------------------------------------
@@ -78,11 +81,16 @@ app.post("/upload", async (ctx) => {
   const handledProgram = pipe(
     program,
     Effect.catchTag("DatabaseError", (error) => {
-      return Effect.succeed(ctx.json({ error: { message: "" } }));
-    })
+      return Effect.succeed(
+        ctx.json({
+          message: "Failed to save tool. Please try again.",
+        })
+      );
+    }),
+    Effect.ensureErrorType<never>()
   );
 
-  return await serviceRuntime.runPromise(handledProgram);
+  return await serverRuntime.runPromise(handledProgram);
 });
 
 export default app;
