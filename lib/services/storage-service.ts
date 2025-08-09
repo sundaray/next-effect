@@ -8,6 +8,7 @@ class StorageError extends Data.TaggedError("StorageError")<{
 
 type StorageServiceImp = {
   use: <A>(
+    vercelOidcToken: string,
     f: (client: S3Client) => Promise<A>
   ) => Effect.Effect<A, StorageError>;
 };
@@ -16,12 +17,15 @@ export class StorageService extends Effect.Service<StorageServiceImp>()(
   "EmailService",
   {
     effect: Effect.gen(function* () {
-      const s3Client = yield* S3ClientService;
+      const s3Service = yield* S3ClientService;
 
       return {
-        use: (f) =>
+        use: (vercelOidcToken, f) =>
           Effect.tryPromise({
-            try: () => f(s3Client),
+            try: () => {
+              const client = s3Service.getclient(vercelOidcToken);
+              return f(client);
+            },
             catch: (error) => new StorageError({ cause: error }),
           }),
       } satisfies StorageServiceImp;

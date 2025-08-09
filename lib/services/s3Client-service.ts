@@ -12,13 +12,16 @@ export class S3ClientService extends Effect.Service<S3ClientService>()(
         bucketName: Config.string("S3_BUCKET_NAME"),
       });
 
-      return new S3Client({
-        region: config.region,
-        credentials: fromWebToken({
-          roleArn: config.roleArn,
-          webIdentityToken: process.env.VERCEL_OIDC_TOKEN!,
-        }),
-      });
+      return {
+        getclient: (vercelOidcToken: string) =>
+          new S3Client({
+            region: config.region,
+            credentials: fromWebToken({
+              roleArn: config.roleArn,
+              webIdentityToken: vercelOidcToken,
+            }),
+          }),
+      };
     }),
   }
 ) {}
