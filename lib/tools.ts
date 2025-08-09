@@ -1,6 +1,14 @@
 import { Hono } from "hono";
 import { ToolSubmissionFormSchema } from "@/lib/schema";
-import { Effect, Schema, Config, Data, pipe, ParseResult } from "effect";
+import {
+  Effect,
+  Schema,
+  Config,
+  Data,
+  pipe,
+  ParseResult,
+  Option,
+} from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
 import { StorageService } from "@/lib/services/storage-service";
 import { serverRuntime } from "@/lib/server-runtime";
@@ -41,9 +49,9 @@ app.post("/presigned-url", async (ctx) => {
       .pop()}`;
 
     const homepageScreenshotUploadUrl = yield* storageService
-      .use(vercelOicdToken, (client) =>
+      .use((s3Client) =>
         getSignedUrl(
-          client,
+          s3Client,
           new PutObjectCommand({
             Bucket: yield* Config.string("S3_BUCKET_NAME"),
             Key: homepageScreenshotKey,
@@ -60,8 +68,49 @@ app.post("/presigned-url", async (ctx) => {
 
     // --- Generate Logo Upload URL (If logo exists) ---
 
+    let logoUploadDetails: Option.Option<{
+      logoUploadUrl: string;
+      logoKey: string;
+    }> = Option.none();
+
+    if (validatedFormData.logo) {
+      const logoFile = validatedFormData.logo as File;
+      const logoKey = `logos/${randomUUID()}.${logoFile.name.split(".").pop()}`;
+
+      const logoUploadUrl = yield* storageService
+        .use((s3) =>
+          getSignedUrl(
+            s3,
+            new PutObjectCommand({
+              Bucket: "indie-ai-tools",
+              Key: logoKey,
+              ContentType: logoFile.type,
+            }),
+            { expiresIn: 600 }
+          )
+        )
+        .pipe(
+          Effect.mapError(
+            (error) => new PresignedUrlGenerationError({ cause: error })
+          )
+        );
+
+      logoUploadDetails = Option.some({ logoUploadUrl, logoKey });
+    }
+
+    const responsepayload = {
+      homepageScreenshotUploadUrl,
+      homepageScreenshotKey,
+      ...Option.getOrUndefined(
+        Option.map(logoUploadDetails, (details) => ({
+          logoUploadUrl: details.logoUploadUrl,
+          logoKey: details.logoKey,
+        }))
+      ),
+    };
+
     return ctx.json({
-      message: "Tool submitted successfully!",
+      responsepayload,
     });
   });
 
@@ -71,6 +120,14 @@ app.post("/presigned-url", async (ctx) => {
       const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
       return Effect.succeed(ctx.json({ issues }));
     }),
+    Effect.catchTag("PresignedUrlGenerationError", () =>
+      Effect.succeed(
+        ctx.json({
+          message: "Couldn't generate file upload URL. Please try again.",
+        })
+      )
+    ),
+
     Effect.ensureErrorType<never>()
   );
 
