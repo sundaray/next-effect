@@ -27,5 +27,6 @@ export class DatabaseService extends Effect.Service<DatabaseService>()(
           }),
       } satisfies DatabaseServiceImp;
     }),
+    dependencies: [DbClientService.Default],
   }
 ) {}
