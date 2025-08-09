@@ -74,6 +74,8 @@ export function ToolSubmissionForm() {
     const program = Effect.gen(function* () {
       const formData = new FormData();
 
+      // --- Step 1: Get presigned URLs ---
+
       formData.append("name", data.name);
       formData.append("website", data.website);
       formData.append("tagline", data.tagline);
@@ -87,17 +89,46 @@ export function ToolSubmissionForm() {
 
       const client = yield* ApiClientService;
 
-      const request = HttpClientRequest.post("/api/tools/presigned-url").pipe(
-        HttpClientRequest.bodyFormData(formData)
-      );
+      const presignedUrlRequest = HttpClientRequest.post(
+        "/api/tools/presigned-url"
+      ).pipe(HttpClientRequest.bodyFormData(formData));
 
-      const response = yield* client.execute(request);
+      const presignedUrlResponse = yield* client.execute(presignedUrlRequest);
 
-      const presignedUrlsPayload = yield* response.json;
+      const {
+        logoKey,
+        homepageScreenshotKey,
+        logoUploadUrl,
+        homepageScreenshotUploadUrl,
+      } = yield* presignedUrlResponse.json;
 
       // --- Step 2: Upload logo and homepage screenshot to the S3 bucket ---
+      const uploadEffects = [];
 
-      // --- Step 3: Send tool data to the /upload endpoint ---
+      const homepageScreenshotUploadEffect = Effect.gen(function* () {
+        const request = HttpClientRequest.put(homepageScreenshotUploadUrl).pipe(
+          HttpClientRequest.bodyFileWeb(data.homepageScreenshot)
+        );
+        return yield* client.execute(request);
+      });
+      uploadEffects.push(homepageScreenshotUploadEffect);
+
+      if (data.logo) {
+        const logoFile = data.logo;
+
+        const logoUploadEffect = Effect.gen(function* () {
+          const request = HttpClientRequest.put(logoUploadUrl).pipe(
+            HttpClientRequest.bodyFileWeb(logoFile)
+          );
+          return yield* client.execute(request);
+        });
+
+        uploadEffects.push(logoUploadEffect);
+      }
+      // Run uploads in parallel. Fails if any single upload fails.
+      yield* Effect.all(uploadEffects, { concurrency: "unbounded" });
+
+      // --- Step 3: Send tool data to the "/api/tools/upload" endpoint ---
       const toolUploadPayload = {
         name: data.name,
         website: data.website,
@@ -105,15 +136,16 @@ export function ToolSubmissionForm() {
         description: data.description,
         pricing: data.pricing,
         categories: data.categories,
-        homepageScreenshotUrl: presignedUrlsPayload.homepageScreenshotKey,
-        logoUrl: presignedUrlsPayload.logoKey || null,
+        homepageScreenshotUrl: homepageScreenshotKey,
+        logoUrl: logoKey || null,
       };
 
-      const toolUploadRequest = HttpClientRequest.post(
+      const toolUploadRequest = yield* HttpClientRequest.post(
         "/api/tools/upload"
       ).pipe(HttpClientRequest.bodyJson(toolUploadPayload));
 
       const toolUploadResponse = yield* client.execute(toolUploadRequest);
+
       return yield* toolUploadResponse.json;
     });
 
