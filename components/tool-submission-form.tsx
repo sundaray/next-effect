@@ -93,7 +93,28 @@ export function ToolSubmissionForm() {
 
       const response = yield* client.execute(request);
 
-      return yield* response.json;
+      const presignedUrlsPayload = yield* response.json;
+
+      // --- Step 2: Upload logo and homepage screenshot to the S3 bucket ---
+
+      // --- Step 3: Send tool data to the /upload endpoint ---
+      const toolUploadPayload = {
+        name: data.name,
+        website: data.website,
+        tagline: data.tagline,
+        description: data.description,
+        pricing: data.pricing,
+        categories: data.categories,
+        homepageScreenshotUrl: presignedUrlsPayload.homepageScreenshotKey,
+        logoUrl: presignedUrlsPayload.logoKey || null,
+      };
+
+      const toolUploadRequest = HttpClientRequest.post(
+        "/api/tools/upload"
+      ).pipe(HttpClientRequest.bodyJson(toolUploadPayload));
+
+      const toolUploadResponse = yield* client.execute(toolUploadRequest);
+      return yield* toolUploadResponse.json;
     });
 
     const handledProgram = pipe(
@@ -113,7 +134,6 @@ export function ToolSubmissionForm() {
       Effect.ensureErrorType<never>(),
       Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
-
     const result = await clientRuntime.runPromise(handledProgram);
 
     if (result && result.success) {
