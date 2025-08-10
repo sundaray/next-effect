@@ -32,6 +32,7 @@ import {
 import { redirect } from "next/navigation";
 import { ApiClientService } from "@/lib/services/apiClient-service";
 import { clientRuntime } from "@/lib/client-runtime";
+import { getpresignedUrls } from "@/lib/get-presigned-urls";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -72,35 +73,7 @@ export function ToolSubmissionForm() {
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
-      const formData = new FormData();
-
-      // --- Step 1: Get presigned URLs ---
-
-      formData.append("name", data.name);
-      formData.append("website", data.website);
-      formData.append("tagline", data.tagline);
-      formData.append("description", data.description);
-      formData.append("pricing", data.pricing);
-      formData.append("categories", JSON.stringify(data.categories));
-      if (data.logo) {
-        formData.append("logo", data.logo);
-      }
-      formData.append("homepageScreenshot", data.homepageScreenshot);
-
-      const client = yield* ApiClientService;
-
-      const presignedUrlRequest = HttpClientRequest.post(
-        "/api/tools/presigned-url"
-      ).pipe(HttpClientRequest.bodyFormData(formData));
-
-      const presignedUrlResponse = yield* client.execute(presignedUrlRequest);
-
-      const {
-        logoKey,
-        homepageScreenshotKey,
-        logoUploadUrl,
-        homepageScreenshotUploadUrl,
-      } = yield* presignedUrlResponse.json;
+      const response = yield* getpresignedUrls(data);
 
       // --- Step 2: Upload logo and homepage screenshot to the S3 bucket ---
       const uploadEffects = [];

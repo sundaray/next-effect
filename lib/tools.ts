@@ -113,7 +113,7 @@ app.post("/presigned-url", async (ctx) => {
 
     return ctx.json({
       success: true as const,
-      responsepayload,
+      response: responsepayload,
     });
   });
 
