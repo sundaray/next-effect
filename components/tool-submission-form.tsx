@@ -33,6 +33,8 @@ import { redirect } from "next/navigation";
 import { ApiClientService } from "@/lib/services/apiClient-service";
 import { clientRuntime } from "@/lib/client-runtime";
 import { getpresignedUrls } from "@/lib/get-presigned-urls";
+import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
+import { Struct } from "effect";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -73,38 +75,9 @@ export function ToolSubmissionForm() {
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
-      const {
-        logoKey,
-        homepageScreenshotKey,
-        logoUploadUrl,
-        homepageScreenshotUploadUrl,
-      } = yield* getpresignedUrls(data);
+      const presignedUrlsData = yield* getpresignedUrls(data);
 
-      // --- Step 2: Upload logo and homepage screenshot to the S3 bucket ---
-      const uploadEffects = [];
-
-      const homepageScreenshotUploadEffect = Effect.gen(function* () {
-        const request = HttpClientRequest.put(homepageScreenshotUploadUrl).pipe(
-          HttpClientRequest.bodyFileWeb(data.homepageScreenshot)
-        );
-        return yield* client.execute(request);
-      });
-      uploadEffects.push(homepageScreenshotUploadEffect);
-
-      if (data.logo) {
-        const logoFile = data.logo;
-
-        const logoUploadEffect = Effect.gen(function* () {
-          const request = HttpClientRequest.put(logoUploadUrl).pipe(
-            HttpClientRequest.bodyFileWeb(logoFile)
-          );
-          return yield* client.execute(request);
-        });
-
-        uploadEffects.push(logoUploadEffect);
-      }
-      // Run uploads in parallel. Fails if any single upload fails.
-      yield* Effect.all(uploadEffects, { concurrency: "unbounded" });
+      yield* uploadFilesToS3();
 
       // --- Step 3: Send tool data to the "/api/tools/upload" endpoint ---
       const toolUploadPayload = {
@@ -115,7 +88,7 @@ export function ToolSubmissionForm() {
         pricing: data.pricing,
         categories: data.categories,
         homepageScreenshotUrl: homepageScreenshotKey,
-        logoUrl: logoKey || null,
+        logoUrl: logoKey,
       };
 
       const toolUploadRequest = yield* HttpClientRequest.post(
