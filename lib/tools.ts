@@ -118,16 +118,20 @@ app.post("/presigned-url", async (ctx) => {
     program,
     Effect.catchTag("ParseError", (error) => {
       const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-      return Effect.succeed(ctx.json({ error: issues }, { status: 400 }));
+      Effect.logError("ConfigError: ", error);
+      return Effect.succeed(
+        ctx.json({ _tag: "ParseError", issues }, { status: 400 })
+      );
     }),
     Effect.catchTag("ConfigError", (error) => {
+      Effect.logError("ConfigError backend: ", error);
+
       return Effect.succeed(
         ctx.json(
           {
-            error: {
-              message:
-                "S3_BUCKET_NAME environment variable is not found. Please try again.",
-            },
+            _tag: "ConfigError",
+            message:
+              "S3_BUCKET_NAME environment variable is not found. Please try again.",
           },
           { status: 500 }
         )
@@ -137,7 +141,8 @@ app.post("/presigned-url", async (ctx) => {
       Effect.succeed(
         ctx.json(
           {
-            error: "Failed to generate file upload URLs. Please try again.",
+            _tag: "PresignedUrlGenerationError",
+            message: "Failed to generate file upload URLs. Please try again.",
           },
           { status: 500 }
         )

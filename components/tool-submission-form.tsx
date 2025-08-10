@@ -27,6 +27,8 @@ import {
   SUPPORTED_FILE_TYPES,
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
+import { getPresignedUrls } from "@/lib/get-presigned-urls";
+import type { GetPresignedUrlsError } from "@/lib/get-presigned-urls";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -44,9 +46,34 @@ export function ToolSubmissionForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  function handleError(error: GetPresignedUrlsError) {
+    setErrorMessage(null);
+
+    switch (error._tag) {
+      case "ParseError":
+        error.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof ToolSubmissionFormSchemaType;
+          if (field) {
+            setError(field, { type: "server", message: issue.message });
+          }
+        });
+        break;
+
+      case "ConfigError":
+      case "PresignedUrlGenerationError":
+      case "NetworkError":
+      case "ResponseBodyParseError":
+        setErrorMessage(error.message);
+        break;
+
+      default:
+        setErrorMessage("An unexpected error occurred. Please try again.");
+    }
+  }
+
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
-      resolver: effectTsResolver(ToolSubmissionFormSchema),
+      // resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -66,20 +93,17 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const formData = new FormData();
-
-    formData.append("name", data.name);
-    formData.append("website", data.website);
-    formData.append("tagline", data.tagline);
-    formData.append("description", data.description);
-    formData.append("pricing", data.pricing);
-    formData.append("categories", JSON.stringify(data.categories));
-    if (data.logo) {
-      formData.append("logo", data.logo);
-    }
-    formData.append("homepageScreenshot", data.homepageScreenshot);
-
     // Get presigned URLs
+    const response = await getPresignedUrls(data);
+
+    if (response.isErr()) {
+      const error = response.error;
+      handleError(error);
+      setIsProcessing(false);
+      return;
+    }
+
+    const presignedUrlsData = response.value;
 
     // Upload logo and homepage screenshot to S3
 
