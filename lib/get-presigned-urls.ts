@@ -1,13 +1,17 @@
 import { Effect, Schema } from "effect";
-import { HttpClientRequest, HttpClientResponse } from "@effect/platform";
+import {
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+} from "@effect/platform";
 import { ApiClientService } from "@/lib/services/apiClient-service";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
 
 const GetPresignedUrlsSchema = Schema.Struct({
   homepageScreenshotUploadUrl: Schema.String,
   homepageScreenshotKey: Schema.String,
-  logoUploadUrl: Schema.String,
-  logoKey: Schema.String,
+  logoUploadUrl: Schema.optional(Schema.String),
+  logoKey: Schema.optional(Schema.String),
 });
 
 export function getpresignedUrls(data: ToolSubmissionFormSchemaType) {
@@ -25,7 +29,9 @@ export function getpresignedUrls(data: ToolSubmissionFormSchemaType) {
     }
     formData.append("homepageScreenshot", data.homepageScreenshot);
 
-    const client = yield* ApiClientService;
+    const baseClient = yield* ApiClientService;
+
+    const client = baseClient.pipe(HttpClient.filterStatusOk);
 
     const request = HttpClientRequest.post("/api/tools/presigned-url").pipe(
       HttpClientRequest.bodyFormData(formData)

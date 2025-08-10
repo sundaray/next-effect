@@ -34,7 +34,7 @@ import { ApiClientService } from "@/lib/services/apiClient-service";
 import { clientRuntime } from "@/lib/client-runtime";
 import { getpresignedUrls } from "@/lib/get-presigned-urls";
 import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
-import { Struct } from "effect";
+import { Struct, Option } from "effect";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -77,31 +77,52 @@ export function ToolSubmissionForm() {
     const program = Effect.gen(function* () {
       const presignedUrlsData = yield* getpresignedUrls(data);
 
-      yield* uploadFilesToS3();
+      let logoOption: Option.Option<{ file: File; uploadUrl: string }>;
+
+      if (data.logo && presignedUrlsData.logoUploadUrl) {
+        logoOption = Option.some({
+          file: data.logo,
+          uploadUrl: presignedUrlsData.logoUploadUrl,
+        });
+      } else {
+        logoOption = Option.none();
+      }
+
+      yield* uploadFilesToS3({
+        logo: logoOption,
+        homepageScreenshot: {
+          file: data.homepageScreenshot,
+          uploadUrl: presignedUrlsData.homepageScreenshotUploadUrl,
+        },
+      });
 
       // --- Step 3: Send tool data to the "/api/tools/upload" endpoint ---
-      const toolUploadPayload = {
-        name: data.name,
-        website: data.website,
-        tagline: data.tagline,
-        description: data.description,
-        pricing: data.pricing,
-        categories: data.categories,
-        homepageScreenshotUrl: homepageScreenshotKey,
-        logoUrl: logoKey,
-      };
+      // const toolUploadPayload = {
+      //   name: data.name,
+      //   website: data.website,
+      //   tagline: data.tagline,
+      //   description: data.description,
+      //   pricing: data.pricing,
+      //   categories: data.categories,
+      //   homepageScreenshotUrl: presignedUrlsData.homepageScreenshotKey,
+      //   logoUrl: presignedUrlsData.logoKey,
+      // };
 
-      const toolUploadRequest = yield* HttpClientRequest.post(
-        "/api/tools/upload"
-      ).pipe(HttpClientRequest.bodyJson(toolUploadPayload));
+      // const toolUploadRequest = yield* HttpClientRequest.post(
+      //   "/api/tools/upload"
+      // ).pipe(HttpClientRequest.bodyJson(toolUploadPayload));
 
-      const toolUploadResponse = yield* client.execute(toolUploadRequest);
+      // const toolUploadResponse = yield* client.execute(toolUploadRequest);
 
-      return yield* toolUploadResponse.json;
+      // return yield* toolUploadResponse.json;
     });
 
     const handledProgram = pipe(
       program,
+      Effect.catchTag("ParseError", () => {
+        // Map through issues and use setError to set form field error messages.
+        return Effect.void;
+      }),
       Effect.catchTag("RequestError", () => {
         setErrorMessage(
           "A network error occurred. Please check your internet connection and try again."
@@ -119,7 +140,7 @@ export function ToolSubmissionForm() {
     );
     const result = await clientRuntime.runPromise(handledProgram);
 
-    if (result && result.success) {
+    if (result) {
       reset();
       redirect("/submit/success");
     }
