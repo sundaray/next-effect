@@ -194,10 +194,12 @@ app.post("/upload", async (ctx) => {
     program,
     Effect.catchTag("ToolCreationError", () => {
       return Effect.succeed(
-        ctx.json({
-          success: false as const,
-          message: "Failed to save tool to the database. Please try again.",
-        })
+        ctx.json(
+          {
+            message: "Failed to save tool to the database. Please try again.",
+          },
+          { status: 500 }
+        )
       );
     }),
     Effect.ensureErrorType<never>()

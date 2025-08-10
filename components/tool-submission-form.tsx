@@ -35,6 +35,7 @@ import { clientRuntime } from "@/lib/client-runtime";
 import { getpresignedUrls } from "@/lib/get-presigned-urls";
 import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
 import { Struct, Option } from "effect";
+import { uploadTool } from "@/lib/upload-tool";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -96,25 +97,18 @@ export function ToolSubmissionForm() {
         },
       });
 
-      // --- Step 3: Send tool data to the "/api/tools/upload" endpoint ---
-      // const toolUploadPayload = {
-      //   name: data.name,
-      //   website: data.website,
-      //   tagline: data.tagline,
-      //   description: data.description,
-      //   pricing: data.pricing,
-      //   categories: data.categories,
-      //   homepageScreenshotUrl: presignedUrlsData.homepageScreenshotKey,
-      //   logoUrl: presignedUrlsData.logoKey,
-      // };
+      const uploadedTool = yield* uploadTool({
+        name: data.name,
+        website: data.website,
+        tagline: data.tagline,
+        description: data.description,
+        pricing: data.pricing,
+        categories: data.categories,
+        homepageScreenshotKey: presignedUrlsData.homepageScreenshotKey,
+        logoKey: presignedUrlsData.logoKey,
+      });
 
-      // const toolUploadRequest = yield* HttpClientRequest.post(
-      //   "/api/tools/upload"
-      // ).pipe(HttpClientRequest.bodyJson(toolUploadPayload));
-
-      // const toolUploadResponse = yield* client.execute(toolUploadRequest);
-
-      // return yield* toolUploadResponse.json;
+      return uploadedTool;
     });
 
     const handledProgram = pipe(
@@ -127,6 +121,10 @@ export function ToolSubmissionForm() {
         setErrorMessage(
           "A network error occurred. Please check your internet connection and try again."
         );
+        return Effect.void;
+      }),
+      Effect.catchTag("HttpBodyError", () => {
+        setErrorMessage("HTTP body error.");
         return Effect.void;
       }),
       Effect.catchTag("ResponseError", () => {
