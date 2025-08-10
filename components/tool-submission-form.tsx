@@ -73,7 +73,12 @@ export function ToolSubmissionForm() {
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
-      const response = yield* getpresignedUrls(data);
+      const {
+        logoKey,
+        homepageScreenshotKey,
+        logoUploadUrl,
+        homepageScreenshotUploadUrl,
+      } = yield* getpresignedUrls(data);
 
       // --- Step 2: Upload logo and homepage screenshot to the S3 bucket ---
       const uploadEffects = [];
