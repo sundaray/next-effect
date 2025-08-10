@@ -75,73 +75,24 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const program = Effect.gen(function* () {
-      const presignedUrlsData = yield* getpresignedUrls(data);
+    const formData = new FormData();
 
-      let logoOption: Option.Option<{ file: File; uploadUrl: string }>;
-
-      if (data.logo && presignedUrlsData.logoUploadUrl) {
-        logoOption = Option.some({
-          file: data.logo,
-          uploadUrl: presignedUrlsData.logoUploadUrl,
-        });
-      } else {
-        logoOption = Option.none();
-      }
-
-      yield* uploadFilesToS3({
-        logo: logoOption,
-        homepageScreenshot: {
-          file: data.homepageScreenshot,
-          uploadUrl: presignedUrlsData.homepageScreenshotUploadUrl,
-        },
-      });
-
-      const uploadedTool = yield* uploadTool({
-        name: data.name,
-        website: data.website,
-        tagline: data.tagline,
-        description: data.description,
-        pricing: data.pricing,
-        categories: data.categories,
-        homepageScreenshotKey: presignedUrlsData.homepageScreenshotKey,
-        logoKey: presignedUrlsData.logoKey,
-      });
-
-      return uploadedTool;
-    });
-
-    const handledProgram = pipe(
-      program,
-      Effect.catchTag("ParseError", () => {
-        // Map through issues and use setError to set form field error messages.
-        return Effect.void;
-      }),
-      Effect.catchTag("RequestError", () => {
-        setErrorMessage(
-          "A network error occurred. Please check your internet connection and try again."
-        );
-        return Effect.void;
-      }),
-      Effect.catchTag("HttpBodyError", () => {
-        setErrorMessage("HTTP body error.");
-        return Effect.void;
-      }),
-      Effect.catchTag("ResponseError", () => {
-        setErrorMessage(
-          "An unexpected server error occurred. Please try again."
-        );
-        return Effect.void;
-      }),
-      Effect.ensureErrorType<never>(),
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
-    );
-    const result = await clientRuntime.runPromise(handledProgram);
-
-    if (result) {
-      reset();
-      redirect("/submit/success");
+    formData.append("name", data.name);
+    formData.append("website", data.website);
+    formData.append("tagline", data.tagline);
+    formData.append("description", data.description);
+    formData.append("pricing", data.pricing);
+    formData.append("categories", JSON.stringify(data.categories));
+    if (data.logo) {
+      formData.append("logo", data.logo);
     }
+    formData.append("homepageScreenshot", data.homepageScreenshot);
+
+    // Get presigned URLs
+
+    // Upload logo and homepage screenshot to S3
+
+    // Save tool in the database
   };
 
   const message = successMessage || errorMessage;

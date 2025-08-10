@@ -124,8 +124,10 @@ app.post("/presigned-url", async (ctx) => {
       return Effect.succeed(
         ctx.json(
           {
-            error:
-              "S3_BUCKET_NAME environment variable is not found. Please try again.",
+            error: {
+              message:
+                "S3_BUCKET_NAME environment variable is not found. Please try again.",
+            },
           },
           { status: 500 }
         )
