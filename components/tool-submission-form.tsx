@@ -20,8 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Effect, pipe } from "effect";
-import { HttpClientRequest } from "@effect/platform";
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
   LOGO_MAX_SIZE_MB,
@@ -29,13 +27,6 @@ import {
   SUPPORTED_FILE_TYPES,
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
-import { redirect } from "next/navigation";
-import { ApiClientService } from "@/lib/services/apiClient-service";
-import { clientRuntime } from "@/lib/client-runtime";
-import { getpresignedUrls } from "@/lib/get-presigned-urls";
-import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
-import { Struct, Option } from "effect";
-import { uploadTool } from "@/lib/upload-tool";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
