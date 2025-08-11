@@ -7,10 +7,13 @@ type UploadFilesToS3Params = {
   logoUploadUrl?: string;
 };
 
-type FileUploadError = {
-  _tag: string;
-  message: string;
-};
+class FileUploadError extends Error {
+  readonly _tag = "FileUploadError" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "FileUploadError";
+  }
+}
 
 export async function uploadFilesToS3(
   params: UploadFilesToS3Params
@@ -53,10 +56,11 @@ export async function uploadFilesToS3(
     // 4. Check if all uploads were successful
     for (const response of responses) {
       if (!response.ok) {
-        return err({
-          _tag: "FileUploadError",
-          message: "Failed to upload files to storage. Please try again.",
-        } as FileUploadError);
+        return err(
+          new FileUploadError(
+            "Failed to upload files to storage. Please try again."
+          )
+        );
       }
     }
 

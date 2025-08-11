@@ -48,7 +48,7 @@ export function ToolSubmissionForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  function handleError(error: GetPresignedUrlsError | FileUploadError) {
+  function handleError(error: GetPresignedUrlsError) {
     setErrorMessage(null);
 
     switch (error._tag) {
@@ -100,7 +100,29 @@ export function ToolSubmissionForm() {
 
     if (response.isErr()) {
       const error = response.error;
-      handleError(error);
+      setErrorMessage(null);
+
+      switch (error._tag) {
+        case "ParseError":
+          error.issues.forEach((issue) => {
+            const field = issue.path[0] as keyof ToolSubmissionFormSchemaType;
+            if (field) {
+              setError(field, { type: "server", message: issue.message });
+            }
+          });
+          break;
+
+        case "ConfigError":
+        case "PresignedUrlGenerationError":
+        case "NetworkError":
+        case "ResponseBodyParseError":
+          setErrorMessage(error.message);
+          break;
+
+        default:
+          setErrorMessage("An unexpected error occurred. Please try again.");
+      }
+
       setIsProcessing(false);
       return;
     }

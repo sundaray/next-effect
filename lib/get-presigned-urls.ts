@@ -16,10 +16,15 @@ class ConfigError extends Error {
   }
 }
 
-type ParseError = {
-  _tag: "ParseError";
-  issues: { message: string; path: (string | number)[] }[];
-};
+class ParseError extends Error {
+  readonly _tag = "ParseError" as const;
+  constructor(
+    readonly issues: { message: string; path: (string | number)[] }[]
+  ) {
+    super();
+    this.name = "ParseError";
+  }
+}
 
 class PresignedUrlGenerationError extends Error {
   readonly _tag = "PresignedUrlGenerationError" as const;
