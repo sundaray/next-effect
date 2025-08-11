@@ -28,7 +28,9 @@ import {
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
 import { getPresignedUrls } from "@/lib/get-presigned-urls";
+import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
 import type { GetPresignedUrlsError } from "@/lib/get-presigned-urls";
+import type { FileUploadError } from "@/lib/upload-files-to-s3";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -46,7 +48,7 @@ export function ToolSubmissionForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  function handleError(error: GetPresignedUrlsError) {
+  function handleError(error: GetPresignedUrlsError | FileUploadError) {
     setErrorMessage(null);
 
     switch (error._tag) {
@@ -103,9 +105,26 @@ export function ToolSubmissionForm() {
       return;
     }
 
-    const presignedUrlsData = response.value;
+    const {
+      logoKey,
+      logoUploadUrl,
+      homepageScreenshotKey,
+      homepageScreenshotUploadUrl,
+    } = response.value;
 
     // Upload logo and homepage screenshot to S3
+    const uploadResult = await uploadFilesToS3({
+      homepageScreenshot: data.homepageScreenshot,
+      homepageScreenshotUploadUrl,
+      logo: data.logo,
+      logoUploadUrl,
+    });
+
+    if (uploadResult.isErr()) {
+      handleError(uploadResult.error);
+      setIsProcessing(false);
+      return;
+    }
 
     // Save tool in the database
   };

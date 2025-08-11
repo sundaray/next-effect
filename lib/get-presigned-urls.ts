@@ -8,36 +8,48 @@ type GetPresignedUrlResponse = {
   logoKey?: string;
 };
 
-type ConfigError = {
-  _tag: "ConfigError";
-  message: string;
-};
+class ConfigError extends Error {
+  readonly _tag = "ConfigError" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "ConfigError";
+  }
+}
 
 type ParseError = {
   _tag: "ParseError";
   issues: { message: string; path: (string | number)[] }[];
 };
 
-type PresignedUrlGenerationError = {
-  _tag: "PresignedUrlGenerationError";
-  message: string;
-};
+class PresignedUrlGenerationError extends Error {
+  readonly _tag = "PresignedUrlGenerationError" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "PresignedUrlGenerationError";
+  }
+}
 
-type NetworkError = {
-  _tag: "NetworkError";
-  message: string;
-};
+class NetworkError extends Error {
+  readonly _tag = "NetworkError" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
 
-type ResonseBodyParseError = {
-  _tag: "ResponseBodyParseError";
-  message: string;
-};
+class ResponseBodyParseError extends Error {
+  readonly _tag = "ResponseBodyParseError" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "ResponseBodyParseError";
+  }
+}
 
 export type GetPresignedUrlsError =
   | ConfigError
   | ParseError
   | PresignedUrlGenerationError
-  | ResonseBodyParseError
+  | ResponseBodyParseError
   | NetworkError;
 
 export async function getPresignedUrls(
@@ -59,18 +71,16 @@ export async function getPresignedUrls(
   const result = await safeTry(async function* () {
     const response = yield* ResultAsync.fromPromise(
       fetch("/api/tools/presigned-url", { method: "POST", body: formData }),
-      (): NetworkError => ({
-        _tag: "NetworkError",
-        message: "Please check your internet connection and try again.",
-      })
+      () =>
+        new NetworkError("Please check your internet connection and try again.")
     );
 
     const data = yield* ResultAsync.fromPromise(
       response.json(),
-      (): ResonseBodyParseError => ({
-        _tag: "ResponseBodyParseError",
-        message: "Failed to parse response body. Please try again.",
-      })
+      () =>
+        new ResponseBodyParseError(
+          "Failed to parse response body. Please try again."
+        )
     );
 
     if (!response.ok) {
