@@ -63,6 +63,9 @@ app.post("/presigned-url", async (ctx) => {
         )
       )
       .pipe(
+        Effect.tapErrorTag("StorageError", (error) =>
+          Effect.logError("PresignedUrlGenerationError: ", error)
+        ),
         Effect.mapError(
           (error) =>
             new PresignedUrlGenerationError({
@@ -96,6 +99,9 @@ app.post("/presigned-url", async (ctx) => {
           )
         )
         .pipe(
+          Effect.tapErrorTag("StorageError", (error) =>
+            Effect.logError("PresignedUrlGenerationError: ", error)
+          ),
           Effect.mapError(
             (error) =>
               new PresignedUrlGenerationError({

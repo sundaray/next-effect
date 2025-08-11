@@ -50,7 +50,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
-      // resolver: effectTsResolver(ToolSubmissionFormSchema),
+      resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -106,79 +106,80 @@ export function ToolSubmissionForm() {
       return;
     }
 
-    const {
-      logoKey,
-      logoUploadUrl,
-      homepageScreenshotKey,
-      homepageScreenshotUploadUrl,
-    } = response.value;
+    // const {
+    //   logoKey,
+    //   logoUploadUrl,
+    //   homepageScreenshotKey,
+    //   homepageScreenshotUploadUrl,
+    // } = response.value;
 
     /********************************************************************
      *
      *  STEP 2: Upload logo and homepage screenshot directly to S3
      *
      ********************************************************************/
-    const uploadResult = await uploadFilesToS3({
-      homepageScreenshot: data.homepageScreenshot,
-      homepageScreenshotUploadUrl,
-      logo: data.logo,
-      logoUploadUrl,
-    });
+    // const uploadResult = await uploadFilesToS3({
+    //   homepageScreenshot: data.homepageScreenshot,
+    //   homepageScreenshotUploadUrl,
+    //   logo: data.logo,
+    //   logoUploadUrl,
+    // });
 
-    if (uploadResult.isErr()) {
-      const error = uploadResult.error;
-      setErrorMessage(null);
+    // if (uploadResult.isErr()) {
+    //   const error = uploadResult.error;
+    //   setErrorMessage(null);
 
-      switch (error._tag) {
-        case "FileUploadError":
-        case "NetworkError":
-          setErrorMessage(error.message);
-          break;
+    //   switch (error._tag) {
+    //     case "NetworkError":
+    //     case "FileUploadError":
+    //       setErrorMessage(error.message);
+    //       break;
 
-        default:
-          setErrorMessage("An unexpected error occurred. Please try again.");
-      }
+    //     default:
+    //       setErrorMessage("An unexpected error occurred. Please try again.");
+    //   }
 
-      setIsProcessing(false);
-      return;
-    }
+    //   setIsProcessing(false);
+    //   return;
+    // }
 
     /********************************************************************
      *
      *  STEP 3: Save the tool in the database
      *
      ********************************************************************/
-    const saveToolResult = await saveTool({
-      name: data.name,
-      website: data.website,
-      tagline: data.tagline,
-      description: data.description,
-      categories: data.categories,
-      pricing: data.pricing,
-      logoKey: logoKey,
-      homepageScreenshotKey: homepageScreenshotKey,
-    });
+    // const saveToolResult = await saveTool({
+    //   name: data.name,
+    //   website: data.website,
+    //   tagline: data.tagline,
+    //   description: data.description,
+    //   categories: data.categories,
+    //   pricing: data.pricing,
+    //   logoKey: logoKey,
+    //   homepageScreenshotKey: homepageScreenshotKey,
+    // });
 
-    if (saveToolResult.isErr()) {
-      const error = saveToolResult.error;
-      switch (error._tag) {
-        case "SaveToolError":
-        case "NetworkError":
-        case "ResponseBodyParseError":
-          setErrorMessage(error.message);
-          break;
-        default:
-          setErrorMessage("An unexpected error occurred. Please try again.");
-      }
-      setIsProcessing(false);
-      return;
-    }
+    // if (saveToolResult.isErr()) {
+    //   const error = saveToolResult.error;
+    //   switch (error._tag) {
+    //     case "NetworkError":
+    //     case "ResponseBodyParseError":
+    //     case "SaveToolError":
+    //       setErrorMessage(error.message);
+    //       break;
+    //     default:
+    //       setErrorMessage("An unexpected error occurred. Please try again.");
+    //   }
+    //   setIsProcessing(false);
+    //   return;
+    // }
 
     /********************************************************************
      *
      *  FINAL STEP: Redirect user
      *
      ********************************************************************/
+    reset();
     redirect("/submit/success");
   };
 

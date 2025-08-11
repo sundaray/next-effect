@@ -65,11 +65,11 @@ export const ToolSubmissionFormSchema = Schema.Struct({
         (file) => file.size <= SCREENSHOT_MAX_SIZE_MB * 1024 * 1024,
         {
           message: () =>
-            `Screenshot must be less than ${SCREENSHOT_MAX_SIZE_MB}MB`,
+            `Homepage screenshot must be less than ${SCREENSHOT_MAX_SIZE_MB}MB`,
         }
       ),
       Schema.filter((file) => SUPPORTED_MIME_TYPES.includes(file.type), {
-        message: (file) =>
+        message: () =>
           `Invalid file type. Supported types are ${SUPPORTED_FILE_TYPES.join(
             ", "
           )}.`,

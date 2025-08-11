@@ -50,9 +50,9 @@ export function DropzoneInput<
 
       let message = firstError.message;
       if (firstError.code === "file-too-large") {
-        message = `File is too large. Max size is ${maxSizeInMb}MB.`;
+        message = `File size must be less than ${maxSizeInMb}MB.`;
       } else if (firstError.code === "file-invalid-type") {
-        message = `Invalid file type. Supported: ${supportedFileTypes.join(
+        message = `Invalid file type. Supported types are ${supportedFileTypes.join(
           ", "
         )}.`;
       }
