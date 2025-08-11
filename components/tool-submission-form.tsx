@@ -95,7 +95,11 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    // Get presigned URLs
+    /********************************************************************
+     *
+     *  STEP 1: Get presigned URLs
+     *
+     ********************************************************************/
     const response = await getPresignedUrls(data);
 
     if (response.isErr()) {
@@ -134,7 +138,11 @@ export function ToolSubmissionForm() {
       homepageScreenshotUploadUrl,
     } = response.value;
 
-    // Upload logo and homepage screenshot to S3
+    /********************************************************************
+     *
+     *  STEP 2: Upload logo and homepage screenshot directly to S3
+     *
+     ********************************************************************/
     const uploadResult = await uploadFilesToS3({
       homepageScreenshot: data.homepageScreenshot,
       homepageScreenshotUploadUrl,
@@ -143,7 +151,19 @@ export function ToolSubmissionForm() {
     });
 
     if (uploadResult.isErr()) {
-      handleError(uploadResult.error);
+      const error = uploadResult.error;
+      setErrorMessage(null);
+
+      switch (error._tag) {
+        case "FileUploadError":
+        case "NetworkError":
+          setErrorMessage(error.message);
+          break;
+
+        default:
+          setErrorMessage("An unexpected error occurred. Please try again.");
+      }
+
       setIsProcessing(false);
       return;
     }

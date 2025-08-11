@@ -7,6 +7,14 @@ type UploadFilesToS3Params = {
   logoUploadUrl?: string;
 };
 
+class NetworkError extends Error {
+  readonly _tag = "NetworkError" as const;
+  constructor(message: string) {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
+
 class FileUploadError extends Error {
   readonly _tag = "FileUploadError" as const;
   constructor(message: string) {
@@ -15,13 +23,15 @@ class FileUploadError extends Error {
   }
 }
 
+type UploadFilesToS3Error = NetworkError | FileUploadError;
+
 export async function uploadFilesToS3(
   params: UploadFilesToS3Params
-): Promise<Result<void, FileUploadError>> {
+): Promise<Result<void, UploadFilesToS3Error>> {
   const result = await safeTry(async function* () {
     const uploadPromises: Promise<Response>[] = [];
 
-    // 1. Prepare the homepage screenshot upload promise (mandatory)
+    // 1. Prepare the homepage screenshot upload promise
     const screenshotUploadPromise = fetch(params.homepageScreenshotUploadUrl, {
       method: "PUT",
       headers: {
@@ -31,7 +41,7 @@ export async function uploadFilesToS3(
     });
     uploadPromises.push(screenshotUploadPromise);
 
-    // 2. Prepare the logo upload promise (optional)
+    // 2. Prepare the logo upload promise
     if (params.logoUploadUrl && params.logo) {
       const logoUploadPromise = fetch(params.logoUploadUrl, {
         method: "PUT",
@@ -43,14 +53,11 @@ export async function uploadFilesToS3(
       uploadPromises.push(logoUploadPromise);
     }
 
-    // What this error is?
     // 3. Execute all uploads in parallel
     const responses = yield* ResultAsync.fromPromise(
       Promise.all(uploadPromises),
-      (): FileUploadError => ({
-        _tag: "FileUploadError",
-        message: "Failed to upload files to s3. Please try again.",
-      })
+      () =>
+        new NetworkError("Please check your internet connection and try again.")
     );
 
     // 4. Check if all uploads were successful
