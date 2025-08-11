@@ -87,7 +87,6 @@ export async function getPresignedUrls(
           "Failed to parse response body. Please try again."
         )
     );
-
     if (!response.ok) {
       return err(data as GetPresignedUrlsError);
     }

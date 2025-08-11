@@ -29,8 +29,8 @@ import {
 } from "@/lib/schema";
 import { getPresignedUrls } from "@/lib/get-presigned-urls";
 import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
-import type { GetPresignedUrlsError } from "@/lib/get-presigned-urls";
-import type { FileUploadError } from "@/lib/upload-files-to-s3";
+import { saveTool } from "@/lib/save-tool";
+import { redirect } from "next/navigation";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -47,31 +47,6 @@ export function ToolSubmissionForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  function handleError(error: GetPresignedUrlsError) {
-    setErrorMessage(null);
-
-    switch (error._tag) {
-      case "ParseError":
-        error.issues.forEach((issue) => {
-          const field = issue.path[0] as keyof ToolSubmissionFormSchemaType;
-          if (field) {
-            setError(field, { type: "server", message: issue.message });
-          }
-        });
-        break;
-
-      case "ConfigError":
-      case "PresignedUrlGenerationError":
-      case "NetworkError":
-      case "ResponseBodyParseError":
-        setErrorMessage(error.message);
-        break;
-
-      default:
-        setErrorMessage("An unexpected error occurred. Please try again.");
-    }
-  }
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
@@ -168,7 +143,43 @@ export function ToolSubmissionForm() {
       return;
     }
 
-    // Save tool in the database
+    /********************************************************************
+     *
+     *  STEP 3: Save the tool in the database
+     *
+     ********************************************************************/
+    const saveToolResult = await saveTool({
+      name: data.name,
+      website: data.website,
+      tagline: data.tagline,
+      description: data.description,
+      categories: data.categories,
+      pricing: data.pricing,
+      logoKey: logoKey,
+      homepageScreenshotKey: homepageScreenshotKey,
+    });
+
+    if (saveToolResult.isErr()) {
+      const error = saveToolResult.error;
+      switch (error._tag) {
+        case "SaveToolError":
+        case "NetworkError":
+        case "ResponseBodyParseError":
+          setErrorMessage(error.message);
+          break;
+        default:
+          setErrorMessage("An unexpected error occurred. Please try again.");
+      }
+      setIsProcessing(false);
+      return;
+    }
+
+    /********************************************************************
+     *
+     *  FINAL STEP: Redirect user
+     *
+     ********************************************************************/
+    redirect("/submit/success");
   };
 
   const message = successMessage || errorMessage;

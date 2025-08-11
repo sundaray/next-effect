@@ -67,7 +67,13 @@ export const ToolSubmissionFormSchema = Schema.Struct({
           message: () =>
             `Screenshot must be less than ${SCREENSHOT_MAX_SIZE_MB}MB`,
         }
-      )
+      ),
+      Schema.filter((file) => SUPPORTED_MIME_TYPES.includes(file.type), {
+        message: (file) =>
+          `Invalid file type. Supported types are ${SUPPORTED_FILE_TYPES.join(
+            ", "
+          )}.`,
+      })
     ),
 })
   .annotations({ identifier: "ToolSubmissionFormSchema" })

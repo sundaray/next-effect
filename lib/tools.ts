@@ -21,7 +21,7 @@ const app = new Hono();
 
 class PresignedUrlGenerationError extends Data.TaggedError(
   "PresignedUrlGenerationError"
-)<{ cause: unknown }> {}
+)<{ cause: unknown; message: string }> {}
 
 // -----------------------------------------------
 
@@ -64,7 +64,11 @@ app.post("/presigned-url", async (ctx) => {
       )
       .pipe(
         Effect.mapError(
-          (error) => new PresignedUrlGenerationError({ cause: error })
+          (error) =>
+            new PresignedUrlGenerationError({
+              cause: error,
+              message: "Failed to generate presigned URLs. Please try again.",
+            })
         )
       );
 
@@ -93,7 +97,11 @@ app.post("/presigned-url", async (ctx) => {
         )
         .pipe(
           Effect.mapError(
-            (error) => new PresignedUrlGenerationError({ cause: error })
+            (error) =>
+              new PresignedUrlGenerationError({
+                cause: error,
+                message: "Failed to generate presigned URLs. Please try again.",
+              })
           )
         );
 
@@ -118,14 +126,11 @@ app.post("/presigned-url", async (ctx) => {
     program,
     Effect.catchTag("ParseError", (error) => {
       const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-      Effect.logError("ConfigError: ", error);
       return Effect.succeed(
         ctx.json({ _tag: "ParseError", issues }, { status: 400 })
       );
     }),
     Effect.catchTag("ConfigError", (error) => {
-      Effect.logError("ConfigError backend: ", error);
-
       return Effect.succeed(
         ctx.json(
           {
@@ -137,12 +142,12 @@ app.post("/presigned-url", async (ctx) => {
         )
       );
     }),
-    Effect.catchTag("PresignedUrlGenerationError", () =>
+    Effect.catchTag("PresignedUrlGenerationError", ({ _tag, message }) =>
       Effect.succeed(
         ctx.json(
           {
-            _tag: "PresignedUrlGenerationError",
-            message: "Failed to generate file upload URLs. Please try again.",
+            _tag,
+            message,
           },
           { status: 500 }
         )
@@ -161,11 +166,12 @@ app.post("/presigned-url", async (ctx) => {
 
 // -----------------------------------------------
 
-class ToolCreationError extends Data.TaggedError("ToolCreationError")<{
+class SaveToolError extends Data.TaggedError("SaveToolError")<{
+  message: string;
   cause: unknown;
 }> {}
 
-app.post("/upload", async (ctx) => {
+app.post("/save", async (ctx) => {
   const body = await ctx.req.json();
 
   const program = Effect.gen(function* () {
@@ -189,7 +195,13 @@ app.post("/upload", async (ctx) => {
           .returning()
       )
       .pipe(
-        Effect.mapError((error) => new ToolCreationError({ cause: error }))
+        Effect.mapError(
+          (error) =>
+            new SaveToolError({
+              cause: error,
+              message: "Failed to save tool to the database. Please try again.",
+            })
+        )
       );
 
     return ctx.json({
@@ -199,11 +211,12 @@ app.post("/upload", async (ctx) => {
 
   const handledProgram = pipe(
     program,
-    Effect.catchTag("ToolCreationError", () => {
+    Effect.catchTag("SaveToolError", ({ _tag, message }) => {
       return Effect.succeed(
         ctx.json(
           {
-            message: "Failed to save tool to the database. Please try again.",
+            _tag,
+            message,
           },
           { status: 500 }
         )
