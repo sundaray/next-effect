@@ -12,16 +12,24 @@ const breakpoints = {
   xl: 1280,
 } as const;
 
+type breakpointsWidthInPixels = (typeof breakpoints)[keyof typeof breakpoints];
+
 export function createHomepageScreenshotWebPVariants(
-  homepageScreenshotkey: string
+  homepageScreenshotKey: string
 ) {
   return Effect.gen(function* () {
     const storageService = yield* StorageService;
     const bucketName = yield* Config.string("S3_BUCKET_NAME");
 
+    const homepageScreenshotKeyWithoutExtension =
+      homepageScreenshotKey.substring(
+        0,
+        homepageScreenshotKey.lastIndexOf(".")
+      );
+
     const homepageScreenshotFile = yield* storageService.use((s3Client) =>
       s3Client.send(
-        new GetObjectCommand({ Bucket: bucketName, Key: homepageScreenshotkey })
+        new GetObjectCommand({ Bucket: bucketName, Key: homepageScreenshotKey })
       )
     );
 
@@ -39,7 +47,10 @@ export function createHomepageScreenshotWebPVariants(
 
     const sharpInstance = sharp(homepageScreenshotBuffer);
 
-    const createWebPVariantEffect = (width, quality: number = 85) => {
+    const createWebPVariantEffect = (
+      width: breakpointsWidthInPixels,
+      quality: number = 85
+    ) => {
       return Effect.tryPromise({
         try: () =>
           sharpInstance
@@ -50,19 +61,11 @@ export function createHomepageScreenshotWebPVariants(
       });
     };
 
-    const smWebPEffect = createWebPVariantEffect({
-      width: breakpoints.sm,
-    });
-    const mdWebPEffect = createWebPVariantEffect({
-      width: breakpoints.md,
-    });
-    const lgWebPEffect = createWebPVariantEffect({
-      width: breakpoints.lg,
-    });
-    const xlWebPEffect = createWebPVariantEffect({
-      width: breakpoints.lg,
-    });
-    const originalWebPEffect = createWebPVariantEffect();
+    const smWebPEffect = createWebPVariantEffect(breakpoints.sm);
+    const mdWebPEffect = createWebPVariantEffect(breakpoints.md);
+    const lgWebPEffect = createWebPVariantEffect(breakpoints.lg);
+    const xlWebPEffect = createWebPVariantEffect(breakpoints.lg);
+    const originalSizeWebPEffect = createWebPVariantEffect();
 
     const [
       smWebPImage,
@@ -75,18 +78,35 @@ export function createHomepageScreenshotWebPVariants(
       mdWebPEffect,
       lgWebPEffect,
       xlWebPEffect,
-      originalWebPEffect,
+      originalSizeWebPEffect,
     ]);
 
     yield* Effect.all(
       [
-        uploadToS3(`${baseKey}-sm.webp`, smWebPImage),
-        uploadToS3(`${baseKey}-md.webp`, mdWebPImage),
-        uploadToS3(`${baseKey}-lg.webp`, lgWebPImage),
-        uploadToS3(`${baseKey}-xl.webp`, xlWebPImage),
-        uploadToS3(`${baseKey}-original.webp`, originalWebPImage),
+        uploadToS3(
+          `${homepageScreenshotKeyWithoutExtension}-sm.webp`,
+          smWebPImage
+        ),
+        uploadToS3(
+          `${homepageScreenshotKeyWithoutExtension}-md.webp`,
+          mdWebPImage
+        ),
+        uploadToS3(
+          `${homepageScreenshotKeyWithoutExtension}-lg.webp`,
+          lgWebPImage
+        ),
+        uploadToS3(
+          `${homepageScreenshotKeyWithoutExtension}-xl.webp`,
+          xlWebPImage
+        ),
+        uploadToS3(
+          `${homepageScreenshotKeyWithoutExtension}-original.webp`,
+          originalWebPImage
+        ),
       ],
       { concurrency: 5 }
     );
+
+    // Delete the original image
   });
 }
