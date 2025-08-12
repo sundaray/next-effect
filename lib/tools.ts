@@ -1,27 +1,12 @@
 import { Hono } from "hono";
-import { ToolSubmissionFormSchema } from "@/lib/schema";
-import {
-  Effect,
-  Schema,
-  Data,
-  pipe,
-  ParseResult,
-  Option,
-  Config,
-} from "effect";
+import { Effect, Data, pipe, ParseResult, Config } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
-import { StorageService } from "@/lib/services/storage-service";
 import { serverRuntime } from "@/lib/server-runtime";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { randomUUID } from "node:crypto";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { tools } from "@/db/schema";
+import { validateToolSubmissionFormData } from "@/lib/validate-tool-submission-formdata";
+import { getPresignedUrls } from "@/lib/get-presigned";
 
 const app = new Hono();
-
-class PresignedUrlGenerationError extends Data.TaggedError(
-  "PresignedUrlGenerationError"
-)<{ cause: unknown; message: string }> {}
 
 // -----------------------------------------------
 
@@ -36,96 +21,22 @@ app.post("/presigned-url", async (ctx) => {
   };
 
   const program = Effect.gen(function* () {
-    const validatedFormData = yield* Schema.decodeUnknown(
-      ToolSubmissionFormSchema
-    )(parsedBody);
+    const validatedToolSubmissionFormData =
+      yield* validateToolSubmissionFormData(parsedBody);
 
-    const storageService = yield* StorageService;
-    const bucketName = yield* Config.string("S3_BUCKET_NAME");
-
-    // --- Generate homepage screenshot upload URL ---
-
-    const homepageScreenshotFile = validatedFormData.homepageScreenshot;
-    const homepageScreenshotKey = `homepage-screenshots/${randomUUID()}.${homepageScreenshotFile.name
-      .split(".")
-      .pop()}`;
-
-    const homepageScreenshotUploadUrl = yield* storageService
-      .use((s3Client) =>
-        getSignedUrl(
-          s3Client,
-          new PutObjectCommand({
-            Bucket: bucketName,
-            Key: homepageScreenshotKey,
-            ContentType: homepageScreenshotFile.type,
-          }),
-          { expiresIn: 600 } // 10 minutes
-        )
-      )
-      .pipe(
-        Effect.tapErrorTag("StorageError", (error) =>
-          Effect.logError("PresignedUrlGenerationError: ", error)
-        ),
-        Effect.mapError(
-          (error) =>
-            new PresignedUrlGenerationError({
-              cause: error,
-              message: "Failed to generate presigned URLs. Please try again.",
-            })
-        )
-      );
-
-    // --- Generate logo upload URL (If logo is available) ---
-
-    let logoUploadDetails: Option.Option<{
-      logoUploadUrl: string;
-      logoKey: string;
-    }> = Option.none();
-
-    if (validatedFormData.logo) {
-      const logoFile = validatedFormData.logo as File;
-      const logoKey = `logos/${randomUUID()}.${logoFile.name.split(".").pop()}`;
-
-      const logoUploadUrl = yield* storageService
-        .use((s3) =>
-          getSignedUrl(
-            s3,
-            new PutObjectCommand({
-              Bucket: "indie-ai-tools",
-              Key: logoKey,
-              ContentType: logoFile.type,
-            }),
-            { expiresIn: 600 }
-          )
-        )
-        .pipe(
-          Effect.tapErrorTag("StorageError", (error) =>
-            Effect.logError("PresignedUrlGenerationError: ", error)
-          ),
-          Effect.mapError(
-            (error) =>
-              new PresignedUrlGenerationError({
-                cause: error,
-                message: "Failed to generate presigned URLs. Please try again.",
-              })
-          )
-        );
-
-      logoUploadDetails = Option.some({ logoUploadUrl, logoKey });
-    }
-
-    const responsepayload = {
-      homepageScreenshotUploadUrl,
+    const {
+      logoKey,
+      logoUploadUrl,
       homepageScreenshotKey,
-      ...Option.getOrUndefined(
-        Option.map(logoUploadDetails, (details) => ({
-          logoUploadUrl: details.logoUploadUrl,
-          logoKey: details.logoKey,
-        }))
-      ),
-    };
+      homepageScreenshotUploadUrl,
+    } = yield* getPresignedUrls(validatedToolSubmissionFormData);
 
-    return ctx.json(responsepayload);
+    return ctx.json({
+      logoKey,
+      logoUploadUrl,
+      homepageScreenshotKey,
+      homepageScreenshotUploadUrl,
+    });
   });
 
   const handledProgram = pipe(
@@ -136,7 +47,7 @@ app.post("/presigned-url", async (ctx) => {
         ctx.json({ _tag: "ParseError", issues }, { status: 400 })
       );
     }),
-    Effect.catchTag("ConfigError", (error) => {
+    Effect.catchTag("ConfigError", () => {
       return Effect.succeed(
         ctx.json(
           {
@@ -168,7 +79,7 @@ app.post("/presigned-url", async (ctx) => {
 
 // -----------------------------------------------
 
-//  POST /upload
+//  POST /save
 
 // -----------------------------------------------
 
@@ -183,6 +94,13 @@ app.post("/save", async (ctx) => {
   const program = Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
+    const s3BucketName = yield* Config.string("S3_BUCKET_NAME");
+    const awsRegion = yield* Config.string("AWS_REGION");
+
+    const s3BaseUrl = `https://${s3BucketName}.s3.${awsRegion}.amazonaws.com`;
+    const homepageScreenshotUrl = `${s3BaseUrl}/${body.homepageScreenshotKey}`;
+    const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
+
     const result = yield* dbService
       .use((db) =>
         db
@@ -194,13 +112,16 @@ app.post("/save", async (ctx) => {
             description: body.description,
             categories: body.categories,
             pricing: body.pricing,
-            logoUrl: body.logoUrl || null,
-            homepageScreenshotUrl: body.homepageScreenshotUrl,
+            logoUrl,
+            homepageScreenshotUrl,
             status: "pending",
           })
           .returning()
       )
       .pipe(
+        Effect.tapErrorTag("DatabaseError", (error) =>
+          Effect.logError("SaveToolError: ", error)
+        ),
         Effect.mapError(
           (error) =>
             new SaveToolError({
@@ -217,6 +138,18 @@ app.post("/save", async (ctx) => {
 
   const handledProgram = pipe(
     program,
+    Effect.catchTag("ConfigError", () => {
+      return Effect.succeed(
+        ctx.json(
+          {
+            _tag: "ConfigError",
+            message:
+              "S3_BUCKET_NAME or AWS_REGION environment variable is not found. Please try again.",
+          },
+          { status: 500 }
+        )
+      );
+    }),
     Effect.catchTag("SaveToolError", ({ _tag, message }) => {
       return Effect.succeed(
         ctx.json(
