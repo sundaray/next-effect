@@ -1,3 +1,5 @@
+import "client-only";
+
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
 

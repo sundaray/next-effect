@@ -1,3 +1,4 @@
+import "server-only";
 import { Effect, Option, Config, Data } from "effect";
 import { randomUUID } from "node:crypto";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
@@ -9,7 +10,7 @@ class PresignedUrlGenerationError extends Data.TaggedError(
   "PresignedUrlGenerationError"
 )<{ cause: unknown; message: string }> {}
 
-export function getPresignedUrls(
+export function generatePresignedUrls(
   validatedFormData: ToolSubmissionFormSchemaType
 ) {
   return Effect.gen(function* () {
