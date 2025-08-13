@@ -1,16 +1,9 @@
 import "client-only";
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
 import { saveToolPayload } from "@/lib/schema";
-import {
-  InternalServerError,
-  NetworkError,
-  ResponseBodyParseError,
-} from "@/lib/client/errors";
+import { InternalServerError, NetworkError } from "@/lib/client/errors";
 
-type SaveToolErrors =
-  | InternalServerError
-  | NetworkError
-  | ResponseBodyParseError;
+type SaveToolErrors = InternalServerError | NetworkError;
 
 export async function saveTool(
   params: saveToolPayload
@@ -24,17 +17,20 @@ export async function saveTool(
         },
         body: JSON.stringify(params),
       }),
-      () =>
-        new NetworkError("Please check your internet connection and try again.")
+      (error) => {
+        console.error("NetworkError: ", error);
+        return new NetworkError(
+          "Please check your internet connection and try again."
+        );
+      }
     );
 
-    const data = yield* ResultAsync.fromPromise(
-      response.json(),
-      () =>
-        new ResponseBodyParseError(
-          "Failed to parse response body. Please try again."
-        )
-    );
+    const data = yield* ResultAsync.fromPromise(response.json(), (error) => {
+      console.error("InternalServerError", error);
+      return new InternalServerError(
+        "Tool submission failed due to a server error. Please try again."
+      );
+    });
 
     if (!response.ok) {
       return err(data as SaveToolErrors);

@@ -3,9 +3,9 @@ import "client-only";
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
 import {
+  ParseError,
   InternalServerError,
   NetworkError,
-  ResponseBodyParseError,
 } from "@/lib/client/errors";
 
 type GetPresignedUrlResponse = {
@@ -15,20 +15,9 @@ type GetPresignedUrlResponse = {
   logoKey?: string;
 };
 
-class ParseError extends Error {
-  readonly _tag = "ParseError" as const;
-  constructor(
-    readonly issues: { message: string; path: (string | number)[] }[]
-  ) {
-    super();
-    this.name = "ParseError";
-  }
-}
-
 export type GetPresignedUrlsError =
   | ParseError
   | InternalServerError
-  | ResponseBodyParseError
   | NetworkError;
 
 export async function getPresignedUrls(
@@ -54,13 +43,12 @@ export async function getPresignedUrls(
         new NetworkError("Please check your internet connection and try again.")
     );
 
-    const data = yield* ResultAsync.fromPromise(
-      response.json(),
-      () =>
-        new ResponseBodyParseError(
-          "Failed to parse response body. Please try again."
-        )
-    );
+    const data = yield* ResultAsync.fromPromise(response.json(), (error) => {
+      console.error("InternalServerError: ", error);
+      return new InternalServerError(
+        "Tool submission failed due to a server error. Please try again."
+      );
+    });
     if (!response.ok) {
       return err(data as GetPresignedUrlsError);
     }

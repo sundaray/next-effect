@@ -92,7 +92,7 @@ export function ToolSubmissionForm() {
           break;
 
         case "NetworkError":
-        case "ResponseBodyParseError":
+        case "InternalServerError":
           setErrorMessage(error.message);
           break;
 
@@ -129,7 +129,7 @@ export function ToolSubmissionForm() {
 
       switch (error._tag) {
         case "NetworkError":
-        case "FileUploadError":
+        case "InternalServerError":
           setErrorMessage(error.message);
           break;
 
@@ -161,8 +161,7 @@ export function ToolSubmissionForm() {
     //   const error = saveToolResult.error;
     //   switch (error._tag) {
     //     case "NetworkError":
-    //     case "ResponseBodyParseError":
-    //     case "SaveToolError":
+    //     case "InternalServerError":
     //       setErrorMessage(error.message);
     //       break;
     //     default:

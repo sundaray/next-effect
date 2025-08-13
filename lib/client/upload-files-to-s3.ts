@@ -1,6 +1,6 @@
 import "client-only";
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
-import { NetworkError } from "@/lib/client/errors";
+import { NetworkError, InternalServerError } from "@/lib/client/errors";
 
 type UploadFilesToS3Params = {
   homepageScreenshot: File;
@@ -9,19 +9,11 @@ type UploadFilesToS3Params = {
   logoUploadUrl?: string;
 };
 
-class FileUploadError extends Error {
-  readonly _tag = "FileUploadError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "FileUploadError";
-  }
-}
-
-type UploadFilesToS3Error = NetworkError | FileUploadError;
+type UploadFilesToS3Errors = NetworkError | InternalServerError;
 
 export async function uploadFilesToS3(
   params: UploadFilesToS3Params
-): Promise<Result<void, UploadFilesToS3Error>> {
+): Promise<Result<void, UploadFilesToS3Errors>> {
   const result = await safeTry(async function* () {
     const uploadPromises: Promise<Response>[] = [];
 
@@ -50,16 +42,24 @@ export async function uploadFilesToS3(
     // 3. Execute all uploads in parallel
     const responses = yield* ResultAsync.fromPromise(
       Promise.all(uploadPromises),
-      () =>
-        new NetworkError("Please check your internet connection and try again.")
+      (error) => {
+        console.error("NetworkError: ", error);
+        return new NetworkError(
+          "Please check your internet connection and try again."
+        );
+      }
     );
 
     // 4. Check if all uploads were successful
     for (const response of responses) {
       if (!response.ok) {
+        console.error("InternalServerError: ", {
+          status: response.status,
+          statusText: response.statusText,
+        });
         return err(
-          new FileUploadError(
-            "Failed to upload files to storage. Please try again."
+          new InternalServerError(
+            "Tool submission failed due to a server error. Please try again."
           )
         );
       }

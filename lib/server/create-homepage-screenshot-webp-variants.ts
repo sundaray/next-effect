@@ -1,5 +1,4 @@
 import "server-only";
-
 import { Effect, Config, Data } from "effect";
 import { StorageService } from "@/lib/services/storage-service";
 import sharp from "sharp";
@@ -69,6 +68,9 @@ export function createHomepageScreenshotWebPVariants(
         )
       )
       .pipe(
+        Effect.tapErrorTag("StorageError", (error) =>
+          Effect.logError("S3ImageDownloadError:", error)
+        ),
         Effect.mapError(
           (error) =>
             new S3ImageDownloadError({
@@ -82,12 +84,16 @@ export function createHomepageScreenshotWebPVariants(
     // Step 2: Convert the homepage screenshot image stream to a byte array.
     const homepageScreenshotByteArray = yield* Effect.tryPromise({
       try: () => homepageScreenshotFile.Body!.transformToByteArray(),
-      catch: (error) =>
-        new ImageStreamToByteArrayConversionError({
+      catch: (error) => {
+        Effect.runSync(
+          Effect.logError("ImageStreamToByteArrayConversionError: ", error)
+        );
+        return new ImageStreamToByteArrayConversionError({
           message:
             "Failed to convert the homepage screenshot image stream (from S3) to byte array.",
           cause: error,
-        }),
+        });
+      },
     });
 
     const homepageScreenshotBuffer = Buffer.from(homepageScreenshotByteArray);
@@ -105,11 +111,13 @@ export function createHomepageScreenshotWebPVariants(
             .resize(width, null, { withoutEnlargement: true })
             .webp({ quality })
             .toBuffer(),
-        catch: (error) =>
-          new WebPConversionError({
+        catch: (error) => {
+          Effect.runSync(Effect.logError("WebPConversionError:", error));
+          return new WebPConversionError({
             message: "Failed to convert homepage screenshot to WebP format.",
             cause: error,
-          }),
+          });
+        },
       });
     };
 
@@ -148,6 +156,9 @@ export function createHomepageScreenshotWebPVariants(
           )
         )
         .pipe(
+          Effect.tapErrorTag("StorageError", (error) =>
+            Effect.logError("S3ImageUploadError:", error)
+          ),
           Effect.mapError(
             (error) =>
               new S3ImageUploadError({
@@ -197,6 +208,9 @@ export function createHomepageScreenshotWebPVariants(
         )
       )
       .pipe(
+        Effect.tapErrorTag("StorageError", (error) =>
+          Effect.logError("S3ImageDeletionError:", error)
+        ),
         Effect.mapError(
           (error) =>
             new S3ImageDeletionError({
