@@ -15,6 +15,7 @@ const app = new Hono();
 
 // -----------------------------------------------
 app.post("/presigned-url", async (ctx) => {
+  // Step 1: Parse the incoming tool submission form data.
   const body = await ctx.req.parseBody();
   const parsedBody = {
     ...body,
@@ -22,9 +23,11 @@ app.post("/presigned-url", async (ctx) => {
   } as ToolSubmissionFormSchemaType;
 
   const program = Effect.gen(function* () {
+    // Step 2: Validate the tool submission form data against the schema.
     const validatedToolSubmissionFormData =
       yield* validateToolSubmissionFormData(parsedBody);
 
+    // Step 3: Generate presigned URLs for client-side file upload to S3.
     const {
       logoKey,
       logoUploadUrl,
@@ -32,6 +35,7 @@ app.post("/presigned-url", async (ctx) => {
       homepageScreenshotUploadUrl,
     } = yield* generatePresignedUrls(validatedToolSubmissionFormData);
 
+    // Step 4: Return the presigned URLs and unique keys to the client.
     return ctx.json({
       logoKey,
       logoUploadUrl,
@@ -73,12 +77,17 @@ app.post("/presigned-url", async (ctx) => {
 // -----------------------------------------------
 
 app.post("/save", async (ctx) => {
+  // Step 1: Parse the incoming JSON payload containing the final tool submission data.
   const body = (await ctx.req.json()) as saveToolPayload;
 
   const program = Effect.gen(function* () {
+    // Step 2: Create and upload WebP variants of the homepage screenshot.
     yield* createHomepageScreenshotWebPVariants(body.homepageScreenshotKey);
 
+    // Step 3: Save the final tool submission details to the database.
     const tool = yield* saveTool(body);
+
+    // Step 4: Return the newly created tool record to the client.
     return ctx.json({
       tool: tool[0],
     });
