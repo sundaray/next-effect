@@ -3,7 +3,7 @@ import { Effect, pipe, ParseResult } from "effect";
 import { serverRuntime } from "@/lib/server-runtime";
 import { validateToolSubmissionFormData } from "@/lib/validate-tool-submission-formdata";
 import { generatePresignedUrls } from "@/lib/server/generate-presigned-urls";
-import { createHomepageScreenshotWebPVariants } from "@/lib/create-homepage-screenshot-webp-variants";
+import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-image-webp-variants";
 import { saveTool } from "@/lib/server/save-tool";
 import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
 
@@ -28,19 +28,15 @@ app.post("/presigned-url", async (ctx) => {
       yield* validateToolSubmissionFormData(parsedBody);
 
     // Step 3: Generate presigned URLs for client-side file upload to S3.
-    const {
-      logoKey,
-      logoUploadUrl,
-      homepageScreenshotKey,
-      homepageScreenshotUploadUrl,
-    } = yield* generatePresignedUrls(validatedToolSubmissionFormData);
+    const { logoKey, logoUploadUrl, showcaseImageKey, showcaseImageUploadUrl } =
+      yield* generatePresignedUrls(validatedToolSubmissionFormData);
 
     // Step 4: Return the presigned URLs and unique keys to the client.
     return ctx.json({
       logoKey,
       logoUploadUrl,
-      homepageScreenshotKey,
-      homepageScreenshotUploadUrl,
+      showcaseImageKey,
+      showcaseImageUploadUrl,
     });
   });
 
@@ -82,7 +78,7 @@ app.post("/save", async (ctx) => {
 
   const program = Effect.gen(function* () {
     // Step 2: Create and upload WebP variants of the homepage screenshot.
-    yield* createHomepageScreenshotWebPVariants(body.homepageScreenshotKey);
+    yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
 
     // Step 3: Save the final tool submission details to the database.
     const tool = yield* saveTool(body);

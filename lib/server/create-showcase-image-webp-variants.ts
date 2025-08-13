@@ -44,26 +44,23 @@ class ImageStreamToByteArrayConversionError extends Data.TaggedError(
   message: string;
 }> {}
 
-export function createHomepageScreenshotWebPVariants(
-  homepageScreenshotKey: string
-) {
+export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
   return Effect.gen(function* () {
     const storageService = yield* StorageService;
     const bucketName = yield* Config.string("S3_BUCKET_NAME");
 
-    const homepageScreenshotKeyWithoutExtension =
-      homepageScreenshotKey.substring(
-        0,
-        homepageScreenshotKey.lastIndexOf(".")
-      );
+    const showcaseImageKeyWithoutExtension = showcaseImageKey.substring(
+      0,
+      showcaseImageKey.lastIndexOf(".")
+    );
 
     // Step 1: Download the original homepage screenshot file from S3.
-    const homepageScreenshotFile = yield* storageService
+    const showcaseImageFile = yield* storageService
       .use((s3Client) =>
         s3Client.send(
           new GetObjectCommand({
             Bucket: bucketName,
-            Key: homepageScreenshotKey,
+            Key: showcaseImageKey,
           })
         )
       )
@@ -76,29 +73,29 @@ export function createHomepageScreenshotWebPVariants(
             new S3ImageDownloadError({
               cause: error,
               message:
-                "Failed to download the original homepage screenshot file from S3.",
+                "Failed to download the original showcase image file from S3.",
             })
         )
       );
 
     // Step 2: Convert the homepage screenshot image stream to a byte array.
-    const homepageScreenshotByteArray = yield* Effect.tryPromise({
-      try: () => homepageScreenshotFile.Body!.transformToByteArray(),
+    const showcaseImageByteArray = yield* Effect.tryPromise({
+      try: () => showcaseImageFile.Body!.transformToByteArray(),
       catch: (error) => {
         Effect.runSync(
           Effect.logError("ImageStreamToByteArrayConversionError: ", error)
         );
         return new ImageStreamToByteArrayConversionError({
           message:
-            "Failed to convert the homepage screenshot image stream (from S3) to byte array.",
+            "Failed to convert the showcase image stream (from S3) to byte array.",
           cause: error,
         });
       },
     });
 
-    const homepageScreenshotBuffer = Buffer.from(homepageScreenshotByteArray);
+    const showcaseImageBuffer = Buffer.from(showcaseImageByteArray);
 
-    const sharpInstance = sharp(homepageScreenshotBuffer);
+    const sharpInstance = sharp(showcaseImageBuffer);
 
     // Step 3: Helper to create a WebP variant.
     const createWebPVariantEffect = (
@@ -114,14 +111,14 @@ export function createHomepageScreenshotWebPVariants(
         catch: (error) => {
           Effect.runSync(Effect.logError("WebPConversionError:", error));
           return new WebPConversionError({
-            message: "Failed to convert homepage screenshot to WebP format.",
+            message: "Failed to convert showcase image to WebP format.",
             cause: error,
           });
         },
       });
     };
 
-    // Step 4: Create all WebP variants of the homepage screenshot in parallel.
+    // Step 4: Create all WebP variants of the showcase image in parallel.
     const smWebPEffect = createWebPVariantEffect(breakpoints.sm);
     const mdWebPEffect = createWebPVariantEffect(breakpoints.md);
     const lgWebPEffect = createWebPVariantEffect(breakpoints.lg);
@@ -173,24 +170,12 @@ export function createHomepageScreenshotWebPVariants(
     // Step 6: Upload all WebP variants to S3 in parallel.
     yield* Effect.all(
       [
+        uploadToS3(`${showcaseImageKeyWithoutExtension}-sm.webp`, smWebPImage),
+        uploadToS3(`${showcaseImageKeyWithoutExtension}-md.webp`, mdWebPImage),
+        uploadToS3(`${showcaseImageKeyWithoutExtension}-lg.webp`, lgWebPImage),
+        uploadToS3(`${showcaseImageKeyWithoutExtension}-xl.webp`, xlWebPImage),
         uploadToS3(
-          `${homepageScreenshotKeyWithoutExtension}-sm.webp`,
-          smWebPImage
-        ),
-        uploadToS3(
-          `${homepageScreenshotKeyWithoutExtension}-md.webp`,
-          mdWebPImage
-        ),
-        uploadToS3(
-          `${homepageScreenshotKeyWithoutExtension}-lg.webp`,
-          lgWebPImage
-        ),
-        uploadToS3(
-          `${homepageScreenshotKeyWithoutExtension}-xl.webp`,
-          xlWebPImage
-        ),
-        uploadToS3(
-          `${homepageScreenshotKeyWithoutExtension}-original.webp`,
+          `${showcaseImageKeyWithoutExtension}-original.webp`,
           originalWebPImage
         ),
       ],
@@ -203,7 +188,7 @@ export function createHomepageScreenshotWebPVariants(
         s3Client.send(
           new DeleteObjectCommand({
             Bucket: bucketName,
-            Key: homepageScreenshotKey,
+            Key: showcaseImageKey,
           })
         )
       )
@@ -216,7 +201,7 @@ export function createHomepageScreenshotWebPVariants(
             new S3ImageDeletionError({
               cause: error,
               message:
-                "Failed to delete the original homepage screenshot file from S3.",
+                "Failed to delete the original showcase image file from S3.",
             })
         )
       );

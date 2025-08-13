@@ -9,8 +9,8 @@ import {
 } from "@/lib/client/errors";
 
 type GetPresignedUrlResponse = {
-  homepageScreenshotUploadUrl: string;
-  homepageScreenshotKey: string;
+  showcaseImageUploadUrl: string;
+  showcaseImageKey: string;
   logoUploadUrl?: string;
   logoKey?: string;
 };
@@ -34,7 +34,7 @@ export async function getPresignedUrls(
   if (data.logo) {
     formData.append("logo", data.logo);
   }
-  formData.append("homepageScreenshot", data.homepageScreenshot);
+  formData.append("showcaseImage", data.showcaseImage);
 
   const result = await safeTry(async function* () {
     const response = yield* ResultAsync.fromPromise(

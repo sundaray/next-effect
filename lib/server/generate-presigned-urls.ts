@@ -18,19 +18,19 @@ export function generatePresignedUrls(
     const bucketName = yield* Config.string("S3_BUCKET_NAME");
 
     // --- Generate homepage screenshot upload URL ---
-    const homepageScreenshotFile = validatedFormData.homepageScreenshot;
-    const homepageScreenshotKey = `homepage-screenshots/${randomUUID()}.${homepageScreenshotFile.name
+    const showcaseImageFile = validatedFormData.showcaseImage;
+    const showcaseImageKey = `showcase-image/${randomUUID()}.${showcaseImageFile.name
       .split(".")
       .pop()}`;
 
-    const homepageScreenshotUploadUrl = yield* storageService
+    const showcaseImageUploadUrl = yield* storageService
       .use((s3Client) =>
         getSignedUrl(
           s3Client,
           new PutObjectCommand({
             Bucket: bucketName,
-            Key: homepageScreenshotKey,
-            ContentType: homepageScreenshotFile.type,
+            Key: showcaseImageKey,
+            ContentType: showcaseImageFile.type,
           }),
           { expiresIn: 600 } // 10 minutes
         )
@@ -88,8 +88,8 @@ export function generatePresignedUrls(
     }
 
     return {
-      homepageScreenshotUploadUrl,
-      homepageScreenshotKey,
+      showcaseImageUploadUrl,
+      showcaseImageKey,
       ...Option.getOrUndefined(
         Option.map(logoUploadDetails, (details) => ({
           logoUploadUrl: details.logoUploadUrl,

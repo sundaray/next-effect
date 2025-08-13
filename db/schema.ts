@@ -21,7 +21,7 @@ export const tools = pgTable("tools", {
     .default(sql`'{}'::text[]`),
   pricing: pricingTypeEnum("pricing").notNull(),
   logoUrl: text("logo_url"),
-  homepageScreenshotUrl: text("homepage_screenshot_url").notNull(),
+  showcaseImageUrl: text("showcase_image_url").notNull(),
   status: toolStatusEnum("status").default("pending").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

@@ -3,8 +3,8 @@ import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
 import { NetworkError, InternalServerError } from "@/lib/client/errors";
 
 type UploadFilesToS3Params = {
-  homepageScreenshot: File;
-  homepageScreenshotUploadUrl: string;
+  showcaseImage: File;
+  showcaseImageUploadUrl: string;
   logo?: File;
   logoUploadUrl?: string;
 };
@@ -18,12 +18,12 @@ export async function uploadFilesToS3(
     const uploadPromises: Promise<Response>[] = [];
 
     // 1. Prepare the homepage screenshot upload promise
-    const screenshotUploadPromise = fetch(params.homepageScreenshotUploadUrl, {
+    const screenshotUploadPromise = fetch(params.showcaseImageUploadUrl, {
       method: "PUT",
       headers: {
-        "Content-Type": params.homepageScreenshot.type,
+        "Content-Type": params.showcaseImage.type,
       },
-      body: params.homepageScreenshot,
+      body: params.showcaseImage,
     });
     uploadPromises.push(screenshotUploadPromise);
 

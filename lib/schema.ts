@@ -58,14 +58,14 @@ export const ToolSubmissionFormSchema = Schema.Struct({
     }),
   }),
   logo: Schema.optional(Schema.instanceOf(File)),
-  homepageScreenshot: Schema.instanceOf(File)
-    .annotations({ message: () => "Homepage screenshot is required." })
+  showcaseImage: Schema.instanceOf(File)
+    .annotations({ message: () => "Showcase image is required." })
     .pipe(
       Schema.filter(
         (file) => file.size <= SCREENSHOT_MAX_SIZE_MB * 1024 * 1024,
         {
           message: () =>
-            `Homepage screenshot must be less than ${SCREENSHOT_MAX_SIZE_MB}MB`,
+            `Showcase image must be less than ${SCREENSHOT_MAX_SIZE_MB}MB`,
         }
       ),
       Schema.filter((file) => SUPPORTED_MIME_TYPES.includes(file.type), {
@@ -85,8 +85,8 @@ export type ToolSubmissionFormSchemaType = Schema.Schema.Type<
 
 export type saveToolPayload = Omit<
   ToolSubmissionFormSchemaType,
-  "logo" | "homepageScreenshot"
+  "logo" | "showcaseImage"
 > & {
   logoKey?: string;
-  homepageScreenshotKey: string;
+  showcaseImageKey: string;
 };

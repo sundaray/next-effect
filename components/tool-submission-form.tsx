@@ -61,7 +61,7 @@ export function ToolSubmissionForm() {
         categories: [],
         pricing: undefined,
         logo: undefined,
-        homepageScreenshot: undefined,
+        showcaseImage: undefined,
       },
     });
 
@@ -104,12 +104,8 @@ export function ToolSubmissionForm() {
       return;
     }
 
-    const {
-      logoKey,
-      logoUploadUrl,
-      homepageScreenshotKey,
-      homepageScreenshotUploadUrl,
-    } = response.value;
+    const { logoKey, logoUploadUrl, showcaseImageKey, showcaseImageUploadUrl } =
+      response.value;
 
     /********************************************************************
      *
@@ -117,8 +113,8 @@ export function ToolSubmissionForm() {
      *
      ********************************************************************/
     const uploadResult = await uploadFilesToS3({
-      homepageScreenshot: data.homepageScreenshot,
-      homepageScreenshotUploadUrl,
+      showcaseImage: data.showcaseImage,
+      showcaseImageUploadUrl,
       logo: data.logo,
       logoUploadUrl,
     });
@@ -153,8 +149,8 @@ export function ToolSubmissionForm() {
     //   description: data.description,
     //   categories: data.categories,
     //   pricing: data.pricing,
-    //   logoKey: logoKey,
-    //   homepageScreenshotKey: homepageScreenshotKey,
+    //   logoKey,
+    //   showcaseImageKey,
     // });
 
     // if (saveToolResult.isErr()) {
@@ -288,7 +284,8 @@ export function ToolSubmissionForm() {
               <SelectContent>
                 {pricingOptions.map((option) => (
                   <SelectItem key={option} value={option}>
-                    {option}
+                    {/* Capitalize the first letter. */}
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -320,11 +317,15 @@ export function ToolSubmissionForm() {
       />
 
       <FormField
-        id="homepageScreenshot"
-        name="homepageScreenshot"
-        label="Homepage Screenshot"
+        id="showcaseImage"
+        name="showcaseImage"
+        label="Showcase image"
         control={control}
         disabled={isProcessing}
+        help={{
+          message:
+            "Upload an image that best showcases your product. This could be a screenshot of the homepage, a key feature, or the dashboard. It will be displayed on the product's detail page.",
+        }}
         renderField={({ field, fieldState, disabled, fieldErrorId }) => (
           <DropzoneInput
             field={field}
@@ -339,7 +340,6 @@ export function ToolSubmissionForm() {
           />
         )}
       />
-
       <Button type="submit" disabled={isProcessing}>
         {isProcessing ? "Submitting..." : "Submit Tool"}
       </Button>
