@@ -3,7 +3,11 @@ import "server-only";
 import { Effect, Config, Data } from "effect";
 import { StorageService } from "@/lib/services/storage-service";
 import sharp from "sharp";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
 const breakpoints = {
   sm: 640,
@@ -13,6 +17,33 @@ const breakpoints = {
 } as const;
 
 type breakpointsWidthInPixels = (typeof breakpoints)[keyof typeof breakpoints];
+
+class S3ImageDownloadError extends Data.TaggedError("S3ImageDownloadError")<{
+  cause: unknown;
+  message: string;
+}> {}
+
+class S3ImageUploadError extends Data.TaggedError("S3ImageUploadError")<{
+  cause: unknown;
+  message: string;
+}> {}
+
+class S3ImageDeletionError extends Data.TaggedError("S3ImageDeletionError")<{
+  cause: unknown;
+  message: string;
+}> {}
+
+class WebPConversionError extends Data.TaggedError("WebPConversionError")<{
+  cause: unknown;
+  message: string;
+}> {}
+
+class ImageStreamToByteArrayConversionError extends Data.TaggedError(
+  "ImageStreamToByteArrayConversionError"
+)<{
+  cause: unknown;
+  message: string;
+}> {}
 
 export function createHomepageScreenshotWebPVariants(
   homepageScreenshotKey: string
@@ -27,19 +58,35 @@ export function createHomepageScreenshotWebPVariants(
         homepageScreenshotKey.lastIndexOf(".")
       );
 
-    const homepageScreenshotFile = yield* storageService.use((s3Client) =>
-      s3Client.send(
-        new GetObjectCommand({ Bucket: bucketName, Key: homepageScreenshotKey })
+    // Step 1: Download the original homepage screenshot file from S3.
+    const homepageScreenshotFile = yield* storageService
+      .use((s3Client) =>
+        s3Client.send(
+          new GetObjectCommand({
+            Bucket: bucketName,
+            Key: homepageScreenshotKey,
+          })
+        )
       )
-    );
+      .pipe(
+        Effect.mapError(
+          (error) =>
+            new S3ImageDownloadError({
+              cause: error,
+              message:
+                "Failed to download the original homepage screenshot file from S3.",
+            })
+        )
+      );
 
+    // Step 2: Convert the homepage screenshot image stream to a byte array.
     const homepageScreenshotByteArray = yield* Effect.tryPromise({
       try: () => homepageScreenshotFile.Body!.transformToByteArray(),
-      catch: (e) =>
-        new ApiError({
-          message: "Failed to read screenshot from S3",
-          cause: e,
-          status: 500,
+      catch: (error) =>
+        new ImageStreamToByteArrayConversionError({
+          message:
+            "Failed to convert the homepage screenshot image stream (from S3) to byte array.",
+          cause: error,
         }),
     });
 
@@ -47,8 +94,9 @@ export function createHomepageScreenshotWebPVariants(
 
     const sharpInstance = sharp(homepageScreenshotBuffer);
 
+    // Step 3: Helper to create a WebP variant.
     const createWebPVariantEffect = (
-      width: breakpointsWidthInPixels,
+      width?: breakpointsWidthInPixels,
       quality: number = 85
     ) => {
       return Effect.tryPromise({
@@ -57,10 +105,15 @@ export function createHomepageScreenshotWebPVariants(
             .resize(width, null, { withoutEnlargement: true })
             .webp({ quality })
             .toBuffer(),
-        catch: () => new Error("Hello"),
+        catch: (error) =>
+          new WebPConversionError({
+            message: "Failed to convert homepage screenshot to WebP format.",
+            cause: error,
+          }),
       });
     };
 
+    // Step 4: Create all WebP variants of the homepage screenshot in parallel.
     const smWebPEffect = createWebPVariantEffect(breakpoints.sm);
     const mdWebPEffect = createWebPVariantEffect(breakpoints.md);
     const lgWebPEffect = createWebPVariantEffect(breakpoints.lg);
@@ -81,6 +134,32 @@ export function createHomepageScreenshotWebPVariants(
       originalSizeWebPEffect,
     ]);
 
+    // Step 5: Helper to upload a single WebP variant to S3.
+    const uploadToS3 = (key: string, body: Buffer) => {
+      return storageService
+        .use((s3Client) =>
+          s3Client.send(
+            new PutObjectCommand({
+              Bucket: bucketName,
+              Key: key,
+              Body: body,
+              ContentType: "image/webp",
+            })
+          )
+        )
+        .pipe(
+          Effect.mapError(
+            (error) =>
+              new S3ImageUploadError({
+                cause: error,
+                message:
+                  "Failed to upload the homepage screenshot WebP variant to S3.",
+              })
+          )
+        );
+    };
+
+    // Step 6: Upload all WebP variants to S3 in parallel.
     yield* Effect.all(
       [
         uploadToS3(
@@ -107,6 +186,25 @@ export function createHomepageScreenshotWebPVariants(
       { concurrency: 5 }
     );
 
-    // Delete the original image
+    // Step 7: Delete the original homepage screenshot file from S3.
+    yield* storageService
+      .use((s3Client) =>
+        s3Client.send(
+          new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: homepageScreenshotKey,
+          })
+        )
+      )
+      .pipe(
+        Effect.mapError(
+          (error) =>
+            new S3ImageDeletionError({
+              cause: error,
+              message:
+                "Failed to delete the original homepage screenshot file from S3.",
+            })
+        )
+      );
   });
 }
