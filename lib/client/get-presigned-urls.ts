@@ -2,6 +2,11 @@ import "client-only";
 
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
+import {
+  InternalServerError,
+  NetworkError,
+  ResponseBodyParseError,
+} from "@/lib/client/errors";
 
 type GetPresignedUrlResponse = {
   homepageScreenshotUploadUrl: string;
@@ -17,30 +22,6 @@ class ParseError extends Error {
   ) {
     super();
     this.name = "ParseError";
-  }
-}
-
-class InternalServerError extends Error {
-  readonly _tag = "InternalServerError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "InternalServerError";
-  }
-}
-
-class NetworkError extends Error {
-  readonly _tag = "NetworkError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "NetworkError";
-  }
-}
-
-class ResponseBodyParseError extends Error {
-  readonly _tag = "ResponseBodyParseError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "ResponseBodyParseError";
   }
 }
 

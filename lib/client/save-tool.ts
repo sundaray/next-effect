@@ -1,27 +1,20 @@
+import "client-only";
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
 import { saveToolPayload } from "@/lib/schema";
+import {
+  InternalServerError,
+  NetworkError,
+  ResponseBodyParseError,
+} from "@/lib/client/errors";
 
-class NetworkError extends Error {
-  readonly _tag = "NetworkError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "NetworkError";
-  }
-}
-
-class ResponseBodyParseError extends Error {
-  readonly _tag = "ResponseBodyParseError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "ResponseBodyParseError";
-  }
-}
-
-type SaveToolErrorUnion = SaveToolError | NetworkError | ResponseBodyParseError;
+type SaveToolErrors =
+  | InternalServerError
+  | NetworkError
+  | ResponseBodyParseError;
 
 export async function saveTool(
   params: saveToolPayload
-): Promise<Result<void, SaveToolErrorUnion>> {
+): Promise<Result<void, SaveToolErrors>> {
   const result = await safeTry(async function* () {
     const response = yield* ResultAsync.fromPromise(
       fetch("/api/tools/save", {
@@ -44,7 +37,7 @@ export async function saveTool(
     );
 
     if (!response.ok) {
-      return err(data as SaveToolErrorUnion);
+      return err(data as SaveToolErrors);
     }
 
     return ok(data as undefined);

@@ -1,4 +1,6 @@
+import "client-only";
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
+import { NetworkError } from "@/lib/client/errors";
 
 type UploadFilesToS3Params = {
   homepageScreenshot: File;
@@ -6,14 +8,6 @@ type UploadFilesToS3Params = {
   logo?: File;
   logoUploadUrl?: string;
 };
-
-class NetworkError extends Error {
-  readonly _tag = "NetworkError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "NetworkError";
-  }
-}
 
 class FileUploadError extends Error {
   readonly _tag = "FileUploadError" as const;
