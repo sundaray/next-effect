@@ -1,11 +1,7 @@
 import { text, pgEnum, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const pricingTypeEnum = pgEnum("pricing", [
-  "free",
-  "premium",
-  "freemium",
-]);
+export const pricingTypeEnum = pgEnum("pricing", ["free", "paid", "freemium"]);
 
 export const toolStatusEnum = pgEnum("status", [
   "pending",

@@ -27,9 +27,9 @@ import {
   SUPPORTED_FILE_TYPES,
   SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
-import { getPresignedUrls } from "@/lib/get-presigned-urls";
-import { uploadFilesToS3 } from "@/lib/upload-files-to-s3";
-import { saveTool } from "@/lib/save-tool";
+import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
+import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
+import { saveTool } from "@/lib/client/save-tool";
 import { redirect } from "next/navigation";
 
 export const PREDEFINED_CATEGORIES = [
@@ -91,8 +91,6 @@ export function ToolSubmissionForm() {
           });
           break;
 
-        case "ConfigError":
-        case "PresignedUrlGenerationError":
         case "NetworkError":
         case "ResponseBodyParseError":
           setErrorMessage(error.message);
@@ -106,42 +104,42 @@ export function ToolSubmissionForm() {
       return;
     }
 
-    // const {
-    //   logoKey,
-    //   logoUploadUrl,
-    //   homepageScreenshotKey,
-    //   homepageScreenshotUploadUrl,
-    // } = response.value;
+    const {
+      logoKey,
+      logoUploadUrl,
+      homepageScreenshotKey,
+      homepageScreenshotUploadUrl,
+    } = response.value;
 
     /********************************************************************
      *
      *  STEP 2: Upload logo and homepage screenshot directly to S3
      *
      ********************************************************************/
-    // const uploadResult = await uploadFilesToS3({
-    //   homepageScreenshot: data.homepageScreenshot,
-    //   homepageScreenshotUploadUrl,
-    //   logo: data.logo,
-    //   logoUploadUrl,
-    // });
+    const uploadResult = await uploadFilesToS3({
+      homepageScreenshot: data.homepageScreenshot,
+      homepageScreenshotUploadUrl,
+      logo: data.logo,
+      logoUploadUrl,
+    });
 
-    // if (uploadResult.isErr()) {
-    //   const error = uploadResult.error;
-    //   setErrorMessage(null);
+    if (uploadResult.isErr()) {
+      const error = uploadResult.error;
+      setErrorMessage(null);
 
-    //   switch (error._tag) {
-    //     case "NetworkError":
-    //     case "FileUploadError":
-    //       setErrorMessage(error.message);
-    //       break;
+      switch (error._tag) {
+        case "NetworkError":
+        case "FileUploadError":
+          setErrorMessage(error.message);
+          break;
 
-    //     default:
-    //       setErrorMessage("An unexpected error occurred. Please try again.");
-    //   }
+        default:
+          setErrorMessage("An unexpected error occurred. Please try again.");
+      }
 
-    //   setIsProcessing(false);
-    //   return;
-    // }
+      setIsProcessing(false);
+      return;
+    }
 
     /********************************************************************
      *

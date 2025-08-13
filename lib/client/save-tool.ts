@@ -1,12 +1,5 @@
 import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
-
-class SaveToolError extends Error {
-  readonly _tag = "SaveToolError" as const;
-  constructor(readonly message: string) {
-    super(message);
-    this.name = "SaveToolError";
-  }
-}
+import { saveToolPayload } from "@/lib/schema";
 
 class NetworkError extends Error {
   readonly _tag = "NetworkError" as const;
@@ -26,19 +19,8 @@ class ResponseBodyParseError extends Error {
 
 type SaveToolErrorUnion = SaveToolError | NetworkError | ResponseBodyParseError;
 
-export type SaveToolParams = {
-  name: string;
-  website: string;
-  tagline: string;
-  description: string;
-  categories: readonly string[];
-  pricing: "Free" | "Paid" | "Freemium";
-  logoKey?: string;
-  homepageScreenshotKey: string;
-};
-
 export async function saveTool(
-  params: SaveToolParams
+  params: saveToolPayload
 ): Promise<Result<void, SaveToolErrorUnion>> {
   const result = await safeTry(async function* () {
     const response = yield* ResultAsync.fromPromise(

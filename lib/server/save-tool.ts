@@ -1,24 +1,14 @@
 import { Effect, Config, Data } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
 import { tools } from "@/db/schema";
-
-export type SaveToolParams = {
-  name: string;
-  website: string;
-  tagline: string;
-  description: string;
-  categories: readonly string[];
-  pricing: "Free" | "Paid" | "Freemium";
-  logoKey?: string;
-  homepageScreenshotKey: string;
-};
+import { saveToolPayload } from "@/lib/schema";
 
 class SaveToolError extends Data.TaggedError("SaveToolError")<{
   cause: unknown;
   message: string;
 }> {}
 
-export function saveTool(body: SaveToolParams) {
+export function saveTool(body: saveToolPayload) {
   return Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
@@ -26,8 +16,8 @@ export function saveTool(body: SaveToolParams) {
     const awsRegion = yield* Config.string("AWS_REGION");
 
     const s3BaseUrl = `https://${s3BucketName}.s3.${awsRegion}.amazonaws.com`;
-    const homepageScreenshotUrl = `${s3BaseUrl}/${body.homepageScreenshotKey}`;
     const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
+    const homepageScreenshotUrl = `${s3BaseUrl}/${body.homepageScreenshotKey}`;
 
     const result = yield* dbService
       .use((db) =>
@@ -38,7 +28,9 @@ export function saveTool(body: SaveToolParams) {
             website: body.website,
             tagline: body.tagline,
             description: body.description,
-            categories: body.categories,
+            // Create a new, mutable array from the readonly 'categories' array.
+            // Drizzle's 'insert' method expects a mutable 'string[]' to match the database schema,
+            categories: [...body.categories],
             pricing: body.pricing,
             logoUrl,
             homepageScreenshotUrl,
@@ -58,5 +50,7 @@ export function saveTool(body: SaveToolParams) {
             })
         )
       );
+
+    return result;
   });
 }

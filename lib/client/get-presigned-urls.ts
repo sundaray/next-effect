@@ -10,14 +10,6 @@ type GetPresignedUrlResponse = {
   logoKey?: string;
 };
 
-class ConfigError extends Error {
-  readonly _tag = "ConfigError" as const;
-  constructor(message: string) {
-    super(message);
-    this.name = "ConfigError";
-  }
-}
-
 class ParseError extends Error {
   readonly _tag = "ParseError" as const;
   constructor(
@@ -28,11 +20,11 @@ class ParseError extends Error {
   }
 }
 
-class PresignedUrlGenerationError extends Error {
-  readonly _tag = "PresignedUrlGenerationError" as const;
+class InternalServerError extends Error {
+  readonly _tag = "InternalServerError" as const;
   constructor(message: string) {
     super(message);
-    this.name = "PresignedUrlGenerationError";
+    this.name = "InternalServerError";
   }
 }
 
@@ -53,9 +45,8 @@ class ResponseBodyParseError extends Error {
 }
 
 export type GetPresignedUrlsError =
-  | ConfigError
   | ParseError
-  | PresignedUrlGenerationError
+  | InternalServerError
   | ResponseBodyParseError
   | NetworkError;
 

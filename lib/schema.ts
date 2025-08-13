@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
+export const pricingOptions = ["free", "paid", "freemium"] as const;
 
 export const LOGO_MAX_SIZE_MB = 2;
 export const SCREENSHOT_MAX_SIZE_MB = 5;
@@ -82,3 +82,11 @@ export const ToolSubmissionFormSchema = Schema.Struct({
 export type ToolSubmissionFormSchemaType = Schema.Schema.Type<
   typeof ToolSubmissionFormSchema
 >;
+
+export type saveToolPayload = Omit<
+  ToolSubmissionFormSchemaType,
+  "logo" | "homepageScreenshot"
+> & {
+  logoKey?: string;
+  homepageScreenshotKey: string;
+};
