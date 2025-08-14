@@ -73,18 +73,63 @@ export function ToolSubmissionForm() {
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
-      const response = yield* getPresignedUrls(data);
+      const {
+        logoKey,
+        logoUploadUrl,
+        showcaseImageKey,
+        showcaseImageUploadUrl,
+      } = yield* getPresignedUrls(data);
+
+      yield* uploadFilesToS3({
+        logo: data.logo,
+        logoUploadUrl,
+        showcaseImage: data.showcaseImage,
+        showcaseImageUploadUrl,
+      });
+
+      yield* saveTool({
+        name: data.name,
+        website: data.website,
+        tagline: data.tagline,
+        description: data.description,
+        categories: data.categories,
+        pricing: data.pricing,
+        logoKey,
+        showcaseImageKey,
+      });
     });
 
     const handledProgram = pipe(
-      effect,
-      Effect.catchTag("InternalServerError", () => setErrorMessage("Hello")),
-      Effect.ensureErrorType<never>()
+      program,
+      Effect.as({ success: true }),
+      Effect.catchTags({
+        ParseError: (error) =>
+          Effect.sync(() => {
+            error.issues.forEach((issue) => {
+              const field = issue.path[0] as keyof ToolSubmissionFormSchemaType;
+              if (field)
+                setError(field, { type: "server", message: issue.message });
+            });
+            return { success: false };
+          }),
+        NetworkError: (error) =>
+          Effect.sync(() => {
+            setErrorMessage(error.message);
+            return { success: false };
+          }),
+        InternalServerError: (error) =>
+          Effect.sync(() => {
+            setErrorMessage(error.message);
+            return { success: false };
+          }),
+      }),
+      Effect.ensureErrorType<never>(),
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
-    const result = clientRuntime.runPromise(handledProgram);
+    const { success } = await clientRuntime.runPromise(handledProgram);
 
-    if (result) {
+    if (success === true) {
       reset();
       redirect("/submit/success");
     }

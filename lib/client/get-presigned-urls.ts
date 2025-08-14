@@ -1,15 +1,11 @@
 import "client-only";
-import { Effect, Data } from "effect";
+import { Effect } from "effect";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
-
-class NetworkError extends Data.TaggedError("NetworkError")<{
-  cause: unknown;
-  message: string;
-}> {}
-
-class InternalServerError extends Data.TaggedError("InternalServerError")<{
-  message: string;
-}> {}
+import {
+  NetworkError,
+  InternalServerError,
+  ParseError,
+} from "@/lib/client/errors";
 
 export function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
   return Effect.gen(function* () {
@@ -31,27 +27,27 @@ export function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
       catch: (error) =>
         new NetworkError({
           message: "Please check your internet connection and try again.",
-          cause: error,
         }),
     });
 
-    const jsonResult = yield* Effect.tryPromise({
+    const result = yield* Effect.tryPromise({
       try: () => response.json(),
-      catch: (cause) =>
+      catch: () =>
         new InternalServerError({
-          message: "Failed to parse server response.",
+          message:
+            "Tool submission failed due to a server error. Please try again.",
         }),
     });
 
     if (!response.ok) {
-      if (jsonResult._tag === "ParseError") {
-        return yield* Effect.fail({ issues: jsonResult.issues });
+      if (result._tag === "ParseError") {
+        return yield* Effect.fail(new ParseError({ issues: result.issues }));
       }
       return yield* Effect.fail(
-        new InternalServerError({ message: jsonResult.message })
+        new InternalServerError({ message: result.message })
       );
     }
 
-    return jsonResult;
+    return result;
   });
 }

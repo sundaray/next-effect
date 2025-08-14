@@ -1,43 +1,37 @@
 import "client-only";
-import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
+import { Effect } from "effect";
 import { saveToolPayload } from "@/lib/schema";
 import { InternalServerError, NetworkError } from "@/lib/client/errors";
 
-type SaveToolErrors = InternalServerError | NetworkError;
+export function saveTool(params: saveToolPayload) {
+  return Effect.gen(function* () {
+    const response = yield* Effect.tryPromise({
+      try: () =>
+        fetch("/api/tools/save", {
+          method: "POST",
+          body: JSON.stringify(params),
+        }),
+      catch: (error) =>
+        new NetworkError({
+          message: "Please check your internet connection and try again.",
+        }),
+    });
 
-export async function saveTool(
-  params: saveToolPayload
-): Promise<Result<void, SaveToolErrors>> {
-  const result = await safeTry(async function* () {
-    const response = yield* ResultAsync.fromPromise(
-      fetch("/api/tools/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
-      }),
-      (error) => {
-        console.error("NetworkError: ", error);
-        return new NetworkError(
-          "Please check your internet connection and try again."
-        );
-      }
-    );
-
-    const data = yield* ResultAsync.fromPromise(response.json(), (error) => {
-      console.error("InternalServerError", error);
-      return new InternalServerError(
-        "Tool submission failed due to a server error. Please try again."
-      );
+    const result = yield* Effect.tryPromise({
+      try: () => response.json(),
+      catch: () =>
+        new InternalServerError({
+          message:
+            "Tool submission failed due to a server error. Please try again.",
+        }),
     });
 
     if (!response.ok) {
-      return err(data as SaveToolErrors);
+      return yield* Effect.fail(
+        new InternalServerError({ message: result.message })
+      );
     }
 
-    return ok(data as undefined);
+    return result;
   });
-
-  return result;
 }

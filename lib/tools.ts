@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Effect, pipe, ParseResult } from "effect";
 import { serverRuntime } from "@/lib/server-runtime";
-import { validateToolSubmissionFormData } from "@/lib/validate-tool-submission-formdata";
+import { validateToolSubmissionFormData } from "@/lib/server/validate-tool-submission-formdata";
 import { generatePresignedUrls } from "@/lib/server/generate-presigned-urls";
 import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-image-webp-variants";
 import { saveTool } from "@/lib/server/save-tool";
