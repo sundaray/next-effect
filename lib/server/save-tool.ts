@@ -17,7 +17,7 @@ export function saveTool(body: saveToolPayload) {
 
     const s3BaseUrl = `https://${s3BucketName}.s3.${awsRegion}.amazonaws.com`;
     const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
-    const homepageScreenshotUrl = `${s3BaseUrl}/${body.homepageScreenshotKey}`;
+    const showcaseImageUrl = `${s3BaseUrl}/${body.showcaseImageKey}`;
 
     const result = yield* dbService
       .use((db) =>
@@ -33,7 +33,7 @@ export function saveTool(body: saveToolPayload) {
             categories: [...body.categories],
             pricing: body.pricing,
             logoUrl,
-            homepageScreenshotUrl,
+            showcaseImageUrl,
             status: "pending",
           })
           .returning()
