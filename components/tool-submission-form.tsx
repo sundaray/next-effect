@@ -31,6 +31,8 @@ import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
 import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
 import { saveTool } from "@/lib/client/save-tool";
 import { redirect } from "next/navigation";
+import { Effect, pipe } from "effect";
+import { clientRuntime } from "@/lib/client-runtime";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -65,116 +67,28 @@ export function ToolSubmissionForm() {
       },
     });
 
-  const onSubmit = async (data: ToolSubmissionFormSchemaType) => {
+  async function onSubmit(data: ToolSubmissionFormSchemaType) {
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    /********************************************************************
-     *
-     *  STEP 1: Get presigned URLs
-     *
-     ********************************************************************/
-    const response = await getPresignedUrls(data);
-
-    if (response.isErr()) {
-      const error = response.error;
-      setErrorMessage(null);
-
-      switch (error._tag) {
-        case "ParseError":
-          error.issues.forEach((issue) => {
-            const field = issue.path[0] as keyof ToolSubmissionFormSchemaType;
-            if (field) {
-              setError(field, { type: "server", message: issue.message });
-            }
-          });
-          break;
-
-        case "NetworkError":
-        case "InternalServerError":
-          setErrorMessage(error.message);
-          break;
-
-        default:
-          setErrorMessage("An unexpected error occurred. Please try again.");
-      }
-
-      setIsProcessing(false);
-      return;
-    }
-
-    const { logoKey, logoUploadUrl, showcaseImageKey, showcaseImageUploadUrl } =
-      response.value;
-
-    /********************************************************************
-     *
-     *  STEP 2: Upload logo and homepage screenshot directly to S3
-     *
-     ********************************************************************/
-    const uploadResult = await uploadFilesToS3({
-      showcaseImage: data.showcaseImage,
-      showcaseImageUploadUrl,
-      logo: data.logo,
-      logoUploadUrl,
+    const program = Effect.gen(function* () {
+      const response = yield* getPresignedUrls(data);
     });
 
-    if (uploadResult.isErr()) {
-      const error = uploadResult.error;
-      setErrorMessage(null);
+    const handledProgram = pipe(
+      effect,
+      Effect.catchTag("InternalServerError", () => setErrorMessage("Hello")),
+      Effect.ensureErrorType<never>()
+    );
 
-      switch (error._tag) {
-        case "NetworkError":
-        case "InternalServerError":
-          setErrorMessage(error.message);
-          break;
+    const result = clientRuntime.runPromise(handledProgram);
 
-        default:
-          setErrorMessage("An unexpected error occurred. Please try again.");
-      }
-
-      setIsProcessing(false);
-      return;
+    if (result) {
+      reset();
+      redirect("/submit/success");
     }
-
-    /********************************************************************
-     *
-     *  STEP 3: Save the tool in the database
-     *
-     ********************************************************************/
-    const saveToolResult = await saveTool({
-      name: data.name,
-      website: data.website,
-      tagline: data.tagline,
-      description: data.description,
-      categories: data.categories,
-      pricing: data.pricing,
-      logoKey,
-      showcaseImageKey,
-    });
-
-    if (saveToolResult.isErr()) {
-      const error = saveToolResult.error;
-      switch (error._tag) {
-        case "NetworkError":
-        case "InternalServerError":
-          setErrorMessage(error.message);
-          break;
-        default:
-          setErrorMessage("An unexpected error occurred. Please try again.");
-      }
-      setIsProcessing(false);
-      return;
-    }
-
-    /********************************************************************
-     *
-     *  FINAL STEP: Redirect user
-     *
-     ********************************************************************/
-    reset();
-    redirect("/submit/success");
-  };
+  }
 
   const message = successMessage || errorMessage;
   const messageType = successMessage ? "success" : "error";

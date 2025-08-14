@@ -1,60 +1,57 @@
 import "client-only";
-
-import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
+import { Effect, Data } from "effect";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
-import {
-  ParseError,
-  InternalServerError,
-  NetworkError,
-} from "@/lib/client/errors";
 
-type GetPresignedUrlResponse = {
-  showcaseImageUploadUrl: string;
-  showcaseImageKey: string;
-  logoUploadUrl?: string;
-  logoKey?: string;
-};
+class NetworkError extends Data.TaggedError("NetworkError")<{
+  cause: unknown;
+  message: string;
+}> {}
 
-export type GetPresignedUrlsError =
-  | ParseError
-  | InternalServerError
-  | NetworkError;
+class InternalServerError extends Data.TaggedError("InternalServerError")<{
+  message: string;
+}> {}
 
-export async function getPresignedUrls(
-  data: ToolSubmissionFormSchemaType
-): Promise<Result<GetPresignedUrlResponse, GetPresignedUrlsError>> {
-  const formData = new FormData();
+export function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
+  return Effect.gen(function* () {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("website", data.website);
+    formData.append("tagline", data.tagline);
+    formData.append("description", data.description);
+    formData.append("pricing", data.pricing);
+    formData.append("categories", JSON.stringify(data.categories));
+    if (data.logo) {
+      formData.append("logo", data.logo);
+    }
+    formData.append("showcaseImage", data.showcaseImage);
 
-  formData.append("name", data.name);
-  formData.append("website", data.website);
-  formData.append("tagline", data.tagline);
-  formData.append("description", data.description);
-  formData.append("pricing", data.pricing);
-  formData.append("categories", JSON.stringify(data.categories));
-  if (data.logo) {
-    formData.append("logo", data.logo);
-  }
-  formData.append("showcaseImage", data.showcaseImage);
-
-  const result = await safeTry(async function* () {
-    const response = yield* ResultAsync.fromPromise(
-      fetch("/api/tools/presigned-url", { method: "POST", body: formData }),
-      () =>
-        new NetworkError("Please check your internet connection and try again.")
-    );
-
-    const data = yield* ResultAsync.fromPromise(response.json(), (error) => {
-      console.error("InternalServerError: ", error);
-      return new InternalServerError(
-        "Tool submission failed due to a server error. Please try again."
-      );
+    const response = yield* Effect.tryPromise({
+      try: () =>
+        fetch("/api/tools/presigned-url", { method: "POST", body: formData }),
+      catch: (error) =>
+        new NetworkError({
+          message: "Please check your internet connection and try again.",
+          cause: error,
+        }),
     });
+
+    const jsonResult = yield* Effect.tryPromise({
+      try: () => response.json(),
+      catch: (cause) =>
+        new InternalServerError({
+          message: "Failed to parse server response.",
+        }),
+    });
+
     if (!response.ok) {
-      return err(data as GetPresignedUrlsError);
+      if (jsonResult._tag === "ParseError") {
+        return yield* Effect.fail({ issues: jsonResult.issues });
+      }
+      return yield* Effect.fail(
+        new InternalServerError({ message: jsonResult.message })
+      );
     }
 
-    return ok(data as GetPresignedUrlResponse);
+    return jsonResult;
   });
-
-  return result;
 }

@@ -6,7 +6,6 @@ import { generatePresignedUrls } from "@/lib/server/generate-presigned-urls";
 import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-image-webp-variants";
 import { saveTool } from "@/lib/server/save-tool";
 import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
-import { WebPVariantCreationQueueService } from "@/lib/services/webp-variant-creation-queue-service";
 
 const app = new Hono();
 
@@ -78,18 +77,11 @@ app.post("/save", async (ctx) => {
   const body = (await ctx.req.json()) as saveToolPayload;
 
   const program = Effect.gen(function* () {
-    const queue = yield* WebPVariantCreationQueueService;
-
     // Step 2: Create and upload WebP variants of the homepage screenshot.
-    // yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
+    yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
 
     // Step 3: Save the final tool submission details to the database.
     const tool = yield* saveTool(body);
-
-    yield* queue.offer({
-      toolId: tool.id,
-      showcaseImageKey: body.showcaseImageKey,
-    });
 
     // Step 4: Return the newly created tool record to the client.
     return ctx.json({

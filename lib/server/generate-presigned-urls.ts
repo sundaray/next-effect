@@ -64,7 +64,7 @@ export function generatePresignedUrls(
           getSignedUrl(
             s3,
             new PutObjectCommand({
-              Bucket: "indie-ai-tools",
+              Bucket: bucketName,
               Key: logoKey,
               ContentType: logoFile.type,
             }),

@@ -1,5 +1,5 @@
 import "client-only";
-import { ok, err, Result, ResultAsync, safeTry } from "neverthrow";
+import { Effect, pipe } from "effect";
 import { NetworkError, InternalServerError } from "@/lib/client/errors";
 
 type UploadFilesToS3Params = {
@@ -9,64 +9,46 @@ type UploadFilesToS3Params = {
   logoUploadUrl?: string;
 };
 
-type UploadFilesToS3Errors = NetworkError | InternalServerError;
+export function uploadFilesToS3(params: UploadFilesToS3Params) {
+  // We wrap the entire logic in Effect.gen
+  return Effect.gen(function* () {
+    // Helper function to create an Effect for a single file upload.
+    const createUploadEffect = (url: string, file: File) =>
+      pipe(
+        Effect.tryPromise({
+          try: () =>
+            fetch(url, {
+              method: "PUT",
+              headers: { "Content-Type": file.type },
+              body: file,
+            }),
+          catch: (cause) => new NetworkError({ cause }),
+        }),
+        Effect.flatMap((response) =>
+          response.ok
+            ? Effect.succeed(undefined)
+            : Effect.fail(
+                new InternalServerError({
+                  message: `File upload to S3 failed with status: ${response.status}`,
+                })
+              )
+        )
+      );
 
-export async function uploadFilesToS3(
-  params: UploadFilesToS3Params
-): Promise<Result<void, UploadFilesToS3Errors>> {
-  const result = await safeTry(async function* () {
-    const uploadPromises: Promise<Response>[] = [];
+    // Create a list to hold our upload effects.
+    const uploadEffects: Effect.Effect<void, UploadFilesToS3Errors>[] = [];
 
-    // 1. Prepare the homepage screenshot upload promise
-    const screenshotUploadPromise = fetch(params.showcaseImageUploadUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": params.showcaseImage.type,
-      },
-      body: params.showcaseImage,
-    });
-    uploadPromises.push(screenshotUploadPromise);
-
-    // 2. Prepare the logo upload promise
-    if (params.logoUploadUrl && params.logo) {
-      const logoUploadPromise = fetch(params.logoUploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": params.logo.type,
-        },
-        body: params.logo,
-      });
-      uploadPromises.push(logoUploadPromise);
-    }
-
-    // 3. Execute all uploads in parallel
-    const responses = yield* ResultAsync.fromPromise(
-      Promise.all(uploadPromises),
-      (error) => {
-        console.error("NetworkError: ", error);
-        return new NetworkError(
-          "Please check your internet connection and try again."
-        );
-      }
+    // Always add the showcase image upload effect.
+    uploadEffects.push(
+      createUploadEffect(params.showcaseImageUploadUrl, params.showcaseImage)
     );
 
-    // 4. Check if all uploads were successful
-    for (const response of responses) {
-      if (!response.ok) {
-        console.error("InternalServerError: ", {
-          status: response.status,
-          statusText: response.statusText,
-        });
-        return err(
-          new InternalServerError(
-            "Tool submission failed due to a server error. Please try again."
-          )
-        );
-      }
+    // Conditionally add the logo upload effect.
+    if (params.logoUploadUrl && params.logo) {
+      yield* Effect.logInfo("Logo found, preparing logo upload.");
+      uploadEffects.push(createUploadEffect(params.logoUploadUrl, params.logo));
     }
 
-    return ok(undefined);
+    yield* Effect.all(uploadEffects, { concurrency: "inherit", discard: true });
   });
-
-  return result;
 }
