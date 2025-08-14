@@ -142,30 +142,30 @@ export function ToolSubmissionForm() {
      *  STEP 3: Save the tool in the database
      *
      ********************************************************************/
-    // const saveToolResult = await saveTool({
-    //   name: data.name,
-    //   website: data.website,
-    //   tagline: data.tagline,
-    //   description: data.description,
-    //   categories: data.categories,
-    //   pricing: data.pricing,
-    //   logoKey,
-    //   showcaseImageKey,
-    // });
+    const saveToolResult = await saveTool({
+      name: data.name,
+      website: data.website,
+      tagline: data.tagline,
+      description: data.description,
+      categories: data.categories,
+      pricing: data.pricing,
+      logoKey,
+      showcaseImageKey,
+    });
 
-    // if (saveToolResult.isErr()) {
-    //   const error = saveToolResult.error;
-    //   switch (error._tag) {
-    //     case "NetworkError":
-    //     case "InternalServerError":
-    //       setErrorMessage(error.message);
-    //       break;
-    //     default:
-    //       setErrorMessage("An unexpected error occurred. Please try again.");
-    //   }
-    //   setIsProcessing(false);
-    //   return;
-    // }
+    if (saveToolResult.isErr()) {
+      const error = saveToolResult.error;
+      switch (error._tag) {
+        case "NetworkError":
+        case "InternalServerError":
+          setErrorMessage(error.message);
+          break;
+        default:
+          setErrorMessage("An unexpected error occurred. Please try again.");
+      }
+      setIsProcessing(false);
+      return;
+    }
 
     /********************************************************************
      *

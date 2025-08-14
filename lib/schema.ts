@@ -2,8 +2,8 @@ import { Schema } from "effect";
 
 export const pricingOptions = ["free", "paid", "freemium"] as const;
 
-export const LOGO_MAX_SIZE_MB = 2;
-export const SCREENSHOT_MAX_SIZE_MB = 5;
+export const LOGO_MAX_SIZE_MB = 1;
+export const SCREENSHOT_MAX_SIZE_MB = 4;
 export const SUPPORTED_FILE_TYPES = ["JPEG", "PNG", "WEBP"];
 
 export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
