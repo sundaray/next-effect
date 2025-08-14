@@ -3,9 +3,9 @@ import { DatabaseService } from "@/lib/services/database-service";
 import { DbClientService } from "@/lib/services/dbClient-service";
 import { StorageService } from "@/lib/services/storage-service";
 import { WebPVariantCreationQueueService } from "./services/webp-variant-creation-queue-service";
-import { tools } from "@/db/schema";
 import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-image-webp-variants";
 import { eq } from "drizzle-orm";
+import { tools } from "@/db/schema";
 
 const DatabaseServiceLayer = DatabaseService.Default;
 const DbClientServiceLayer = DbClientService.Default;

@@ -34,9 +34,10 @@ export function saveTool(body: saveToolPayload) {
             pricing: body.pricing,
             logoUrl,
             showcaseImageUrl,
-            status: "pending",
+            adminApprovalStatus: "pending",
+            webpVariantCreationStatus: "queued",
           })
-          .returning()
+          .returning({ id: tools.id })
       )
       .pipe(
         Effect.tapErrorTag("DatabaseError", (error) =>
@@ -51,6 +52,6 @@ export function saveTool(body: saveToolPayload) {
         )
       );
 
-    return result;
+    return result[0];
   });
 }
