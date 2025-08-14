@@ -7,7 +7,19 @@ import {
   ParseError,
 } from "@/lib/client/errors";
 
-export function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
+type GetPresignedUrlsResponse = {
+  logoKey?: string;
+  logoUploadUrl?: string;
+  showcaseImageUploadUrl: string;
+  showcaseImageKey: string;
+};
+
+export function getPresignedUrls(
+  data: ToolSubmissionFormSchemaType
+): Effect.Effect<
+  GetPresignedUrlsResponse,
+  ParseError | NetworkError | InternalServerError
+> {
   return Effect.gen(function* () {
     const formData = new FormData();
     formData.append("name", data.name);

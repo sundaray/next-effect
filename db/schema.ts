@@ -3,11 +3,6 @@ import { sql } from "drizzle-orm";
 
 export const pricingTypeEnum = pgEnum("pricing", ["free", "paid", "freemium"]);
 
-export const webpVariantCreationStatusEnum = pgEnum(
-  "webp_variant_creation_status",
-  ["queued", "processing", "completed", "failed"]
-);
-
 export const adminApprovalStatusEnum = pgEnum("admin_approval_status", [
   "pending",
   "approved",
@@ -27,12 +22,6 @@ export const tools = pgTable("tools", {
   pricing: pricingTypeEnum("pricing").notNull(),
   logoUrl: text("logo_url"),
   showcaseImageUrl: text("showcase_image_url").notNull(),
-  webpVariantCreationStatus: webpVariantCreationStatusEnum(
-    "webp_variant_creation_status"
-  )
-    .default("queued")
-    .notNull(),
-
   adminApprovalStatus: adminApprovalStatusEnum("admin_approval_status")
     .default("pending")
     .notNull(),
