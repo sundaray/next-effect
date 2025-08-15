@@ -30,9 +30,9 @@ import {
 import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
 import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
 import { saveTool } from "@/lib/client/save-tool";
-import { redirect } from "next/navigation";
 import { Effect, pipe } from "effect";
 import { clientRuntime } from "@/lib/client-runtime";
+import { useRouter } from "next/navigation";
 
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -49,6 +49,8 @@ export function ToolSubmissionForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
@@ -101,7 +103,12 @@ export function ToolSubmissionForm() {
 
     const handledProgram = pipe(
       program,
-      Effect.as({ success: true }),
+      Effect.tap(() =>
+        Effect.sync(() => {
+          reset();
+          router.push("/submit/success");
+        })
+      ),
       Effect.catchTags({
         ParseError: (error) =>
           Effect.sync(() => {
@@ -110,29 +117,25 @@ export function ToolSubmissionForm() {
               if (field)
                 setError(field, { type: "server", message: issue.message });
             });
-            return { success: false };
           }),
         NetworkError: (error) =>
           Effect.sync(() => {
             setErrorMessage(error.message);
-            return { success: false };
+          }),
+        UserSessionError: () =>
+          Effect.sync(() => {
+            router.push("/login");
           }),
         InternalServerError: (error) =>
           Effect.sync(() => {
             setErrorMessage(error.message);
-            return { success: false };
           }),
       }),
       Effect.ensureErrorType<never>(),
       Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
     );
 
-    const { success } = await clientRuntime.runPromise(handledProgram);
-
-    if (success === true) {
-      reset();
-      redirect("/submit/success");
-    }
+    await clientRuntime.runPromise(handledProgram);
   }
 
   const message = successMessage || errorMessage;

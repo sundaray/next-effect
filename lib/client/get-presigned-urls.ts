@@ -5,6 +5,7 @@ import {
   NetworkError,
   InternalServerError,
   ParseError,
+  UserSessionError,
 } from "@/lib/client/errors";
 
 type GetPresignedUrlsResponse = {
@@ -18,7 +19,7 @@ export function getPresignedUrls(
   data: ToolSubmissionFormSchemaType
 ): Effect.Effect<
   GetPresignedUrlsResponse,
-  ParseError | NetworkError | InternalServerError
+  ParseError | NetworkError | InternalServerError | UserSessionError
 > {
   return Effect.gen(function* () {
     const formData = new FormData();
@@ -54,6 +55,11 @@ export function getPresignedUrls(
     if (!response.ok) {
       if (result._tag === "ParseError") {
         return yield* Effect.fail(new ParseError({ issues: result.issues }));
+      }
+      if (result._tag === "UserSessionError") {
+        return yield* Effect.fail(
+          new UserSessionError({ message: result.issues })
+        );
       }
       return yield* Effect.fail(
         new InternalServerError({ message: result.message })

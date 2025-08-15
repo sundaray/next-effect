@@ -4,7 +4,7 @@ import { Effect, Data, pipe, Predicate } from "effect";
 import { AuthService, AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
 
-class UserSessionError extends Data.TaggedError("UserSessionError")<{
+export class UserSessionError extends Data.TaggedError("UserSessionError")<{
   message: string;
 }> {}
 
@@ -27,7 +27,9 @@ export async function authHandler(ctx: MiddlewareContext, next: Next) {
       Effect.filterOrFail(
         Predicate.isNotNull,
         () =>
-          new UserSessionError({ message: "No active users session found." })
+          new UserSessionError({
+            message: "No active users session found.",
+          })
       )
     );
 
@@ -43,11 +45,12 @@ export async function authHandler(ctx: MiddlewareContext, next: Next) {
         await next();
       })
     ),
-    Effect.catchTag("UserSessionError", () =>
+    Effect.catchTag("UserSessionError", (error) =>
       Effect.succeed(
         ctx.json(
           {
-            error: "Unathorized",
+            _tag: "UserSessionError",
+            message: error.message,
           },
           { status: 401 }
         )
