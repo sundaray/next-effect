@@ -1,22 +1,34 @@
+import { createMiddleware } from "hono/factory";
 import type { Next, Context } from "hono";
-import { Effect, Data, Config, pipe } from "effect";
-import { AuthService } from "@/lib/services/auth-service";
+import { Effect, Data, pipe, Predicate } from "effect";
+import { AuthService, AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
 
 class UserSessionError extends Data.TaggedError("UserSessionError")<{
   message: string;
 }> {}
 
-export async function authHandler(ctx: Context, next: Next) {
+type MiddlewareContext = Context<{
+  Variables: AuthType;
+}>;
+
+export async function authHandler(ctx: MiddlewareContext, next: Next) {
   const program = Effect.gen(function* () {
     const auth = yield* AuthService;
 
     const session = Effect.tryPromise({
       try: () => auth.api.getSession({ headers: ctx.req.raw.headers }),
       catch: () =>
-        new UserSessionError({ message: "Failed to get user session." }),
+        new UserSessionError({ message: "No active users session found." }),
     }).pipe(
-      Effect.tapErrorTag("UserSessionError", (error) => Effect.logError(error))
+      Effect.tapErrorTag("UserSessionError", (error) =>
+        Effect.logError("UserSessionError: ", error)
+      ),
+      Effect.filterOrFail(
+        Predicate.isNotNull,
+        () =>
+          new UserSessionError({ message: "No active users session found." })
+      )
     );
 
     return yield* session;
@@ -24,6 +36,13 @@ export async function authHandler(ctx: Context, next: Next) {
 
   const handledProgram = pipe(
     program,
+    Effect.flatMap((session) =>
+      Effect.promise(async () => {
+        ctx.set("user", session.user);
+        ctx.set("session", session.session);
+        await next();
+      })
+    ),
     Effect.catchTag("UserSessionError", () =>
       Effect.succeed(
         ctx.json(
@@ -39,3 +58,5 @@ export async function authHandler(ctx: Context, next: Next) {
 
   return await serverRuntime.runPromise(handledProgram);
 }
+
+export const authMiddleware = createMiddleware(authHandler);
