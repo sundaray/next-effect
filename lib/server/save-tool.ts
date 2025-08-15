@@ -35,7 +35,6 @@ export function saveTool(body: saveToolPayload) {
             logoUrl,
             showcaseImageUrl,
             adminApprovalStatus: "pending",
-            webpVariantCreationStatus: "queued",
           })
           .returning({ id: tools.id })
       )
