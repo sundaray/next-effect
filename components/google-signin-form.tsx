@@ -7,7 +7,7 @@ import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/form-message";
 import { authClient } from "@/lib/client/auth";
 import { clientRuntime } from "@/lib/client-runtime";
-import { SignInWithGoogleError } from "@/lib/client/errors";
+import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";
 
 export function GoogleSignInForm() {
   const [isPending, setIsPending] = useState(false);
@@ -20,21 +20,43 @@ export function GoogleSignInForm() {
     setIsPending(true);
     setErrorMessage(null);
 
-    const program = Effect.tryPromise({
-      try: () => authClient.signIn.social({ provider: "google" }),
-      catch: () =>
-        new SignInWithGoogleError({
-          message: "Google sign-in failed. Please try again.",
-        }),
+    const program = Effect.gen(function* () {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+      if (!baseUrl) {
+        return yield* Effect.fail(
+          new ConfigError({
+            message: "NEXT_PUBLIC_BASE_URL environment variable is not found.",
+          })
+        );
+      }
+
+      const callbackURL = next ? `${baseUrl}${next}` : baseUrl;
+
+      yield* Effect.tryPromise({
+        try: () =>
+          authClient.signIn.social({
+            provider: "google",
+            callbackURL,
+          }),
+        catch: () =>
+          new SignInWithGoogleError({
+            message: "Google sign-in failed. Please try again.",
+          }),
+      });
     }).pipe(
       Effect.tapErrorTag("SignInWithGoogleError", (error) =>
         Effect.logError("SignInWithGoogleError: ", error)
       )
     );
-
     const handledProgram = pipe(
       program,
       Effect.catchTag("SignInWithGoogleError", (error) =>
+        Effect.sync(() => {
+          setErrorMessage(error.message);
+        })
+      ),
+      Effect.catchTag("ConfigError", (error) =>
         Effect.sync(() => {
           setErrorMessage(error.message);
         })

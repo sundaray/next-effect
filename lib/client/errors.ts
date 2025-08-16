@@ -1,5 +1,9 @@
 import { Data } from "effect";
 
+export class ConfigError extends Data.TaggedError("ConfigError")<{
+  message: string;
+}> {}
+
 export class NetworkError extends Data.TaggedError("NetworkError")<{
   message: string;
 }> {}
