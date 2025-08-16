@@ -59,7 +59,7 @@ export function SignInWithEmailOtpForm({ next }: { next: string }) {
         }),
       catch: () =>
         new SendVerificationOtpError({
-          message: "Failed to send verification OTP.",
+          message: "Failed to send verification OTP. Please try again.",
         }),
     }).pipe(
       Effect.tapErrorTag("SendVerificationOtpError", (error) =>
@@ -69,9 +69,15 @@ export function SignInWithEmailOtpForm({ next }: { next: string }) {
 
     const handledProgram = pipe(
       program,
-      Effect.tap(() =>
+      Effect.tap((result) =>
         Effect.sync(() => {
-          setSuccessMessage("An OTP has been sent to your email.");
+          if (result.error) {
+            setErrorMessage(
+              "Failed to send verification OTP. Please try again."
+            );
+          } else {
+            setSuccessMessage("An OTP has been sent to your email.");
+          }
         })
       ),
       Effect.catchTag("SendVerificationOtpError", (error) =>
