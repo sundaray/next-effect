@@ -8,7 +8,7 @@ import { authClient } from "@/lib/client/auth";
 import { clientRuntime } from "@/lib/client-runtime";
 import { SignInWithGoogleError } from "@/lib/client/errors";
 
-export function GoogleSignInButton() {
+export function GoogleSignInForm() {
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -20,7 +20,7 @@ export function GoogleSignInButton() {
       try: () => authClient.signIn.social({ provider: "google" }),
       catch: () =>
         new SignInWithGoogleError({
-          message: "Could not start sign-in. Please try again.",
+          message: "Google sign-in failed. Please try again.",
         }),
     });
 
