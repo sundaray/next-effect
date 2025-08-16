@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,51 +9,66 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/form-message";
 import { FormFieldErrorMessage } from "@/components/form-field-error-message";
-
+import {
+  SignInWithEmailOtpFormSchemaType,
+  SignInWithEmailOtpFormSchema,
+} from "@/lib/schema";
 
 export function SignInWithEmailOtpForm({ next }: { next: string }) {
+  const [isPending, setIsPending] = useState(false);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<SignInWithEmailOtpFormSchemaType>({
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  async function onSubmit(data: SignInWithEmailOtpFormSchemaType) {
+    setIsPending(true);
+    setFormErrors([]);
+  }
 
   return (
-    <form {...getFormProps(form)} action={formAction}>
-      {form.errors && <FormErrorMessage error={form.errors[0]} />}
-      <div className={`grid gap-1 ${form.errors ? "mt-4" : ""}`}>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className={`grid gap-4 ${formErrors.length > 0 ? "mt-4" : ""}`}>
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input
-            {...getInputProps(fields.email, { type: "email" })}
-            className="mt-2"
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                id="email"
+                type="email"
+                className="mt-2"
+                placeholder="Enter your email address"
+              />
+            )}
           />
-          <FormFieldErrorMessage
-            id={fields.email.errorId}
-            name={fields.email.name}
-            errors={fields.email.errors}
-          />
+          {errors.email && (
+            <FormFieldErrorMessage
+              id="email-error"
+              name="email"
+              errors={[errors.email.message || ""]}
+            />
+          )}
         </div>
-        <div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <div className="text-sm">
-              <Link
-                href="/forgot-password"
-                className="font-medium text-sky-600 hover:underline hover:underline-offset-2"
-              >
-                Forgot password?
-              </Link>
-            </div>
-          </div>
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="h-10 rounded-full"
-        >
+
+        <Button type="submit" disabled={isPending} className="h-10">
           {isPending ? (
             <>
               <Icons.loader className="size-3 animate-spin" />
-              Signing in...
+              Sending OTP...
             </>
           ) : (
-            "Sign in"
+            "Send OTP"
           )}
         </Button>
       </div>

@@ -1,4 +1,5 @@
-import { GoogleSignInForm } from "@/components/google-signin-form";
+import { SignInWitjGoogleForm } from "@/components/signin-with-google-form";
+import { SignInWithEmailOtpForm } from "@/components/signin-with-email-otp-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default async function SignIn() {
         Sign in to your account
       </p>
       <div className="mt-12 grid gap-4">
-        <GoogleSignInForm />
+        <SignInWitjGoogleForm />
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
@@ -24,6 +25,7 @@ export default async function SignIn() {
             <span className="bg-background px-2">Or continue with</span>
           </div>
         </div>
+        <SignInWithEmailOtpForm next="/" />
       </div>
     </div>
   );

@@ -83,6 +83,22 @@ export type ToolSubmissionFormSchemaType = Schema.Schema.Type<
   typeof ToolSubmissionFormSchema
 >;
 
+export const SignInWithEmailOtpFormSchema = Schema.Struct({
+  email: Schema.String.pipe(
+    Schema.nonEmptyString({ message: () => "Email is required." }),
+    Schema.pattern(
+      /^(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i,
+      {
+        message: () => "Please enter a valid email address.",
+      }
+    )
+  ),
+});
+
+export type SignInWithEmailOtpFormSchemaType = Schema.Schema.Type<
+  typeof SignInWithEmailOtpFormSchema
+>;
+
 export type saveToolPayload = Omit<
   ToolSubmissionFormSchemaType,
   "logo" | "showcaseImage"
