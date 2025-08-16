@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import {
@@ -51,6 +52,7 @@ export function ToolSubmissionForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
@@ -124,7 +126,9 @@ export function ToolSubmissionForm() {
           }),
         UserSessionError: () =>
           Effect.sync(() => {
-            router.push("/login");
+            const searchParams = new URLSearchParams();
+            searchParams.set("next", pathname);
+            router.push(`/signin?${searchParams.toString()}`);
           }),
         InternalServerError: (error) =>
           Effect.sync(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Effect, pipe } from "effect";
 import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/form-message";
@@ -12,6 +13,9 @@ export function GoogleSignInForm() {
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
+
   async function handleSignInWithGoogle() {
     setIsPending(true);
     setErrorMessage(null);
@@ -22,7 +26,11 @@ export function GoogleSignInForm() {
         new SignInWithGoogleError({
           message: "Google sign-in failed. Please try again.",
         }),
-    });
+    }).pipe(
+      Effect.tapErrorTag("SignInWithGoogleError", (error) =>
+        Effect.logError("SignInWithGoogleError: ", error)
+      )
+    );
 
     const handledProgram = pipe(
       program,
@@ -41,18 +49,13 @@ export function GoogleSignInForm() {
   return (
     <div>
       <FormMessage message={errorMessage} type="error" />
-
       <button
         type="button"
         onClick={handleSignInWithGoogle}
         disabled={isPending}
         className="item-center flex w-full justify-center rounded-md border border-neutral-300 py-2 text-sm font-medium text-neutral-900 shadow-xs transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isPending ? (
-          <Icons.loader className="mr-2 inline-block size-5 animate-spin" />
-        ) : (
-          <Icons.google className="mr-2 inline-block size-5" />
-        )}
+        <Icons.google className="mr-2 inline-block size-5" />
         Sign in with Google
       </button>
     </div>
