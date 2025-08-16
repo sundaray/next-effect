@@ -54,6 +54,9 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
+  role: text("role").default("user").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
 });
 
 export const sessions = pgTable("sessions", {
