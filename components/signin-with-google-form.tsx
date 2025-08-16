@@ -9,7 +9,7 @@ import { authClient } from "@/lib/client/auth";
 import { clientRuntime } from "@/lib/client-runtime";
 import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";
 
-export function GoogleSignInForm() {
+export function SignInWitjGoogleForm() {
   const [isPending, setIsPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
