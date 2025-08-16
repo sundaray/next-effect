@@ -1,4 +1,4 @@
-import { Effect, Context, Config, Redacted } from "effect";
+import { Effect, Config, Redacted } from "effect";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { DbClientService } from "@/lib/services/dbClient-service";
@@ -15,7 +15,7 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
     );
 
     const auth = betterAuth({
-      database: drizzleAdapter(db, { provider: "pg" }),
+      database: drizzleAdapter(db, { provider: "pg", usePlural: true }),
       socialProviders: {
         google: {
           clientId: googleClientId,
@@ -27,8 +27,6 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
   }),
   dependencies: [DbClientService.Default],
 }) {}
-
-export type Auth = Context.Tag.Service<typeof AuthService>;
 
 export type AuthType = {
   user: typeof AuthService.Service.$Infer.Session.user | null;
