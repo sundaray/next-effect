@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { Effect, Data, pipe } from "effect";
 import { useState, useId } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -36,13 +37,16 @@ class VerifyOtpError extends Data.TaggedError("VerifyOtpError")<{
 
 type FormStep = "email" | "otp";
 
-export function SignInWithEmailOtpForm({ next }: { next: string }) {
+export function SignInWithEmailOtpForm() {
   const [step, setStep] = useState<FormStep>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
 
   const router = useRouter();
   const id = useId();
@@ -142,7 +146,7 @@ export function SignInWithEmailOtpForm({ next }: { next: string }) {
           } else {
             setSuccessMessage("Successfully signed in!");
             // Redirect after successful login
-            router.push(next);
+            router.push(next || "/");
           }
         })
       ),
