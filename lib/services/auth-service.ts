@@ -26,6 +26,7 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
         google: {
           clientId: googleClientId,
           clientSecret: googleClientSecret,
+          prompt: "select_account",
           mapProfileToUser: (profile) => {
             return {
               firstName: profile.given_name,

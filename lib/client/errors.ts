@@ -17,3 +17,9 @@ export class ParseError extends Data.TaggedError("ParseError")<{
 export class UserSessionError extends Data.TaggedError("UserSessionError")<{
   message: string;
 }> {}
+
+export class SignInWithGoogleError extends Data.TaggedError(
+  "SignInWithGoogleError"
+)<{
+  message: string;
+}> {}
