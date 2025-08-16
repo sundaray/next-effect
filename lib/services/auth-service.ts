@@ -3,6 +3,8 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { DbClientService } from "@/lib/services/dbClient-service";
 import { emailOTP } from "better-auth/plugins/email-otp";
+import { serverRuntime } from "@/lib/server-runtime";
+import { sendSignInOtpEmail } from "@/lib/send-otp-email";
 
 const adminEmailsConfig = Config.array(Config.string(), "ADMIN_EMAILS").pipe(
   Config.map((emails) => emails.map((email) => email.trim().toLowerCase()))
@@ -38,7 +40,9 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
       },
       plugins: [
         emailOTP({
-          async sendVerificationOTP({ email, otp, type }) {},
+          async sendVerificationOTP({ email, otp }) {
+            await serverRuntime.runPromise(sendSignInOtpEmail(email, otp));
+          },
           otpLength: 6,
           expiresIn: 300, // 5 minutes
           allowedAttempts: 3,

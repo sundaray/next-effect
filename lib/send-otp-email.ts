@@ -37,7 +37,7 @@ export function sendSignInOtpEmail(email: string, otp: string) {
         },
         Subject: {
           Charset: "UTF-8",
-          Data: "Your sign-in verification code",
+          Data: "Your sign-in OTP",
         },
       },
       Source: emailFrom,
@@ -54,6 +54,5 @@ export function sendSignInOtpEmail(email: string, otp: string) {
     Effect.tapErrorTag("EmailTemplateRenderError", (error) =>
       Effect.logError(error)
     )
-    Effect.ensureErrorType<never>()
   );
 }

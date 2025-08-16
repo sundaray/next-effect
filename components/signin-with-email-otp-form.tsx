@@ -1,5 +1,6 @@
 "use client";
 
+import { Effect, Data, pipe } from "effect";
 import { useState, useId } from "react";
 import { useForm, Controller } from "react-hook-form";
 
@@ -14,6 +15,14 @@ import {
   SignInWithEmailOtpFormSchema,
 } from "@/lib/schema";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { authClient } from "@/lib/client/auth";
+import { clientRuntime } from "@/lib/client-runtime";
+
+class SendVerificationOtpError extends Data.TaggedError(
+  "SendVerificationOtpError"
+)<{
+  message: string;
+}> {}
 
 export function SignInWithEmailOtpForm({ next }: { next: string }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -37,7 +46,45 @@ export function SignInWithEmailOtpForm({ next }: { next: string }) {
     },
   });
 
-  async function onSubmit(data: SignInWithEmailOtpFormSchemaType) {}
+  async function onSubmit(data: SignInWithEmailOtpFormSchemaType) {
+    setIsProcessing(true);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+
+    const program = Effect.tryPromise({
+      try: () =>
+        authClient.emailOtp.sendVerificationOtp({
+          email: data.email,
+          type: "sign-in",
+        }),
+      catch: () =>
+        new SendVerificationOtpError({
+          message: "Failed to send verification OTP.",
+        }),
+    }).pipe(
+      Effect.tapErrorTag("SendVerificationOtpError", (error) =>
+        Effect.logError("SendVerificationOtpError: ", error)
+      )
+    );
+
+    const handledProgram = pipe(
+      program,
+      Effect.tap(() =>
+        Effect.sync(() => {
+          setSuccessMessage("An OTP has been sent to your email.");
+        })
+      ),
+      Effect.catchTag("SendVerificationOtpError", (error) =>
+        Effect.sync(() => {
+          setErrorMessage(error.message);
+        })
+      ),
+      Effect.ensureErrorType<never>(),
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+    );
+
+    await clientRuntime.runPromise(handledProgram);
+  }
 
   const message = successMessage || errorMessage;
   const messageType = successMessage ? "success" : "error";
