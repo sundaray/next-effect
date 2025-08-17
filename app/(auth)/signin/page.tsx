@@ -12,7 +12,7 @@ export default async function SignIn() {
       <h2 className="text-center text-2xl font-semibold tracking-tight text-neutral-900">
         Welcome
       </h2>
-      <p className="mt-2 text-center text-neutral-700">
+      <p className="text-center text-neutral-700 mt-1">
         Sign in to your account
       </p>
       <div className="mt-12 grid gap-4">
@@ -25,7 +25,7 @@ export default async function SignIn() {
             <span className="bg-background px-2">Or continue with</span>
           </div>
         </div>
-        <SignInWithEmailOtpForm next="/" />
+        <SignInWithEmailOtpForm />
       </div>
     </div>
   );
