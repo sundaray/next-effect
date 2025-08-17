@@ -207,7 +207,7 @@ export function SignInWithEmailOtpForm() {
             />
           </div>
 
-          <Button type="submit" disabled={isProcessing} className="h-10">
+          <Button type="submit" disabled={isProcessing} className="h-10 mt-2">
             {isProcessing ? (
               <>
                 <Spinner
@@ -222,7 +222,6 @@ export function SignInWithEmailOtpForm() {
           </Button>
         </form>
       ) : (
-        // The OTP step is now also inside the main layout wrapper.
         <div key="otp-step" className="grid gap-3">
           {message && <FormMessage message={message} type={messageType} />}
 
@@ -258,7 +257,7 @@ export function SignInWithEmailOtpForm() {
             type="button"
             onClick={handleVerifyOtp}
             disabled={isProcessing || otp.length !== 6}
-            className="h-10"
+            className="h-10 mt-2"
           >
             {isProcessing ? (
               <>
