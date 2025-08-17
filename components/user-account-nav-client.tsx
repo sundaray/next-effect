@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { UserSession } from "@/lib/schema";
 import {
   DropdownMenu,
@@ -9,15 +10,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Icons } from "@/components/icons";
-import { signOut } from "@/app/auth-action";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/kibo-ui/spinner";
+import { authClient } from "@/lib/client/auth";
 
 export function UserAccountNavClient({ user }: { user: UserSession }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const router = useRouter();
 
   // Prevent dropdown from closing during sign out
   function handleOpenChange(open: boolean) {
@@ -32,10 +35,17 @@ export function UserAccountNavClient({ user }: { user: UserSession }) {
   function handleSignOut() {
     startTransition(async () => {
       setError(null);
-      const result = await signOut();
-
-      if (result && result._tag === "Error") {
-        setError("Sign out error. Try again.");
+      try {
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              router.push("/");
+            },
+          },
+        });
+      } catch (error) {
+        console.error("Sign out error:", error);
+        setError("Sign out failed. Try again.");
       }
     });
   }
