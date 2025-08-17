@@ -12,13 +12,12 @@ export function FormMessage({ message, type }: FormMessageProps) {
       {message && (
         <motion.div
           key="form-message"
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
+          exit={{ opacity: 0, y: -5 }}
           transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
+            ease: "easeOut",
+            duration: 0.2,
           }}
           layout
           className={cn(
