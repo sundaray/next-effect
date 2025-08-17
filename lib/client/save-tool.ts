@@ -19,11 +19,13 @@ export function saveTool(params: saveToolPayload) {
 
     const result = yield* Effect.tryPromise({
       try: () => response.json(),
-      catch: () =>
-        new InternalServerError({
+      catch: (error) => {
+        console.error("Save tool client error: ", error);
+        return new InternalServerError({
           message:
             "Tool submission failed due to a server error. Please try again.",
-        }),
+        });
+      },
     });
 
     if (!response.ok) {

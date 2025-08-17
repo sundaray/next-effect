@@ -16,7 +16,7 @@ export function FormFieldMessage({
       <p
         id={errorId}
         role="alert"
-        className="text-sm text-red-600 mt-1 ease-out animate-in fade-in-0"
+        className="text-sm text-red-600 mt-1 ease-out animate-in fade-in-0 slide-in-from-left-2"
       >
         {errorMessage}
       </p>

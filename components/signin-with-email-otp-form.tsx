@@ -10,7 +10,6 @@ import { motion } from "motion/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/form-message";
 import { FormFieldMessage } from "@/components/form-field-message";
 import {
@@ -46,6 +45,7 @@ export function SignInWithEmailOtpForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [otpErrorMessage, setOtpErrorMessage] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
@@ -53,6 +53,8 @@ export function SignInWithEmailOtpForm() {
   const router = useRouter();
   const id = useId();
   const fieldErrorId = `email-error-${id}`;
+  // CHANGE: Add a unique ID for the OTP error message for accessibility.
+  const otpErrorId = `otp-error-${id}`;
 
   const {
     control,
@@ -121,6 +123,7 @@ export function SignInWithEmailOtpForm() {
     setIsProcessing(true);
     setSuccessMessage(null);
     setErrorMessage(null);
+    setOtpErrorMessage(null);
 
     const program = Effect.tryPromise({
       try: () =>
@@ -130,7 +133,7 @@ export function SignInWithEmailOtpForm() {
         }),
       catch: () =>
         new VerifyOtpError({
-          message: "Invalid OTP. Please try again.",
+          message: "Incorrect OTP. Please try again.",
         }),
     }).pipe(
       Effect.tapErrorTag("VerifyOtpError", (error) =>
@@ -143,7 +146,9 @@ export function SignInWithEmailOtpForm() {
       Effect.tap((result) =>
         Effect.sync(() => {
           if (result.error) {
-            setErrorMessage("Invalid OTP. Please try again.");
+            setOtpErrorMessage(
+              "The 6-digit code is incorrect. Please try again."
+            );
           } else {
             router.push(next || "/");
           }
@@ -151,7 +156,7 @@ export function SignInWithEmailOtpForm() {
       ),
       Effect.catchTag("VerifyOtpError", (error) =>
         Effect.sync(() => {
-          setErrorMessage(error.message);
+          setOtpErrorMessage(error.message);
         })
       ),
       Effect.ensureErrorType<never>(),
@@ -166,8 +171,17 @@ export function SignInWithEmailOtpForm() {
     setOtp("");
     setSuccessMessage(null);
     setErrorMessage(null);
+    setOtpErrorMessage(null);
   }
 
+  function handleOtpChange(value: string) {
+    if (otpErrorMessage) {
+      setOtpErrorMessage(null);
+    }
+    setOtp(value);
+  }
+
+  // The general message now only shows server/send errors or success messages.
   const message = successMessage || errorMessage;
   const messageType = successMessage ? "success" : "error";
 
@@ -222,33 +236,60 @@ export function SignInWithEmailOtpForm() {
           </Button>
         </form>
       ) : (
-        <div key="otp-step" className="grid gap-3">
+        <form key="otp-step" className="grid">
           {message && <FormMessage message={message} type={messageType} />}
 
-          <div>
+          <div className={message ? "mt-4" : ""}>
             <Label htmlFor="otp">OTP</Label>
             <div className="mt-2 grid">
               <InputOTP
                 maxLength={6}
                 value={otp}
-                onChange={setOtp}
+                onChange={handleOtpChange}
                 disabled={isProcessing}
                 onComplete={handleVerifyOtp}
                 containerClassName="w-full"
+                aria-invalid={otpErrorMessage ? "true" : "false"}
+                aria-describedby={otpErrorMessage ? otpErrorId : undefined}
               >
                 <InputOTPGroup className="w-full">
-                  <InputOTPSlot index={0} className="w-full" />
-                  <InputOTPSlot index={1} className="w-full" />
-                  <InputOTPSlot index={2} className="w-full" />
-                  <InputOTPSlot index={3} className="w-full" />
-                  <InputOTPSlot index={4} className="w-full" />
-                  <InputOTPSlot index={5} className="w-full" />
+                  <InputOTPSlot
+                    index={0}
+                    className="w-full border-neutral-300"
+                  />
+                  <InputOTPSlot
+                    index={1}
+                    className="w-full border-neutral-300"
+                  />
+                  <InputOTPSlot
+                    index={2}
+                    className="w-full border-neutral-300"
+                  />
+                  <InputOTPSlot
+                    index={3}
+                    className="w-full border-neutral-300"
+                  />
+                  <InputOTPSlot
+                    index={4}
+                    className="w-full border-neutral-300"
+                  />
+                  <InputOTPSlot
+                    index={5}
+                    className="w-full border-neutral-300"
+                  />
                 </InputOTPGroup>
               </InputOTP>
               <div className="text-left">
-                <p className="text-sm text-neutral-500 mt-1">
-                  Enter the 6-digit OTP sent to your email.
-                </p>
+                {otpErrorMessage ? (
+                  <FormFieldMessage
+                    errorId={otpErrorId}
+                    errorMessage={otpErrorMessage}
+                  />
+                ) : (
+                  <p className="text-sm text-neutral-500 mt-1">
+                    Enter the 6-digit OTP sent to your email.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -257,11 +298,14 @@ export function SignInWithEmailOtpForm() {
             type="button"
             onClick={handleVerifyOtp}
             disabled={isProcessing || otp.length !== 6}
-            className="h-10 mt-2"
+            className="h-10 mt-4"
           >
             {isProcessing ? (
               <>
-                <Icons.loader className="size-3 animate-spin" />
+                <Spinner
+                  className="size-4 inline-block"
+                  variant="circle-filled"
+                />
                 Verifying...
               </>
             ) : (
@@ -274,11 +318,11 @@ export function SignInWithEmailOtpForm() {
             variant="ghost"
             onClick={handleBackToEmail}
             disabled={isProcessing}
-            className="h-10"
+            className="h-10 mt-2"
           >
             Back to Email
           </Button>
-        </div>
+        </form>
       )}
     </motion.div>
   );

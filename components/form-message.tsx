@@ -27,7 +27,7 @@ export function FormMessage({ message, type }: FormMessageProps) {
             type === "success" && "bg-green-100 border border-green-200"
           )}
         >
-          <motion.p
+          <p
             className={cn(
               "text-sm",
               type === "error" && "text-red-800",
@@ -35,7 +35,7 @@ export function FormMessage({ message, type }: FormMessageProps) {
             )}
           >
             {message}
-          </motion.p>
+          </p>
         </motion.div>
       )}
     </AnimatePresence>

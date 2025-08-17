@@ -37,7 +37,7 @@ export function getPresignedUrls(
     const response = yield* Effect.tryPromise({
       try: () =>
         fetch("/api/tools/presigned-url", { method: "POST", body: formData }),
-      catch: (error) =>
+      catch: () =>
         new NetworkError({
           message: "Please check your internet connection and try again.",
         }),
@@ -45,11 +45,13 @@ export function getPresignedUrls(
 
     const result = yield* Effect.tryPromise({
       try: () => response.json(),
-      catch: () =>
-        new InternalServerError({
+      catch: (error) => {
+        console.log("Client getPresignedURL error: ", error);
+        return new InternalServerError({
           message:
             "Tool submission failed due to a server error. Please try again.",
-        }),
+        });
+      },
     });
 
     if (!response.ok) {

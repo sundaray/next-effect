@@ -48,8 +48,9 @@ app.post("/presigned-url", async (ctx) => {
         ctx.json({ _tag: "ParseError", issues }, { status: 400 })
       );
     }),
-    Effect.catchAll(() =>
-      Effect.succeed(
+    Effect.catchAll((error) => {
+      console.log("Presigned URL server error: ", error);
+      return Effect.succeed(
         ctx.json(
           {
             _tag: "InternalServerError",
@@ -58,8 +59,8 @@ app.post("/presigned-url", async (ctx) => {
           },
           { status: 500 }
         )
-      )
-    ),
+      );
+    }),
     Effect.ensureErrorType<never>()
   );
 
