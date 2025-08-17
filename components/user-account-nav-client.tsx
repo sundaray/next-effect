@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { UserSession } from "@/lib/schema";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +13,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/kibo-ui/spinner";
 import { authClient } from "@/lib/client/auth";
+import type { User } from "@/lib/services/auth-service";
 
-export function UserAccountNavClient({ user }: { user: UserSession }) {
+export function UserAccountNavClient({ user }: { user: User }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -39,7 +39,9 @@ export function UserAccountNavClient({ user }: { user: UserSession }) {
         await authClient.signOut({
           fetchOptions: {
             onSuccess: () => {
+              setIsOpen(false);
               router.push("/");
+              router.refresh();
             },
           },
         });
@@ -75,10 +77,9 @@ export function UserAccountNavClient({ user }: { user: UserSession }) {
         <div className="px-2 py-1">
           <div className="flex w-full flex-col items-center">
             {error && <p className="text-sm text-red-600">{error}</p>}
-
             <Button
               onClick={handleSignOut}
-              className={cn("w-full rounded-full", {
+              className={cn("w-full", {
                 "mt-2": error,
               })}
               disabled={isPending}

@@ -1,5 +1,3 @@
-import "client-only";
-
 import { createAuthClient } from "better-auth/client";
 import { emailOTPClient } from "better-auth/client/plugins";
 

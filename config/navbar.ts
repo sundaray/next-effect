@@ -5,8 +5,5 @@ type NavbarConfig = {
 };
 
 export const navbarLinks: NavbarConfig = {
-  main: [
-    { title: "Client", href: "/client" },
-    { title: "Server", href: "/server" },
-  ],
+  main: [{ title: "Submit", href: "/submit" }],
 };

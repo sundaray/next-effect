@@ -8,8 +8,8 @@ import { EmailService } from "@/lib/services/email-service";
 const DatabaseServiceLayer = DatabaseService.Default;
 const DbClientServiceLayer = DbClientService.Default;
 const StorageServiceLayer = StorageService.Default;
-const AuthServiceLayer = AuthService.Default;
 const EmailServiceLayer = EmailService.Default;
+const AuthServiceLayer = AuthService.Default;
 
 const AppLayer = Layer.mergeAll(
   DatabaseServiceLayer,

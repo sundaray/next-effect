@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { NavItem } from "@/components/nav-item";
-import { MobileNav } from "@/components/mobile-nav";
+// import { MobileNav } from "@/components/mobile-nav";
 import { UserAccountNav } from "@/components/user-account-nav";
 import type { NavItem as NavItemType } from "@/types/navigation";
 
@@ -28,7 +28,7 @@ export function MainNav({ items }: MainNavProps) {
           ))}
         </ul>
       </nav>
-      <MobileNav />
+      {/* <MobileNav /> */}
       <UserAccountNav />
     </div>
   );

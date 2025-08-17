@@ -68,6 +68,12 @@ export function SignInWithEmailOtpForm() {
     },
   });
 
+  // -----------------------------------------------
+
+  //  Send OTP
+
+  // -----------------------------------------------
+
   async function handleSendOtp(data: SignInWithEmailOtpFormSchemaType) {
     setIsProcessing(true);
     setSuccessMessage(null);
@@ -94,9 +100,7 @@ export function SignInWithEmailOtpForm() {
       Effect.tap((result) =>
         Effect.sync(() => {
           if (result.error) {
-            setErrorMessage(
-              "Failed to send verification OTP. Please try again."
-            );
+            setErrorMessage("Failed to send OTP. Please try again.");
           } else {
             setSuccessMessage("A 6-digit OTP has been sent to your email.");
             setEmail(data.email);
@@ -115,6 +119,12 @@ export function SignInWithEmailOtpForm() {
 
     await clientRuntime.runPromise(handledProgram);
   }
+
+  // -----------------------------------------------
+
+  //  Verify OTP
+
+  // -----------------------------------------------
 
   async function handleVerifyOtp() {
     if (otp.length !== 6) return;
@@ -145,11 +155,11 @@ export function SignInWithEmailOtpForm() {
       Effect.tap((result) =>
         Effect.sync(() => {
           if (result.error) {
-            setOtpErrorMessage(
-              "The 6-digit code is incorrect. Please try again."
-            );
+            setOtpErrorMessage("Incorrect OTP. Please try again.");
+            setIsProcessing(false);
           } else {
             router.push(next || "/");
+            router.refresh();
           }
         })
       ),
@@ -158,8 +168,7 @@ export function SignInWithEmailOtpForm() {
           setOtpErrorMessage(error.message);
         })
       ),
-      Effect.ensureErrorType<never>(),
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+      Effect.ensureErrorType<never>()
     );
 
     await clientRuntime.runPromise(handledProgram);
