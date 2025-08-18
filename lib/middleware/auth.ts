@@ -1,7 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import type { Next, Context } from "hono";
 import { Effect, Data, pipe, Predicate } from "effect";
-import { AuthService, AuthType } from "@/lib/services/auth-service";
+import { AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
 
 export class UserSessionError extends Data.TaggedError("UserSessionError")<{
@@ -13,37 +13,21 @@ type MiddlewareContext = Context<{
 }>;
 
 export async function authHandler(ctx: MiddlewareContext, next: Next) {
-  const program = Effect.gen(function* () {
-    const auth = yield* AuthService;
-
-    const session = Effect.tryPromise({
-      try: () => auth.api.getSession({ headers: ctx.req.raw.headers }),
-      catch: () =>
-        new UserSessionError({ message: "No active users session found." }),
-    }).pipe(
-      Effect.tapErrorTag("UserSessionError", (error) =>
-        Effect.logError("UserSessionError: ", error)
-      ),
-      Effect.filterOrFail(
-        Predicate.isNotNull,
-        () =>
-          new UserSessionError({
-            message: "No active users session found.",
-          })
-      )
-    );
-
-    return yield* session;
-  });
+  const program = Effect.succeed(ctx.get("user"));
 
   const handledProgram = pipe(
     program,
-    Effect.flatMap((session) =>
+    Effect.filterOrFail(
+      Predicate.isNotNull,
+      () => new UserSessionError({ message: "Authentication required." })
+    ),
+    Effect.flatMap(() =>
       Effect.promise(async () => {
-        ctx.set("user", session.user);
-        ctx.set("session", session.session);
         await next();
       })
+    ),
+    Effect.tapErrorTag("UserSessionError", (error) =>
+      Effect.logError("UserSessionError: ", error)
     ),
     Effect.catchTag("UserSessionError", (error) =>
       Effect.succeed(

@@ -3,12 +3,14 @@ import { handle } from "hono/vercel";
 import tools from "@/lib/tools";
 import auth from "@/lib/auth";
 import { authMiddleware } from "@/lib/middleware/auth";
+import { sessionMiddleware } from "@/lib/middleware/session";
 import type { AuthType } from "@/lib/services/auth-service";
 
 const app = new Hono<{
   Variables: AuthType;
 }>().basePath("/api");
 
+app.use("*", sessionMiddleware);
 app.use("/tools/*", authMiddleware);
 app.route("/tools", tools);
 app.route("/auth", auth);
