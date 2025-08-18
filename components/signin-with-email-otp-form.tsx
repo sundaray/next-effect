@@ -155,7 +155,15 @@ export function SignInWithEmailOtpForm() {
       Effect.tap((result) =>
         Effect.sync(() => {
           if (result.error) {
-            setOtpErrorMessage("Incorrect OTP. Please try again.");
+            if (result.error.code === "TOO_MANY_ATTEMPTS") {
+              setOtpErrorMessage(
+                "Too many attempts. Please go back and request a new OTP."
+              );
+            } else if (result.error.code === "INVALID_OTP") {
+              setOtpErrorMessage("Invalid OTP. Please try again.");
+            } else {
+              setOtpErrorMessage("OTP verification failed. Please try again.");
+            }
             setIsProcessing(false);
           } else {
             router.push(next || "/");
