@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Effect, pipe } from "effect";
 import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/form-message";
-import { authClient } from "@/lib/client/auth";
+import { authClient } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
 import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";
 

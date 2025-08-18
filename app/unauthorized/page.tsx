@@ -5,7 +5,7 @@ export default function UnauthorizedPage() {
   return (
     <div className="max-w-xl mx-auto flex flex-col place-items-center text-center">
       <div>
-        <LockClosedIcon className="size-10 text-amber-500" />
+        <LockClosedIcon className="size-8 text-amber-500" />
       </div>
       <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 mt-6">
         Access Denied

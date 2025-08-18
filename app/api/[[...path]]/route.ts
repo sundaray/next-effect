@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import tools from "@/lib/tools";
+import user from "@/lib/user";
 import auth from "@/lib/auth";
 import { authMiddleware } from "@/lib/middleware/auth";
 import { sessionMiddleware } from "@/lib/middleware/session";
@@ -13,18 +14,7 @@ const app = new Hono<{
 app.use("*", sessionMiddleware);
 app.use("/tools/*", authMiddleware);
 app.route("/tools", tools);
-
-app.get("/session", async (ctx) => {
-  const session = ctx.get("session");
-  const user = ctx.get("user");
-
-  if (!session && !user) {
-    return ctx.json({ user: null, session: null }, 401);
-  }
-
-  return ctx.json({ user, session });
-});
-
+app.route("/user", user);
 app.route("/auth", auth);
 
 export const GET = handle(app);

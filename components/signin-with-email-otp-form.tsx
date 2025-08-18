@@ -22,7 +22,7 @@ import {
   SignInWithEmailOtpFormSchema,
 } from "@/lib/schema";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
-import { authClient } from "@/lib/client/auth";
+import { authClient } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
 import { Spinner } from "@/components/ui/kibo-ui/spinner";
 

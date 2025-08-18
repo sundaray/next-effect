@@ -12,7 +12,7 @@ import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/kibo-ui/spinner";
-import { authClient } from "@/lib/client/auth";
+import { signOut } from "@/lib/auth/client";
 import type { User } from "@/lib/services/auth-service";
 
 export function UserAccountNavClient({ user }: { user: User }) {
@@ -36,7 +36,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
     startTransition(async () => {
       setError(null);
       try {
-        await authClient.signOut({
+        await signOut({
           fetchOptions: {
             onSuccess: () => {
               setIsOpen(false);

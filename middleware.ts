@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
     (route) => path === route || path.startsWith(`${route}/`)
   );
 
-  const response = await fetch(new URL("/api/session", request.url), {
+  const response = await fetch(new URL("/api/user", request.url), {
     headers: {
       cookie: cookieHeader ?? "",
     },
