@@ -16,7 +16,9 @@ export async function getUser() {
     );
 
     const userOption = sessionOption.pipe(
-      Option.flatMap((session) => Option.fromNullable(session?.user))
+      Option.flatMap((sessionOption) =>
+        Option.fromNullable(sessionOption?.user)
+      )
     );
 
     const user = Option.getOrNull(userOption);

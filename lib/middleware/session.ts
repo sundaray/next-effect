@@ -12,7 +12,7 @@
 
 import { createMiddleware } from "hono/factory";
 import type { Next, Context } from "hono";
-import { Effect, Data, pipe } from "effect";
+import { Effect, Data, pipe, Option } from "effect";
 import { AuthService, AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
 
@@ -30,39 +30,37 @@ export async function sessionHandler(ctx: MiddlewareContext, next: Next) {
   const program = Effect.gen(function* () {
     const auth = yield* AuthService;
 
-    const session = yield* Effect.tryPromise({
-      try: () => auth.api.getSession({ headers: ctx.req.raw.headers }),
-      catch: () =>
-        new UserSessionNotFoundError({
-          message: "No active user session found.",
-        }),
-    });
+    const sessionOption = yield* Effect.option(
+      Effect.tryPromise(() =>
+        auth.api.getSession({ headers: ctx.req.raw.headers })
+      )
+    );
 
-    if (!session) {
-      return yield* Effect.fail(
-        new UserSessionNotFoundError({
-          message: "No active user session found.",
-        })
-      );
-    }
+    const session = sessionOption.pipe(Option.flatMap(Option.fromNullable));
 
     return session;
   });
 
   const handledProgram = pipe(
     program,
-    // SUCCESS PATH: A session was found.
     Effect.flatMap((session) =>
-      Effect.promise(async () => {
-        ctx.set("user", session.user);
-        ctx.set("session", session.session);
-        await next();
-      })
+      pipe(
+        session,
+        Option.match({
+          onSome: (session) =>
+            Effect.sync(() => {
+              ctx.set("user", session.user);
+              ctx.set("session", session.session);
+            }),
+          onNone: () =>
+            Effect.sync(() => {
+              ctx.set("user", null);
+              ctx.set("session", null);
+            }),
+        })
+      )
     ),
-    Effect.catchTag("UserSessionNotFoundError", () =>
-      // ERROR PATH: Allow the request to proceed.
-      Effect.promise(async () => await next())
-    )
+    Effect.flatMap(() => Effect.promise(() => next()))
   );
 
   return await serverRuntime.runPromise(handledProgram);
