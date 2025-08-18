@@ -1,5 +1,5 @@
 import { LockClosedIcon } from "@heroicons/react/24/solid";
-import Link from "next/link";
+import { HoverLink } from "@/components/hover-link";
 
 export default function UnauthorizedPage() {
   return (
@@ -13,12 +13,9 @@ export default function UnauthorizedPage() {
       <p className="text-neutral-700 text-pretty mt-4">
         This page can only be accessed by users with admin privileges.
       </p>
-      <Link
-        href="/"
-        className="mt-6 text-sky-600 hover:text-sky-800 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:ring-offset-2"
-      >
-        Return to Home
-      </Link>{" "}
+      <HoverLink href="/" className="mt-6">
+        Return Home
+      </HoverLink>
     </div>
   );
 }

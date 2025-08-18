@@ -57,16 +57,16 @@ export function UserAccountNavClient({ user }: { user: User }) {
       <DropdownMenuTrigger
         className={cn("flex items-center space-x-1 rounded-full px-4 py-2")}
       >
-        <span className="text-sm font-medium text-gray-600">My Account</span>
-        <Icons.chevronDown className="inline-block size-4 text-gray-500" />
+        <span className="text-sm font-medium text-neutral-600">My Account</span>
+        <Icons.chevronDown className="inline-block size-4 text-neutral-500" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             {user?.email && (
               <>
-                <p className="text-xs text-gray-500">signed in as</p>
-                <p className="w-[200px] truncate text-sm text-gray-600 font-medium">
+                <p className="text-xs text-neutral-500">signed in as</p>
+                <p className="w-[200px] truncate text-sm text-neutral-600 font-medium">
                   {user.email}
                 </p>
               </>
