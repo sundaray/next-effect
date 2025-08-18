@@ -18,7 +18,9 @@ export class ParseError extends Data.TaggedError("ParseError")<{
   issues: { _tag: string; path: string[]; message: string }[];
 }> {}
 
-export class UserSessionError extends Data.TaggedError("UserSessionError")<{
+export class UserSessionNotFoundError extends Data.TaggedError(
+  "UserSessionNotFoundError"
+)<{
   message: string;
 }> {}
 

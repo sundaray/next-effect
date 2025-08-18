@@ -124,7 +124,7 @@ export function ToolSubmissionForm() {
           Effect.sync(() => {
             setErrorMessage(error.message);
           }),
-        UserSessionError: () =>
+        UserSessionNotFoundError: () =>
           Effect.sync(() => {
             const searchParams = new URLSearchParams();
             searchParams.set("next", pathname);

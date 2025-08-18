@@ -60,10 +60,7 @@ export async function sessionHandler(ctx: MiddlewareContext, next: Next) {
       })
     ),
     Effect.catchTag("UserSessionNotFoundError", () =>
-      // ERROR PATH
-      // If we catch the error, we don't fail the
-      // request. We simply create an Effect that calls next(), allowing
-      // the request to proceed as if for an unauthenticated user.
+      // ERROR PATH: Allow the request to proceed.
       Effect.promise(async () => await next())
     )
   );
