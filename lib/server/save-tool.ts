@@ -4,7 +4,6 @@ import { tools } from "@/db/schema";
 import { saveToolPayload } from "@/lib/schema";
 
 class SaveToolError extends Data.TaggedError("SaveToolError")<{
-  cause: unknown;
   message: string;
 }> {}
 
@@ -39,13 +38,9 @@ export function saveTool(body: saveToolPayload) {
           .returning({ id: tools.id })
       )
       .pipe(
-        Effect.tapErrorTag("DatabaseError", (error) =>
-          Effect.logError("SaveToolError: ", error)
-        ),
         Effect.mapError(
           (error) =>
             new SaveToolError({
-              cause: error,
               message: "Failed to save tool to the database. Please try again.",
             })
         )

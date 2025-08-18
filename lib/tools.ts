@@ -42,14 +42,19 @@ app.post("/presigned-url", async (ctx) => {
 
   const handledProgram = pipe(
     program,
+    Effect.tapError((error) =>
+      Effect.logError(
+        "Tool submission error at /api/tools/presigned-url: ",
+        error
+      )
+    ),
     Effect.catchTag("ParseError", (error) => {
       const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
       return Effect.succeed(
         ctx.json({ _tag: "ParseError", issues }, { status: 400 })
       );
     }),
-    Effect.catchAll((error) => {
-      console.log("Presigned URL server error: ", error);
+    Effect.catchAll(() => {
       return Effect.succeed(
         ctx.json(
           {
@@ -92,6 +97,9 @@ app.post("/save", async (ctx) => {
 
   const handledProgram = pipe(
     program,
+    Effect.tapError((error) =>
+      Effect.logError("Tool submission error at /api/tools/save: ", error)
+    ),
     Effect.catchAll(() =>
       Effect.succeed(
         ctx.json(
