@@ -5,7 +5,7 @@ const app = new Hono<{
   Variables: AuthType;
 }>();
 
-app.get("/user", (ctx) => {
+app.get("/", (ctx) => {
   const currentUser = ctx.get("user");
 
   if (!currentUser) {
