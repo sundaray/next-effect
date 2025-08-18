@@ -336,7 +336,7 @@ export function SignInWithEmailOtpForm() {
                     className="size-4 inline-block"
                     variant="circle-filled"
                   />
-                  Verifying...
+                  Verifying OTP...
                 </>
               ) : (
                 "Sign In"
