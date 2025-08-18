@@ -307,7 +307,7 @@ export function ToolSubmissionForm() {
         )}
       />
       <Button type="submit" disabled={isProcessing}>
-        {isProcessing ? "Submitting..." : "Submit Tool"}
+        {isProcessing ? "Submitting..." : "Submit"}
       </Button>
     </form>
   );

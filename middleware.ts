@@ -21,11 +21,16 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  if (!response.ok) {
+  let user = null;
+
+  if (response.ok) {
+    const data = await response.json();
+    user = data.user;
+  } else if (response.status === 401) {
+    user = null;
+  } else {
     return NextResponse.next();
   }
-
-  const { user } = await response.json();
 
   // --- Core Routing Logic ---
 
