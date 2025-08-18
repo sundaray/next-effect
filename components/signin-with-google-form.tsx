@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Effect, pipe } from "effect";
 import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/form-message";
-import { authClient } from "@/lib/auth/client";
+import { signIn } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
 import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";
 
@@ -35,7 +35,7 @@ export function SignInWitjGoogleForm() {
 
       yield* Effect.tryPromise({
         try: () =>
-          authClient.signIn.social({
+          signIn.social({
             provider: "google",
             callbackURL,
           }),
@@ -44,13 +44,16 @@ export function SignInWitjGoogleForm() {
             message: "Google sign-in failed. Please try again.",
           }),
       });
-    }).pipe(
-      Effect.tapErrorTag("SignInWithGoogleError", (error) =>
-        Effect.logError("SignInWithGoogleError: ", error)
-      )
-    );
+    });
+
     const handledProgram = pipe(
       program,
+      Effect.tapErrorTag("ConfigError", (error) =>
+        Effect.logError("ConfigError: ", error)
+      ),
+      Effect.tapErrorTag("SignInWithGoogleError", (error) =>
+        Effect.logError("SignInWithGoogleError: ", error)
+      ),
       Effect.catchTag("SignInWithGoogleError", (error) =>
         Effect.sync(() => {
           setErrorMessage(error.message);

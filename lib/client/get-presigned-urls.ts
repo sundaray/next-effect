@@ -58,7 +58,7 @@ export function getPresignedUrls(
       if (result._tag === "ParseError") {
         return yield* Effect.fail(new ParseError({ issues: result.issues }));
       }
-      if (result._tag === "UserSessionError") {
+      if (result._tag === "UserSessionNotFoundError") {
         return yield* Effect.fail(
           new UserSessionNotFoundError({ message: result.issues })
         );
