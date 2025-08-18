@@ -26,7 +26,7 @@ type MiddlewareContext = Context<{
   Variables: AuthType;
 }>;
 
-export async function sessionHandler(ctx: MiddlewareContext, next: Next) {
+export async function loadSessionHandler(ctx: MiddlewareContext, next: Next) {
   const program = Effect.gen(function* () {
     const auth = yield* AuthService;
 
@@ -66,4 +66,4 @@ export async function sessionHandler(ctx: MiddlewareContext, next: Next) {
   return await serverRuntime.runPromise(handledProgram);
 }
 
-export const sessionMiddleware = createMiddleware(sessionHandler);
+export const loadSessionMiddleware = createMiddleware(loadSessionHandler);
