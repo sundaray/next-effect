@@ -1,16 +1,9 @@
 import "server-only";
 
 import { headers } from "next/headers";
-import { Effect, Data, pipe } from "effect";
+import { Effect, Option } from "effect";
 import { AuthService } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
-
-class UserSessionNotFoundError extends Data.TaggedError(
-  "UserSessionNotFoundError"
-)<{
-  operation: string;
-  message: string;
-}> {}
 
 export async function getUser() {
   const requestHeaders = await headers();
@@ -18,25 +11,18 @@ export async function getUser() {
   const program = Effect.gen(function* () {
     const auth = yield* AuthService;
 
-    const session = yield* Effect.tryPromise({
-      try: () => auth.api.getSession({ headers: requestHeaders }),
-      catch: () =>
-        new UserSessionNotFoundError({
-          operation: "getSession",
-          message: "No active usrer session found.",
-        }),
-    });
+    const sessionOption = yield* Effect.option(
+      Effect.tryPromise(() => auth.api.getSession({ headers: requestHeaders }))
+    );
 
-    return session?.user;
+    const userOption = sessionOption.pipe(
+      Option.flatMap((session) => Option.fromNullable(session?.user))
+    );
+
+    const user = Option.getOrNull(userOption);
+
+    return user;
   });
 
-  const handledProgram = pipe(
-    program,
-    Effect.catchTag("UserSessionNotFoundError", (error) =>
-      Effect.logError("UserSessionNotFoundError: ", error)
-    ),
-    Effect.ensureErrorType<never>()
-  );
-
-  return await serverRuntime.runPromise(handledProgram);
+  return await serverRuntime.runPromise(program);
 }

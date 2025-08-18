@@ -17,8 +17,6 @@ export class S3ClientService extends Effect.Service<S3ClientService>()(
           roleArn: config.roleArn,
         }),
       });
-    }).pipe(
-      Effect.tapErrorTag("ConfigError", (error) => Effect.logError(error))
-    ),
+    }),
   }
 ) {}

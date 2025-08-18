@@ -48,13 +48,13 @@ export async function authHandler(ctx: MiddlewareContext, next: Next) {
       })
     ),
     Effect.tapErrorTag("UserSessionNotFoundError", (error) =>
-      Effect.logError("UserSessionError: ", error)
+      Effect.logError("UserSessionNotFoundError: ", error)
     ),
     Effect.catchTag("UserSessionNotFoundError", (error) =>
       Effect.succeed(
         ctx.json(
           {
-            _tag: "UserSessionError",
+            _tag: "UserSessionNotFoundError",
             message: error.message,
           },
           { status: 401 }

@@ -13,7 +13,7 @@ type StorageServiceImp = {
 };
 
 export class StorageService extends Effect.Service<StorageServiceImp>()(
-  "EmailService",
+  "StorageService",
   {
     effect: Effect.gen(function* () {
       const s3Client = yield* S3ClientService;
