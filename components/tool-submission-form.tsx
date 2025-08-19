@@ -76,7 +76,27 @@ export function ToolSubmissionForm() {
     setSuccessMessage(null);
 
     const program = Effect.gen(function* () {
-      const presignedUrls = yield* getPresignedUrls(data);
+      const {
+        logoKey,
+        showcaseImageKey,
+        logoUploadUrl,
+        showcaseImageUploadUrl,
+      } = yield* getPresignedUrls(data);
+
+      yield* uploadFilesToS3({
+        logoUploadUrl,
+        showcaseImageUploadUrl,
+        logo: data.logo,
+        showcaseImage: data.showcaseImage,
+      });
+
+      const { logo, showcaseImage, ...toolData } = data;
+
+      yield* saveTool({
+        ...toolData,
+        logoKey,
+        showcaseImageKey,
+      });
     });
 
     const handledProgram = pipe(
