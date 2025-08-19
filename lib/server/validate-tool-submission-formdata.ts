@@ -5,9 +5,9 @@ import {
 } from "@/lib/schema";
 
 export function validateToolSubmissionFormData(
-  parsedBody: ToolSubmissionFormSchemaType
+  data: ToolSubmissionFormSchemaType
 ) {
   return Effect.gen(function* () {
-    return yield* Schema.decodeUnknown(ToolSubmissionFormSchema)(parsedBody);
+    return yield* Schema.decodeUnknown(ToolSubmissionFormSchema)(data);
   });
 }

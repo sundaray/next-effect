@@ -1,12 +1,16 @@
 import "client-only";
 import { Effect } from "effect";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
+import { hc } from "hono/client";
+import type { ApiRoutes } from "@/app/api/[[...path]]/route";
 import {
   NetworkError,
   InternalServerError,
   ParseError,
   UserSessionNotFoundError,
 } from "@/lib/client/errors";
+
+const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
 
 type GetPresignedUrlsResponse = {
   logoKey?: string;
@@ -15,59 +19,22 @@ type GetPresignedUrlsResponse = {
   showcaseImageKey: string;
 };
 
-export function getPresignedUrls(
-  data: ToolSubmissionFormSchemaType
-): Effect.Effect<
-  GetPresignedUrlsResponse,
-  ParseError | NetworkError | InternalServerError | UserSessionNotFoundError
-> {
-  return Effect.gen(function* () {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("website", data.website);
-    formData.append("tagline", data.tagline);
-    formData.append("description", data.description);
-    formData.append("pricing", data.pricing);
-    formData.append("categories", JSON.stringify(data.categories));
-    if (data.logo) {
-      formData.append("logo", data.logo);
+export async function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
+  console.log("Form data inside get presigned url function: ", data);
+
+  try {
+    const response = await client.api.tools["presigned-url"].$post({
+      form: { ...data, categories: JSON.stringify(data.categories) },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
     }
-    formData.append("showcaseImage", data.showcaseImage);
-
-    const response = yield* Effect.tryPromise({
-      try: () =>
-        fetch("/api/tools/presigned-url", { method: "POST", body: formData }),
-      catch: () =>
-        new NetworkError({
-          message: "Please check your internet connection and try again.",
-        }),
-    });
-
-    const result = yield* Effect.tryPromise({
-      try: () => response.json(),
-      catch: (error) => {
-        console.log("Client getPresignedURL error: ", error);
-        return new InternalServerError({
-          message:
-            "Tool submission failed due to a server error. Please try again.",
-        });
-      },
-    });
 
     if (!response.ok) {
-      if (result._tag === "ParseError") {
-        return yield* Effect.fail(new ParseError({ issues: result.issues }));
-      }
-      if (result._tag === "UserSessionNotFoundError") {
-        return yield* Effect.fail(
-          new UserSessionNotFoundError({ message: result.issues })
-        );
-      }
-      return yield* Effect.fail(
-        new InternalServerError({ message: result.message })
-      );
+      const data = await response.json();
+      console.log("Get presigned URL data: ", data);
     }
-
-    return result;
-  });
+  } catch (error) {}
 }

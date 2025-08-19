@@ -90,7 +90,7 @@ export function generatePresignedUrls(
     return {
       showcaseImageUploadUrl,
       showcaseImageKey,
-      ...Option.getOrUndefined(
+      ...Option.getOrNull(
         Option.map(logoUploadDetails, (details) => ({
           logoUploadUrl: details.logoUploadUrl,
           logoKey: details.logoKey,
