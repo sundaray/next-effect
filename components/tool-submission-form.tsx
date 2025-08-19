@@ -1,5 +1,6 @@
 "use client";
 
+import { Effect, pipe } from "effect";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -33,12 +34,6 @@ import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
 import { saveTool } from "@/lib/client/save-tool";
 import { clientRuntime } from "@/lib/client-runtime";
 import { useRouter } from "next/navigation";
-import {
-  ParseError,
-  NetworkError,
-  InternalServerError,
-  UserSessionNotFoundError,
-} from "@/lib/client/errors";
 export const PREDEFINED_CATEGORIES = [
   "Development",
   "Design",
@@ -60,7 +55,7 @@ export function ToolSubmissionForm() {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
-      // resolver: effectTsResolver(ToolSubmissionFormSchema),
+      resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
@@ -80,26 +75,47 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    try {
-      await getPresignedUrls(data);
-    } catch (error) {
-      if (error instanceof UserSessionNotFoundError) {
-        const params = new URLSearchParams();
-        params.set("next", pathname);
-        router.push(`/signin?${params.toString()}`);
-      }
-      if (error instanceof ParseError) {
-        error.issues.forEach((issue) => {
-          const fieldName = issue.path[0] as keyof ToolSubmissionFormSchemaType;
-          setError(fieldName, {
-            type: "server",
-            message: issue.message,
+    const program = Effect.gen(function* () {
+      const presignedUrls = yield* getPresignedUrls(data);
+    });
+
+    const handledProgram = pipe(
+      program,
+      Effect.tap(() =>
+        Effect.sync(() => {
+          reset();
+          router.push("/submit/success");
+        })
+      ),
+      Effect.catchTag("ParseError", (error) =>
+        Effect.sync(() => {
+          error.issues.forEach((issue) => {
+            const fieldName = issue
+              .path[0] as keyof ToolSubmissionFormSchemaType;
+            if (fieldName) {
+              setError(fieldName, { type: "server", message: issue.message });
+            }
           });
-        });
-      }
-    } finally {
-      setIsProcessing(false);
-    }
+        })
+      ),
+      Effect.catchTag("UserSessionNotFoundError", () =>
+        Effect.sync(() => {
+          const params = new URLSearchParams();
+          params.set("next", pathname);
+          router.push(`/signin?${params.toString()}`);
+        })
+      ),
+      Effect.catchTag("InternalServerError", (error) =>
+        Effect.sync(() => setErrorMessage(error.message))
+      ),
+      Effect.catchTag("NetworkError", (error) =>
+        Effect.sync(() => setErrorMessage(error.message))
+      ),
+      Effect.ensureErrorType<never>(),
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+    );
+
+    await clientRuntime.runPromise(handledProgram);
   }
 
   const message = successMessage || errorMessage;
