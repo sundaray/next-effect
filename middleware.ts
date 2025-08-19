@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { hc } from "hono/client";
+import type { ApiRoutes } from "@/app/api/[[...path]]/route";
 
 const guestOnlyPaths = ["/signin"];
 const adminOnlyPaths = ["/admin"];
 
 export async function middleware(request: NextRequest) {
+  const baseUrl = new URL(request.url).origin;
+
+  const client = hc<ApiRoutes>(baseUrl);
+
   const path = request.nextUrl.pathname;
 
   const cookieHeader = request.headers.get("cookie");
@@ -15,21 +21,30 @@ export async function middleware(request: NextRequest) {
     (route) => path === route || path.startsWith(`${route}/`)
   );
 
-  const response = await fetch(new URL("/api/user", request.url), {
-    headers: {
-      cookie: cookieHeader ?? "",
-    },
-  });
-
   let user = null;
 
-  if (response.ok) {
-    const data = await response.json();
-    user = data.user;
-  } else if (response.status === 401) {
+  try {
+    const response = await client.api.user.$get(
+      {},
+      {
+        headers: {
+          cookie: cookieHeader ?? "",
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      user = data.user;
+    } else {
+      user = null;
+    }
+  } catch (error) {
+    console.error(
+      "[Next.js middleware] Failed to fetch from /api/user:",
+      error
+    );
     user = null;
-  } else {
-    return NextResponse.next();
   }
 
   // --- Core Routing Logic ---

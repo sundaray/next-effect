@@ -3,16 +3,14 @@ import type { AuthType } from "@/lib/services/auth-service";
 
 const app = new Hono<{
   Variables: AuthType;
-}>();
-
-app.get("/", (ctx) => {
+}>().get("/", (ctx) => {
   const currentUser = ctx.get("user");
 
   if (!currentUser) {
-    return ctx.json({ user: null }, 401);
+    return ctx.json({ user: null }, { status: 401 });
   }
 
-  return ctx.json({ user: currentUser });
+  return ctx.json({ user: currentUser }, { status: 200 });
 });
 
 export default app;

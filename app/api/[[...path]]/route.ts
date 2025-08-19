@@ -13,11 +13,15 @@ const app = new Hono<{
 
 app.use("*", loadSessionMiddleware);
 app.use("/tools/*", protectRouteMiddleware);
-app.route("/tools", tools);
-app.route("/user", user);
-app.route("/auth", auth);
+
+const routes = app
+  .route("/tools", tools)
+  .route("/user", user)
+  .route("/auth", auth);
 
 export const GET = handle(app);
 export const POST = handle(app);
 export const PUT = handle(app);
 export const DELETE = handle(app);
+
+export type ApiRoutes = typeof routes;
