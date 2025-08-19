@@ -26,8 +26,6 @@ const app = new Hono<{
       categories: JSON.parse(body.categories as string),
     } as ToolSubmissionFormSchemaType;
 
-    console.log("Parsedbody in server: ", parseBody);
-
     const program = Effect.gen(function* () {
       // Step 2: Validate the tool submission form data against the schema.
       const validatedToolSubmissionFormData =

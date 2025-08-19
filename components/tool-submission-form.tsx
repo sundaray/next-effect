@@ -31,9 +31,13 @@ import {
 import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
 import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
 import { saveTool } from "@/lib/client/save-tool";
-import { Effect, pipe } from "effect";
 import { clientRuntime } from "@/lib/client-runtime";
 import { useRouter } from "next/navigation";
+import {
+  ParseError,
+  NetworkError,
+  InternalServerError,
+} from "@/lib/client/errors";
 export const PREDEFINED_CATEGORIES = [
   "Development",
   "Design",
@@ -74,6 +78,20 @@ export function ToolSubmissionForm() {
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
+
+    try {
+      await getPresignedUrls(data);
+    } catch (error) {
+      if (error instanceof ParseError) {
+        error.issues.forEach((issue) => {
+          const fieldName = issue.path[0] as keyof ToolSubmissionFormSchemaType;
+          setError(fieldName, {
+            type: "server",
+            message: issue.message,
+          });
+        });
+      }
+    }
   }
 
   const message = successMessage || errorMessage;
