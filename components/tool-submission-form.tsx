@@ -34,7 +34,6 @@ import { saveTool } from "@/lib/client/save-tool";
 import { Effect, pipe } from "effect";
 import { clientRuntime } from "@/lib/client-runtime";
 import { useRouter } from "next/navigation";
-
 export const PREDEFINED_CATEGORIES = [
   "Development",
   "Design",
@@ -75,73 +74,6 @@ export function ToolSubmissionForm() {
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
-
-    const response = await getPresignedUrls(data);
-
-    // const program = Effect.gen(function* () {
-    //   const {
-    //     logoKey,
-    //     logoUploadUrl,
-    //     showcaseImageKey,
-    //     showcaseImageUploadUrl,
-    //   } = yield* getPresignedUrls(data);
-
-    //   yield* uploadFilesToS3({
-    //     logo: data.logo,
-    //     logoUploadUrl,
-    //     showcaseImage: data.showcaseImage,
-    //     showcaseImageUploadUrl,
-    //   });
-
-    //   yield* saveTool({
-    //     name: data.name,
-    //     website: data.website,
-    //     tagline: data.tagline,
-    //     description: data.description,
-    //     categories: data.categories,
-    //     pricing: data.pricing,
-    //     logoKey,
-    //     showcaseImageKey,
-    //   });
-    // });
-
-    // const handledProgram = pipe(
-    //   program,
-    //   Effect.tap(() =>
-    //     Effect.sync(() => {
-    //       reset();
-    //       router.push("/submit/success");
-    //     })
-    //   ),
-    //   Effect.catchTags({
-    //     ParseError: (error) =>
-    //       Effect.sync(() => {
-    //         error.issues.forEach((issue) => {
-    //           const field = issue.path[0] as keyof ToolSubmissionFormSchemaType;
-    //           if (field)
-    //             setError(field, { type: "server", message: issue.message });
-    //         });
-    //       }),
-    //     NetworkError: (error) =>
-    //       Effect.sync(() => {
-    //         setErrorMessage(error.message);
-    //       }),
-    //     UserSessionNotFoundError: () =>
-    //       Effect.sync(() => {
-    //         const searchParams = new URLSearchParams();
-    //         searchParams.set("next", pathname);
-    //         router.push(`/signin?${searchParams.toString()}`);
-    //       }),
-    //     InternalServerError: (error) =>
-    //       Effect.sync(() => {
-    //         setErrorMessage(error.message);
-    //       }),
-    //   }),
-    //   Effect.ensureErrorType<never>(),
-    //   Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
-    // );
-
-    // await clientRuntime.runPromise(handledProgram);
   }
 
   const message = successMessage || errorMessage;
