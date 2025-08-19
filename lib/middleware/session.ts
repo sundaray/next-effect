@@ -16,12 +16,6 @@ import { Effect, Data, pipe, Option } from "effect";
 import { AuthService, AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
 
-export class UserSessionNotFoundError extends Data.TaggedError(
-  "UserSessionNotFoundError"
-)<{
-  message: string;
-}> {}
-
 type MiddlewareContext = Context<{
   Variables: AuthType;
 }>;

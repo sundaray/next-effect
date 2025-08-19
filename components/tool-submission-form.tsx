@@ -37,6 +37,7 @@ import {
   ParseError,
   NetworkError,
   InternalServerError,
+  UserSessionNotFoundError,
 } from "@/lib/client/errors";
 export const PREDEFINED_CATEGORIES = [
   "Development",
@@ -82,6 +83,11 @@ export function ToolSubmissionForm() {
     try {
       await getPresignedUrls(data);
     } catch (error) {
+      if (error instanceof UserSessionNotFoundError) {
+        const params = new URLSearchParams();
+        params.set("next", pathname);
+        router.push(`/signin?${params.toString()}`);
+      }
       if (error instanceof ParseError) {
         error.issues.forEach((issue) => {
           const fieldName = issue.path[0] as keyof ToolSubmissionFormSchemaType;
@@ -91,6 +97,8 @@ export function ToolSubmissionForm() {
           });
         });
       }
+    } finally {
+      setIsProcessing(false);
     }
   }
 

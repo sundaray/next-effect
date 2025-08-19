@@ -1,3 +1,4 @@
+import { Data } from "effect";
 import { createMiddleware } from "hono/factory";
 import type { Next, Context } from "hono";
 import { AuthType } from "@/lib/services/auth-service";
@@ -24,15 +25,20 @@ type MiddlewareContext = Context<{
 //
 // -----------------------------------------------
 
+export class UserSessionNotFoundError extends Data.TaggedError(
+  "UserSessionNotFoundError"
+)<{
+  message: string;
+}> {}
+
 export async function protectRouteHandler(ctx: MiddlewareContext, next: Next) {
   const user = ctx.get("user");
 
   if (!user) {
     return ctx.json(
-      {
-        _tag: "UserSessionNotFoundError",
-        messgae: "No active user session found.",
-      },
+      new UserSessionNotFoundError({
+        message: "No active user session found.",
+      }),
       { status: 401 }
     );
   }

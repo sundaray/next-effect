@@ -4,7 +4,7 @@ import { hc, parseResponse, DetailedError } from "hono/client";
 import type { InferResponseType } from "hono/client";
 import type { ApiRoutes } from "@/app/api/[[...path]]/route";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
-import { ParseError } from "@/lib/client/errors";
+import { ParseError, UserSessionNotFoundError } from "@/lib/client/errors";
 
 const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
 
@@ -28,6 +28,10 @@ export async function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
       switch (tag) {
         case "ParseError": {
           throw new ParseError({ issues: detail.data.issues });
+        }
+        case "UserSessionNotFoundError": {
+          const message = detail.data.message;
+          throw new UserSessionNotFoundError({ message });
         }
       }
     }
