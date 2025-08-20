@@ -107,6 +107,9 @@ export function ToolSubmissionForm() {
           router.push("/submit/success");
         })
       ),
+      Effect.tapError((error) =>
+        Effect.logError("Tool submission error: ", error)
+      ),
       Effect.catchTag("ParseError", (error) =>
         Effect.sync(() => {
           error.issues.forEach((issue) => {
