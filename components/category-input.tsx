@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { X, Plus, Search } from "lucide-react";
-import { PREDEFINED_CATEGORIES } from "@/components/tool-submission-form";
 import { Input } from "@/components/ui/input";
 import {
   ControllerRenderProps,
@@ -13,22 +12,24 @@ import {
 
 type CategoryInputProps<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 > = {
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
   fieldErrorId: string;
+  categories: string[];
 };
 
 export function CategoryInput<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 >({
   field,
   fieldState,
   disabled,
   fieldErrorId,
+  categories,
 }: CategoryInputProps<TFieldValues, TName>) {
   const [categoryInput, setCategoryInput] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -41,7 +42,7 @@ export function CategoryInput<
   const isDisabled = disabled || reachedMaxCategories;
 
   // Filter suggestions based on input
-  const filteredSuggestions = PREDEFINED_CATEGORIES.filter(
+  const filteredSuggestions = categories.filter(
     (cat) =>
       !selectedCategories.includes(cat) &&
       cat.toLowerCase().includes(categoryInput.toLowerCase())
@@ -147,21 +148,21 @@ export function CategoryInput<
                     <button
                       key={suggestion}
                       type="button"
-                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-100 focus:bg-gray-50 focus:outline-none transition-colors"
+                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-neutral-100 focus:bg-neutral-50 focus:outline-none transition-colors"
                       onClick={() => addCategory(suggestion)}
                     >
-                      {suggestion}x``
+                      {suggestion}
                     </button>
                   ))
                 ) : (
                   /* No matches found */
-                  <div className="p-3 text-center text-sm text-gray-500">
+                  <div className="p-3 text-center text-sm text-neutral-700">
                     No matching categories
                   </div>
                 )}
 
                 {/* Create new category option */}
-                {!PREDEFINED_CATEGORIES.some(
+                {!categories.some(
                   (cat) => cat.toLowerCase() === categoryInput.toLowerCase()
                 ) && (
                   <div
@@ -169,7 +170,7 @@ export function CategoryInput<
                   >
                     <button
                       type="button"
-                      className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-100 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
+                      className="w-full px-3 py-2.5 text-sm font-medium text-sky-600 hover:bg-sky-100 focus:bg-sky-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
                       onClick={() => addCategory(categoryInput)}
                     >
                       <Plus className="size-4" />
@@ -180,18 +181,18 @@ export function CategoryInput<
               </>
             ) : (
               /* Show all available categories when no search input */
-              PREDEFINED_CATEGORIES.filter(
-                (cat) => !selectedCategories.includes(cat)
-              ).map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-100 focus:bg-gray-50 focus:outline-none transition-colors"
-                  onClick={() => addCategory(category)}
-                >
-                  {category}
-                </button>
-              ))
+              categories
+                .filter((cat) => !selectedCategories.includes(cat))
+                .map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    className="w-full px-3 py-2.5 text-left text-sm hover:bg-neutral-100 focus:bg-neutral-50 focus:outline-none transition-colors"
+                    onClick={() => addCategory(category)}
+                  >
+                    {category}
+                  </button>
+                ))
             )}
           </div>
         )}

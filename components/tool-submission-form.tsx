@@ -34,18 +34,8 @@ import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
 import { saveTool } from "@/lib/client/save-tool";
 import { clientRuntime } from "@/lib/client-runtime";
 import { useRouter } from "next/navigation";
-export const PREDEFINED_CATEGORIES = [
-  "Development",
-  "Design",
-  "Marketing",
-  "Productivity",
-  "AI/ML",
-  "Analytics",
-  "Communication",
-  "Security",
-];
 
-export function ToolSubmissionForm() {
+export function ToolSubmissionForm({ categories }: { categories: string[] }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -71,6 +61,7 @@ export function ToolSubmissionForm() {
     });
 
   async function onSubmit(data: ToolSubmissionFormSchemaType) {
+    console.log("Form data: ", data);
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -219,6 +210,7 @@ export function ToolSubmissionForm() {
             fieldState={fieldState}
             disabled={disabled}
             fieldErrorId={fieldErrorId}
+            categories={categories}
           />
         )}
       />

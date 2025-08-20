@@ -7,7 +7,7 @@ class SaveToolError extends Data.TaggedError("SaveToolError")<{
   message: string;
 }> {}
 
-export function saveTool(body: saveToolPayload) {
+export function saveTool(body: saveToolPayload, userId: string) {
   return Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
@@ -34,12 +34,16 @@ export function saveTool(body: saveToolPayload) {
             logoUrl,
             showcaseImageUrl,
             adminApprovalStatus: "pending",
+            submittedBy: userId,
           })
           .returning({ id: tools.id })
       )
       .pipe(
+        Effect.tapError((error) =>
+          Effect.logError("Database error in saveTool: ", error)
+        ),
         Effect.mapError(
-          (error) =>
+          () =>
             new SaveToolError({
               message: "Failed to save tool to the database. Please try again.",
             })

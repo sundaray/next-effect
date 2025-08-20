@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { Effect, pipe, ParseResult } from "effect";
+import { Effect, Data, pipe, ParseResult } from "effect";
 import { serverRuntime } from "@/lib/server-runtime";
 import { validateToolSubmissionFormData } from "@/lib/server/validate-tool-submission-formdata";
 import { generatePresignedUrls } from "@/lib/server/generate-presigned-urls";
@@ -7,6 +7,12 @@ import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-im
 import { saveTool } from "@/lib/server/save-tool";
 import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
 import type { AuthType } from "@/lib/services/auth-service";
+
+class UserSessionNotFoundError extends Data.TaggedError(
+  "UserSessionNotFoundError"
+)<{
+  message: string;
+}> {}
 
 const app = new Hono<{
   Variables: AuthType;
@@ -91,11 +97,22 @@ const app = new Hono<{
     const body = (await ctx.req.json()) as saveToolPayload;
 
     const program = Effect.gen(function* () {
+      const user = ctx.get("user");
+
+      if (!user) {
+        return ctx.json(
+          new UserSessionNotFoundError({
+            message: "No active user session found.",
+          }),
+          { status: 401 }
+        );
+      }
+
       // Step 2: Create and upload WebP variants of the homepage screenshot.
       yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
 
       // Step 3: Save the final tool submission details to the database.
-      const tool = yield* saveTool(body);
+      const tool = yield* saveTool(body, user.id);
 
       // Step 4: Return the newly created tool record to the client.
       return ctx.json({

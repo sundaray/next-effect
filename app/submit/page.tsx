@@ -1,6 +1,8 @@
 import { ToolSubmissionForm } from "@/components/tool-submission-form";
+import { getCategories } from "@/lib/get-categories";
 
-export default function Submit() {
+export default async function Submit() {
+  const categories = await getCategories();
   return (
     <div className="max-w-xl mx-auto px-4">
       <div className="text-center mb-12">
@@ -11,7 +13,7 @@ export default function Submit() {
           Get discovered by users and boost your SEO with a backlink.
         </p>
       </div>
-      <ToolSubmissionForm />
+      <ToolSubmissionForm categories={categories} />
     </div>
   );
 }

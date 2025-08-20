@@ -7,19 +7,23 @@ export default function SubmitForReviewPage() {
         <CheckCircleIcon className="size-8 text-green-600" />
       </div>
 
-      <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 text-center mt-6">
-        Tool Submitted for Review
+      <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 mt-6 text-center">
+        Submitted for Review
       </h2>
 
       <p className="text-neutral-700 text-pretty mt-4">
-        Thank you for your submission! Your tool will be reviewed by our team
-        within 24 hours. Once approved, it will appear in our tool directory.
+        Thank you for your submission! Your app will be reviewed by our team
+        within 24 hours.
       </p>
 
       <p className="text-neutral-700 mt-4 text-pretty">
-        We&apos;ll notify you via email once the review is complete. If your
-        submission doesn&apos;t meet our guidelines, we&apos;ll provide feedback
-        on what needs to be changed.
+        Once reviewed, you&apos;ll receive an email letting you know if your
+        submission was approved or rejected.
+      </p>
+      <p className="text-neutral-700 mt-4 text-pretty">
+        If approved, your app will appear in our directory. If rejected, the
+        email will include specific feedback on what needs to be changed. You
+        can then incorporate this feedback and resubmit for approval.
       </p>
     </div>
   );

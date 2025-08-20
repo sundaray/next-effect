@@ -1,87 +1,10 @@
 import {
-  text,
-  pgEnum,
   pgTable,
+  text,
   timestamp,
-  uuid,
   boolean,
   integer,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-
-export const pricingTypeEnum = pgEnum("pricing", ["free", "paid", "freemium"]);
-
-export const adminApprovalStatusEnum = pgEnum("admin_approval_status", [
-  "pending",
-  "approved",
-  "rejected",
-]);
-
-export const toolHistoryEventEnum = pgEnum("tool_history_event", [
-  "submitted",
-  "updated",
-  "approved",
-  "rejected",
-]);
-
-export const tools = pgTable("tools", {
-  id: uuid("id").primaryKey().defaultRandom(),
-
-  name: text("name").notNull(),
-
-  website: text("website").notNull(),
-
-  tagline: text("tagline").notNull(),
-
-  description: text("description").notNull(),
-
-  categories: text("categories")
-    .array()
-    .notNull()
-    .default(sql`'{}'::text[]`),
-
-  pricing: pricingTypeEnum("pricing").notNull(),
-
-  logoUrl: text("logo_url"),
-
-  showcaseImageUrl: text("showcase_image_url").notNull(),
-
-  adminApprovalStatus: adminApprovalStatusEnum("admin_approval_status")
-    .default("pending")
-    .notNull(),
-
-  submittedAt: timestamp("submitted_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-
-  submittedBy: text("submitted_by")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-
-  approvedAt: timestamp("approved_at", { withTimezone: true }).defaultNow(),
-
-  rejectionCount: integer("rejection_count").notNull().default(0),
-});
-
-export const toolHistory = pgTable("tool_history", {
-  id: uuid("id").primaryKey().defaultRandom(),
-
-  toolId: uuid("tool_id")
-    .notNull()
-    .references(() => tools.id, { onDelete: "cascade" }),
-
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-
-  eventType: toolHistoryEventEnum("event_type").notNull(),
-
-  reason: text("reason"),
-
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -100,7 +23,7 @@ export const users = pgTable("users", {
   role: text("role").default("user").notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
-  submissionCount: integer("submission_count").notNull().default(0),
+  submissionCount: integer("submission_count").notNull(),
 });
 
 export const sessions = pgTable("sessions", {
@@ -140,9 +63,9 @@ export const verifications = pgTable("verifications", {
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date()
+    () => /* @__PURE__ */ new Date(),
   ),
   updatedAt: timestamp("updated_at").$defaultFn(
-    () => /* @__PURE__ */ new Date()
+    () => /* @__PURE__ */ new Date(),
   ),
 });
