@@ -15,7 +15,11 @@ export const auth = betterAuth({
     },
   },
 
-  plugins: [emailOTP({})],
+  plugins: [
+    emailOTP({
+      async sendVerificationOTP({ email, otp }) {},
+    }),
+  ],
 
   user: {
     additionalFields: {

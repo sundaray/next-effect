@@ -4,6 +4,7 @@ import type { ApiRoutes } from "@/app/api/[[...path]]/route";
 
 const guestOnlyPaths = ["/signin"];
 const adminOnlyPaths = ["/admin"];
+const protectedPaths = ["/submit"];
 
 export async function middleware(request: NextRequest) {
   const baseUrl = new URL(request.url).origin;
@@ -18,6 +19,10 @@ export async function middleware(request: NextRequest) {
     (route) => path === route || path.startsWith(`${route}/`)
   );
   const isOnAdminPath = adminOnlyPaths.some(
+    (route) => path === route || path.startsWith(`${route}/`)
+  );
+
+  const isOnProtectedPath = protectedPaths.some(
     (route) => path === route || path.startsWith(`${route}/`)
   );
 
@@ -61,7 +66,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Handle guest-only paths
+  // 2. Handle protected paths for regular users
+  if (isOnProtectedPath && !user) {
+    const redirectUrl = new URL("/signin", request.url);
+    redirectUrl.searchParams.set("next", path);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // 3. Handle guest-only paths
   if (isOnGuestPath) {
     if (user) {
       return NextResponse.redirect(new URL("/", request.url));
