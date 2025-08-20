@@ -64,6 +64,12 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
             type: "string",
             required: false,
           },
+          submissionCount: {
+            type: "number",
+            required: true,
+            defaultValue: 0,
+            input: false,
+          },
         },
       },
       databaseHooks: {

@@ -5,6 +5,7 @@ import {
   timestamp,
   uuid,
   boolean,
+  integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -32,12 +33,16 @@ export const tools = pgTable("tools", {
   adminApprovalStatus: adminApprovalStatusEnum("admin_approval_status")
     .default("pending")
     .notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
+  submittedAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  submittedBy: text("submitted_by")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  approvedAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  rejectionCount: integer("rejection_count").notNull().default(0),
 });
 
 export const users = pgTable("users", {
