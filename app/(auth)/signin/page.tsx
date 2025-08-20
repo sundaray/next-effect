@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function SignIn() {
   return (
-    <div className="mx-auto max-w-[420px] px-4">
+    <div>
       <h2 className="text-center text-2xl font-semibold tracking-tight text-neutral-900">
         Welcome
       </h2>
@@ -17,7 +17,7 @@ export default async function SignIn() {
         Sign in to your account
       </p>
       <Suspense>
-        <div className="mt-8 grid gap-4 bg-neutral-100 border rounded-lg p-6">
+        <div className="mt-8 grid gap-4 bg-neutral-100 border sm:rounded-lg px-5 py-10 sm:px-10 sm:mx-auto sm:w-full sm:max-w-[420px]">
           <SignInWitjGoogleForm />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

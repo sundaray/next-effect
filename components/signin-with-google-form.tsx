@@ -78,7 +78,7 @@ export function SignInWitjGoogleForm() {
         type="button"
         onClick={handleSignInWithGoogle}
         disabled={isPending}
-        className="item-center flex w-full justify-center bg-white rounded-md border border-neutral-300 py-2 text-sm font-medium text-neutral-900 shadow-xs disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex items-center justify-center w-full  bg-white rounded-md border border-neutral-300 h-10 text-sm font-medium text-neutral-900 shadow-xs disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Icons.google className="mr-2 inline-block size-5" />
         Sign in with Google
