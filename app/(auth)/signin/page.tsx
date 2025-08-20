@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function SignIn() {
   return (
-    <div className="mx-auto max-w-[380px] px-4">
+    <div className="mx-auto max-w-[420px] px-4">
       <h2 className="text-center text-2xl font-semibold tracking-tight text-neutral-900">
         Welcome
       </h2>
