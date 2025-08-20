@@ -143,7 +143,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         id="name"
         name="name"
         label="Name"
-        placeholder="ex: Clarity AI"
+        placeholder="Clarity AI"
         type="text"
         control={control}
         disabled={isProcessing}
@@ -153,7 +153,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         id="website"
         name="website"
         label="Website"
-        placeholder="ex: https://clarityai.co"
+        placeholder="https://clarityai.co"
         control={control}
         disabled={isProcessing}
       />
@@ -162,7 +162,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         id="tagline"
         name="tagline"
         label="Tagline"
-        placeholder="ex: Upscale and enhance your images with AI Magic"
+        placeholder="Upscale and enhance your images with AI Magic"
         help={{
           message: "Tagline must be 20 words or fewer.",
           maxWordCount: 20,

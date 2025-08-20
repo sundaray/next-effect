@@ -227,7 +227,7 @@ export function SignInWithEmailOtpForm() {
                     {...field}
                     id="email"
                     type="email"
-                    className="mt-2 border-neutral-300"
+                    className="mt-2 border-neutral-300 bg-white"
                     placeholder="john@gmail.com"
                     disabled={isProcessing}
                     aria-invalid={errors.email ? "true" : "false"}
