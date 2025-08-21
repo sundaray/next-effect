@@ -1,5 +1,3 @@
-// src/app/page.jsx (or wherever your HomePage is)
-
 import { getTools } from "@/lib/get-tools";
 import { ToolCard } from "@/components/tool-card";
 
@@ -44,7 +42,7 @@ export default async function HomePage() {
       </div>
 
       <div className="mx-auto max-w-6xl">
-        <ToolSearch placeholder="hello" page="search" />
+        <ToolSearch page="search" />
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
           {tools && tools.length > 0 ? (
             <>
