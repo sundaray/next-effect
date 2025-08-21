@@ -5,5 +5,8 @@ type NavbarConfig = {
 };
 
 export const navbarLinks: NavbarConfig = {
-  main: [{ title: "Submit", href: "/submit" }],
+  main: [
+    { title: "Submit", href: "/submit" },
+    { title: "Categories", href: "/categories" },
+  ],
 };

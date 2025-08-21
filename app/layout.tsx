@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { navbarLinks } from "@/config/navbar";
 import { MainNav } from "@/components/main-nav";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import "./globals.css";
 
@@ -34,7 +35,9 @@ export default function RootLayout({
           <MainNav items={navbarLinks.main} />
         </header>
 
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </main>
       </body>
     </html>
   );
