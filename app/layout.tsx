@@ -34,7 +34,7 @@ export default function RootLayout({
           <MainNav items={navbarLinks.main} />
         </header>
 
-        <main className="flex-1 py-32">{children}</main>
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );
