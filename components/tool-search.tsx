@@ -6,8 +6,21 @@ import { useQueryState, parseAsString } from "nuqs";
 
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
+import { cn } from "@/lib/utils";
 
-export function ToolSearch({ page }: { page: string }) {
+interface ToolSearchProps {
+  page: string;
+  className?: string;
+  onFilterClick: () => void;
+  isFilterOpen: boolean;
+}
+
+export function ToolSearch({
+  page,
+  className,
+  onFilterClick,
+  isFilterOpen,
+}: ToolSearchProps) {
   const [isPending, startTransition] = useTransition();
 
   // Set up query parameter for search term
@@ -39,7 +52,7 @@ export function ToolSearch({ page }: { page: string }) {
   }, 250);
 
   return (
-    <div className="flex">
+    <div className={cn("flex", className)}>
       <div
         className="w-full grid grid-cols-1"
         data-pending={isPending ? "" : undefined}
@@ -56,7 +69,8 @@ export function ToolSearch({ page }: { page: string }) {
       </div>
       <button
         type="button"
-        className="flex shrink-0 items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-neutral-900 outline-1 -outline-offset-1 outline-neutral-300 hover:bg-neutral-100 transition-colors focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600"
+        onClick={onFilterClick}
+        className="flex shrink-0 items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-neutral-900 border border-neutral-300 hover:bg-neutral-100 transition-colors focus:relative focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sky-600"
       >
         <Icons.listFilter
           aria-hidden="true"
