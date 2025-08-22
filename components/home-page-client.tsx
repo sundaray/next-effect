@@ -9,6 +9,7 @@ import { ToolOrderBy } from "@/components/tool-order-by";
 import { ToolFilters } from "@/components/tool-filters";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
+import { ActiveFilters } from "@/components/active-filters";
 
 interface HomePageClientProps {
   initialTools: Tool[];
@@ -57,33 +58,31 @@ export function HomePageClient({
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Search, Filter, and Sort Controls */}
-        <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center">
-          <ToolSearch
-            page="search"
-            className="flex-1"
-            isFilterOpen={showFilters}
-            onFilterClick={() => setShowFilters(!showFilters)}
-          />
+        <ActiveFilters />
+        <div className="my-8 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
+          <div>
+            <ToolSearch
+              page="search"
+              isFilterOpen={showFilters}
+              onFilterClick={() => setShowFilters(!showFilters)}
+            />
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0, y: 0 }}
+                  animate={{ height: "auto", opacity: 1, y: 8 }}
+                  exit={{ height: 0, opacity: 0, y: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                >
+                  <ToolFilters categories={allCategories} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <ToolOrderBy />
         </div>
-
-        {/* Conditionally Rendered Filter Panel with Animation */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ height: 0, opacity: 0, marginTop: 0 }}
-              animate={{ height: "auto", opacity: 1, marginTop: "16px" }}
-              exit={{ height: 0, opacity: 0, marginTop: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <ToolFilters categories={allCategories} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Tool Grid */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
           {tools && tools.length > 0 ? (

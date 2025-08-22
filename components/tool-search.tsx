@@ -70,7 +70,7 @@ export function ToolSearch({
       <button
         type="button"
         onClick={onFilterClick}
-        className="flex shrink-0 items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-neutral-900 border border-neutral-300 hover:bg-neutral-100 transition-colors focus:relative focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sky-600"
+        className="flex shrink-0 items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-medium text-neutral-900 border border-neutral-300 hover:bg-neutral-100 transition-colors focus:relative focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sky-600"
       >
         <Icons.listFilter
           aria-hidden="true"

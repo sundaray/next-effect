@@ -51,7 +51,8 @@ export function ToolOrderBy() {
           className="w-full sm:w-[220px] justify-between border-neutral-300 bg-transparent h-10"
         >
           <span>
-            Sort by: <span className="font-semibold">{selectedLabel}</span>
+            <span className="text-neutral-500">Sort by: </span>
+            <span className="font-medium">{selectedLabel}</span>
           </span>
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>

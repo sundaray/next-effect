@@ -40,25 +40,19 @@ export function ToolFilters({ categories }: ToolFiltersProps) {
   }));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded-md bg-white">
-      <div className="flex flex-col gap-2">
-        <h3 className="font-semibold text-sm text-neutral-800">Categories</h3>
-        <MultiSelectCommand
-          placeholder="Search categories..."
-          options={categoryOptions}
-          selectedValues={selectedCategories}
-          onValueChange={setSelectedCategories}
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <h3 className="font-semibold text-sm text-neutral-800">Pricing</h3>
-        <MultiSelectCommand
-          placeholder="Search pricing..."
-          options={pricingOptionsFormatted}
-          selectedValues={selectedPricing}
-          onValueChange={setSelectedPricing}
-        />
-      </div>
+    <div className="flex flex-col sm:flex-row gap-4 items-center">
+      <MultiSelectCommand
+        placeholder="Search categories..."
+        options={categoryOptions}
+        selectedValues={selectedCategories}
+        onValueChange={setSelectedCategories}
+      />
+      <MultiSelectCommand
+        placeholder="Search pricing..."
+        options={pricingOptionsFormatted}
+        selectedValues={selectedPricing}
+        onValueChange={setSelectedPricing}
+      />
     </div>
   );
 }

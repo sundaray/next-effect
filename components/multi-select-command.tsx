@@ -9,6 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -62,12 +63,7 @@ export function MultiSelectCommand({
                     checked={isSelected}
                     className="mr-2 pointer-events-none"
                   />
-                  <label
-                    htmlFor={`select-${option.value}`}
-                    className="w-full cursor-pointer"
-                  >
-                    {option.label}
-                  </label>
+                  <Label className="font-normal">{option.label}</Label>
                 </CommandItem>
               );
             })}
