@@ -5,10 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Tool } from "@/components/tool-card";
 import { ToolCard } from "@/components/tool-card";
 import { ToolSearch } from "@/components/tool-search";
-import { ToolOrderBy } from "@/components/tool-order-by";
-import { ToolFilters } from "@/components/tool-filters";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
+import { ToolSort } from "@/components/tool-sort";
+import { ToolFilter } from "@/components/tool-filter";
 import { ActiveFilters } from "@/components/active-filters";
 
 interface HomePageClientProps {
@@ -64,7 +62,7 @@ export function HomePageClient({
 
       <div className="max-w-6xl mx-auto px-4">
         {/* Search, Filter, and Sort Controls */}
-        <ActiveFilters />
+        <ActiveFilters onClearAll={() => setShowFilters(false)} />
         <div className="my-8 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
           <div>
             <ToolSearch
@@ -80,7 +78,7 @@ export function HomePageClient({
                   exit={{ height: 0, opacity: 0, y: 0 }}
                   transition={{ duration: 0.2, ease: "easeInOut" }}
                 >
-                  <ToolFilters
+                  <ToolFilter
                     categories={allCategories}
                     categoryCounts={categoryCounts}
                     pricingCounts={pricingCounts}
@@ -89,7 +87,7 @@ export function HomePageClient({
               )}
             </AnimatePresence>
           </div>
-          <ToolOrderBy />
+          <ToolSort />
         </div>
         {/* Tool Grid */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">

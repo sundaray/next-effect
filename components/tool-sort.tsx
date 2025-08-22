@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useQueryState, parseAsString } from "nuqs";
-import { useTransition } from "react";
+import { useToolFilters } from "@/hooks/use-tool-filters";
+import { toolSortOptions } from "@/config/tool-options";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -19,27 +19,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const sortOptions = [
-  { value: "latest", label: "Latest" },
-  { value: "name-asc", label: "Name (A to Z)" },
-  { value: "name-desc", label: "Name (Z to A)" },
-  { value: "bookmarks-desc", label: "Most Bookmarks" },
-];
-
-export function ToolOrderBy() {
+export function ToolSort() {
   const [open, setOpen] = useState(false);
-  const [_isPending, startTransition] = useTransition();
-
-  const [orderBy, setOrderBy] = useQueryState(
-    "orderBy",
-    parseAsString.withDefault("latest").withOptions({
-      startTransition,
-      shallow: false,
-    })
-  );
+  const { filters, setFilters } = useToolFilters();
 
   const selectedLabel =
-    sortOptions.find((option) => option.value === orderBy)?.label || "Latest";
+    toolSortOptions.find((option) => option.value === filters.sort)?.label ||
+    "Latest";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -61,19 +47,21 @@ export function ToolOrderBy() {
         <Command>
           <CommandList>
             <CommandGroup>
-              {sortOptions.map((option) => (
+              {toolSortOptions.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    setOrderBy(currentValue);
+                    setFilters({ sort: currentValue });
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      orderBy === option.value ? "opacity-100" : "opacity-0"
+                      filters.sort === option.value
+                        ? "opacity-100"
+                        : "opacity-0"
                     )}
                   />
                   {option.label}

@@ -1,0 +1,52 @@
+"use client";
+
+import { MultiSelectCommand } from "@/components/multi-select-command";
+import { pricingOptions } from "@/lib/schema";
+import { useToolFilters } from "@/hooks/use-tool-filters";
+
+interface ToolFiltersProps {
+  categories: string[];
+  categoryCounts: Record<string, number>;
+  pricingCounts: Record<string, number>;
+}
+
+export function ToolFilter({
+  categories,
+  categoryCounts,
+  pricingCounts,
+}: ToolFiltersProps) {
+  const { filters, setFilters } = useToolFilters();
+
+  const categoryOptions = categories.map((cat) => ({
+    value: cat,
+    label: cat,
+    count: categoryCounts[cat] || 0,
+  }));
+
+  const pricingOptionsFormatted = pricingOptions.map((p) => ({
+    value: p,
+    label: p.charAt(0).toUpperCase() + p.slice(1),
+    count: pricingCounts[p] || 0,
+  }));
+
+  return (
+    <div className="flex flex-col sm:flex-row gap-4 items-center">
+      <MultiSelectCommand
+        placeholder="Search categories..."
+        options={categoryOptions}
+        selectedValues={filters.category}
+        onValueChange={(newCategories) => {
+          setFilters({ category: newCategories });
+        }}
+      />
+      <MultiSelectCommand
+        placeholder="Search pricing..."
+        options={pricingOptionsFormatted}
+        selectedValues={filters.pricing}
+        onValueChange={(newPricing) => {
+          setFilters({ pricing: newPricing });
+        }}
+      />
+    </div>
+  );
+}

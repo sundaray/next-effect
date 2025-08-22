@@ -1,8 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useQueryState, parseAsString } from "nuqs";
+import { useToolFilters } from "@/hooks/use-tool-filters";
 
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
@@ -21,34 +20,11 @@ export function ToolSearch({
   onFilterClick,
   isFilterOpen,
 }: ToolSearchProps) {
-  const [isPending, startTransition] = useTransition();
-
-  // Set up query parameter for search term
-  const [query, setQuery] = useQueryState(
-    "query",
-    parseAsString.withDefault("").withOptions({
-      startTransition,
-      shallow: false,
-    })
-  );
-
-  // Set up access to page parameter just to reset it
-  const [_, setPage] = useQueryState(
-    "page",
-    parseAsString.withDefault("1").withOptions({
-      startTransition,
-      shallow: false,
-    })
-  );
+  const { isPending, filters, setFilters } = useToolFilters();
 
   // Handle search with debounce
   const handleSearch = useDebouncedCallback((term: string) => {
-    setQuery(term);
-
-    // Only reset page if we're using the podcast search
-    if (page === "podcasts") {
-      setPage("1");
-    }
+    setFilters({ search: term, page: 1 });
   }, 250);
 
   return (
@@ -61,7 +37,7 @@ export function ToolSearch({
           className="border-neutral-300 pl-8 rounded-r-none border-r-0 col-start-1 row-start-1 pr-3"
           type="search"
           placeholder="Search for apps by name..."
-          defaultValue={query || ""}
+          defaultValue={filters.search}
           onChange={(e) => handleSearch(e.target.value)}
           aria-label="Search for apps by name..."
         />

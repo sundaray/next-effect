@@ -9,7 +9,8 @@ export function useToolFilters() {
 
   const [filters, setFilters] = useQueryStates(toolSearchParams, {
     startTransition,
+    shallow: false,
   });
 
-  return [filters, setFilters] as const;
+  return { isPending, filters, setFilters } as const;
 }

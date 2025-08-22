@@ -1,122 +1,163 @@
 "use client";
 
-import { useTransition } from "react";
-import { useQueryState, parseAsString, parseAsArrayOf } from "nuqs";
-import { Check, X } from "lucide-react";
-
+import { useToolFilters } from "@/hooks/use-tool-filters";
+import { toolSortOptions } from "@/config/tool-options";
+import { Icons } from "@/components/icons";
+import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 
-// This should be the same as in your ToolOrderBy component
-const sortOptions = [
-  { value: "latest", label: "Latest" },
-  { value: "name-asc", label: "Name (A to Z)" },
-  { value: "name-desc", label: "Name (Z to A)" },
-  { value: "bookmarks-desc", label: "Most Bookmarks" },
-];
-
-export function ActiveFilters() {
-  const [_isPending, startTransition] = useTransition();
-
-  // Read all relevant query states from the URL
-  const [orderBy, setOrderBy] = useQueryState(
-    "orderBy",
-    parseAsString.withDefault("latest").withOptions({ startTransition })
+function FilterPill({
+  label,
+  onClear,
+}: {
+  label: string;
+  onClear: () => void;
+}) {
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      className="flex items-center gap-x-2 rounded-full bg-neutral-200 px-2 py-1 border"
+    >
+      <span className="text-xs text-neutral-700 font-semibold">{label}</span>
+      <button
+        onClick={onClear}
+        className="text-neutral-500 hover:text-neutral-700 transition-colors"
+        aria-label={`Remove ${label} filter`}
+      >
+        <Icons.x className="size-4" />
+      </button>
+    </motion.div>
   );
+}
 
-  // === FIX IS HERE ===
-  const [categories, setCategories] = useQueryState(
-    "category",
-    parseAsArrayOf(parseAsString) // You must pass the item parser here
-      .withDefault([])
-      .withOptions({ startTransition })
-  );
-  const [pricing, setPricing] = useQueryState(
-    "pricing",
-    parseAsArrayOf(parseAsString) // And here as well
-      .withDefault([])
-      .withOptions({ startTransition })
-  );
-  // === END FIX ===
+export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
+  const { filters, setFilters } = useToolFilters();
 
-  // Build a list of active filters to render
-  const activeFilters = [];
+  // --- Create separate filter groups ---
+  const searchFilters = [];
+  if (filters.search) {
+    searchFilters.push({
+      key: "search",
+      label: `Query: "${filters.search}"`,
+      clear: () => setFilters({ search: null }),
+    });
+  }
 
-  // Order By filter (only show if it's not the default)
-  if (orderBy && orderBy !== "latest") {
-    const option = sortOptions.find((o) => o.value === orderBy);
+  const sortFilters = [];
+  if (filters.sort !== "latest") {
+    const option = toolSortOptions.find((o) => o.value === filters.sort);
     if (option) {
-      activeFilters.push({
-        key: "orderBy",
+      sortFilters.push({
+        key: "sort",
         label: option.label,
-        clear: () => setOrderBy(null), // Resets to default
+        clear: () => setFilters({ sort: null }),
       });
     }
   }
 
-  // Category filters
-  categories.forEach((categoryName) => {
-    activeFilters.push({
-      key: `category-${categoryName}`,
-      label: categoryName,
-      clear: () =>
-        setCategories(categories.filter((name) => name !== categoryName)),
-    });
-  });
+  const categoryFilters = filters.category.map((categoryName) => ({
+    key: `category-${categoryName}`,
+    label: categoryName,
+    clear: () =>
+      setFilters({
+        category: filters.category.filter((name) => name !== categoryName),
+      }),
+  }));
 
-  // Pricing filters
-  pricing.forEach((price) => {
-    activeFilters.push({
-      key: `pricing-${price}`,
-      // Simple capitalization for the label
-      label: price.charAt(0).toUpperCase() + price.slice(1),
-      clear: () => setPricing(pricing.filter((p) => p !== price)),
-    });
-  });
+  const pricingFilters = filters.pricing.map((price) => ({
+    key: `pricing-${price}`,
+    label: price.charAt(0).toUpperCase() + price.slice(1),
+    clear: () =>
+      setFilters({
+        pricing: filters.pricing.filter((p) => p !== price),
+      }),
+  }));
+
+  const totalActiveFilters =
+    searchFilters.length +
+    sortFilters.length +
+    categoryFilters.length +
+    pricingFilters.length;
 
   const handleClearAll = () => {
-    startTransition(() => {
-      setOrderBy(null);
-      setCategories([]);
-      setPricing([]);
+    setFilters({
+      search: null,
+      sort: null,
+      category: null,
+      pricing: null,
     });
+    onClearAll();
   };
 
-  // Don't render anything if no filters are active
-  if (activeFilters.length === 0) {
+  if (totalActiveFilters === 0) {
     return null;
   }
 
   return (
     <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-      <div className="flex items-center gap-2 flex-wrap">
-        {activeFilters.map((filter) => (
-          <div
-            key={filter.key}
-            className="flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm"
-          >
-            <span className="font-medium text-neutral-700">{filter.label}</span>
-            <button
-              onClick={filter.clear}
-              className="text-neutral-500 hover:text-neutral-800 transition-colors"
-              aria-label={`Remove ${filter.label} filter`}
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-        ))}
+      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
+        <AnimatePresence>
+          {/* Render non-grouped filters first */}
+          {searchFilters.map((filter) => (
+            <FilterPill
+              key={filter.key}
+              label={filter.label}
+              onClear={filter.clear}
+            />
+          ))}
+          {sortFilters.map((filter) => (
+            <FilterPill
+              key={filter.key}
+              label={filter.label}
+              onClear={filter.clear}
+            />
+          ))}
+
+          {/* Render Category group */}
+          {categoryFilters.length > 0 && (
+            <div key="category-group" className="flex items-center gap-2">
+              <span className="text-sm font-medium text-neutral-600">
+                Categories:
+              </span>
+              {categoryFilters.map((filter) => (
+                <FilterPill
+                  key={filter.key}
+                  label={filter.label}
+                  onClear={filter.clear}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Render Pricing group */}
+          {pricingFilters.length > 0 && (
+            <div className="flex items-center gap-2" key="pricing-group">
+              <span className="text-sm font-medium text-neutral-600">
+                Pricing:
+              </span>
+              {pricingFilters.map((filter) => (
+                <FilterPill
+                  key={filter.key}
+                  label={filter.label}
+                  onClear={filter.clear}
+                />
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {activeFilters.length > 1 && (
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleClearAll}
-          className="shrink-0"
-        >
-          <Check className="mr-1.5 size-4" />
-          Clear all
-        </Button>
-      )}
+      <Button
+        onClick={handleClearAll}
+        className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-2 py-1 text-xs h-auto gap-x-2"
+      >
+        <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
+        Clear all
+      </Button>
     </div>
   );
 }
