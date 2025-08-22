@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, LayoutGroup } from "motion/react";
 import type { Tool } from "@/components/tool-card";
 import { ToolCard } from "@/components/tool-card";
 import { ToolSearch } from "@/components/tool-search";
@@ -62,33 +62,40 @@ export function HomePageClient({
 
       <div className="max-w-6xl mx-auto px-4">
         {/* Search, Filter, and Sort Controls */}
-        <ActiveFilters onClearAll={() => setShowFilters(false)} />
-        <div className="my-8 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
-          <div>
-            <ToolSearch
-              page="search"
-              isFilterOpen={showFilters}
-              onFilterClick={() => setShowFilters(!showFilters)}
-            />
-            <AnimatePresence>
-              {showFilters && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0, y: 0 }}
-                  animate={{ height: "auto", opacity: 1, y: 8 }}
-                  exit={{ height: 0, opacity: 0, y: 0 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                >
-                  <ToolFilter
-                    categories={allCategories}
-                    categoryCounts={categoryCounts}
-                    pricingCounts={pricingCounts}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <ToolSort />
-        </div>
+        <LayoutGroup>
+          <ActiveFilters onClearAll={() => setShowFilters(false)} />
+          <motion.div
+            layout
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="my-8 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4"
+          >
+            <div>
+              <ToolSearch
+                page="search"
+                isFilterOpen={showFilters}
+                onFilterClick={() => setShowFilters(!showFilters)}
+              />
+              <AnimatePresence>
+                {showFilters && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0, y: 0 }}
+                    animate={{ height: "auto", opacity: 1, y: 8 }}
+                    exit={{ height: 0, opacity: 0, y: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                  >
+                    <ToolFilter
+                      categories={allCategories}
+                      categoryCounts={categoryCounts}
+                      pricingCounts={pricingCounts}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            <ToolSort />
+          </motion.div>
+        </LayoutGroup>
+
         {/* Tool Grid */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
           {tools && tools.length > 0 ? (

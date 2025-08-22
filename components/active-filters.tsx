@@ -150,14 +150,15 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
           )}
         </AnimatePresence>
       </div>
-
-      <Button
-        onClick={handleClearAll}
-        className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-2 py-1 text-xs h-auto gap-x-2"
-      >
-        <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
-        Clear all
-      </Button>
+      {totalActiveFilters > 1 && (
+        <Button
+          onClick={handleClearAll}
+          className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-2 py-1 text-xs h-auto gap-x-2"
+        >
+          <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
+          Clear all
+        </Button>
+      )}
     </div>
   );
 }
