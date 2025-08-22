@@ -14,11 +14,15 @@ import { ActiveFilters } from "@/components/active-filters";
 interface HomePageClientProps {
   initialTools: Tool[];
   allCategories: string[];
+  categoryCounts: Record<string, number>;
+  pricingCounts: Record<string, number>;
 }
 
 export function HomePageClient({
   initialTools,
   allCategories,
+  categoryCounts,
+  pricingCounts,
 }: HomePageClientProps) {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -76,7 +80,11 @@ export function HomePageClient({
                   exit={{ height: 0, opacity: 0, y: 0 }}
                   transition={{ duration: 0.2, ease: "easeInOut" }}
                 >
-                  <ToolFilters categories={allCategories} />
+                  <ToolFilters
+                    categories={allCategories}
+                    categoryCounts={categoryCounts}
+                    pricingCounts={pricingCounts}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface MultiSelectOption {
   value: string;
   label: string;
+  count: number;
 }
 
 interface MultiSelectCommandProps {
@@ -56,14 +57,17 @@ export function MultiSelectCommand({
                   key={option.value}
                   value={option.value}
                   onSelect={() => handleToggle(option.value)}
-                  className="cursor-pointer"
+                  className="cursor-pointer flex justify-between"
                 >
-                  <Checkbox
-                    id={`select-${option.value}`}
-                    checked={isSelected}
-                    className="mr-2 pointer-events-none"
-                  />
-                  <Label className="font-normal">{option.label}</Label>
+                  <div className="flex">
+                    <Checkbox
+                      id={`select-${option.value}`}
+                      checked={isSelected}
+                      className="mr-2 pointer-events-none"
+                    />
+                    <Label className="font-normal">{option.label}</Label>
+                  </div>
+                  <span className="text-neutral-500">{option.count}</span>
                 </CommandItem>
               );
             })}

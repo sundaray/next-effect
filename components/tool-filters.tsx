@@ -8,9 +8,15 @@ import { pricingOptions } from "@/lib/schema";
 
 interface ToolFiltersProps {
   categories: string[];
+  categoryCounts: Record<string, number>;
+  pricingCounts: Record<string, number>;
 }
 
-export function ToolFilters({ categories }: ToolFiltersProps) {
+export function ToolFilters({
+  categories,
+  categoryCounts,
+  pricingCounts,
+}: ToolFiltersProps) {
   const [_isPending, startTransition] = useTransition();
 
   const [selectedCategories, setSelectedCategories] = useQueryState(
@@ -32,11 +38,13 @@ export function ToolFilters({ categories }: ToolFiltersProps) {
   const categoryOptions = categories.map((cat) => ({
     value: cat,
     label: cat,
+    count: categoryCounts[cat] || 0,
   }));
 
   const pricingOptionsFormatted = pricingOptions.map((p) => ({
     value: p,
     label: p.charAt(0).toUpperCase() + p.slice(1),
+    count: pricingCounts[p] || 0,
   }));
 
   return (
