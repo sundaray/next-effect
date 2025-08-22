@@ -3,6 +3,7 @@
 import { MultiSelectCommand } from "@/components/multi-select-command";
 import { pricingOptions } from "@/lib/schema";
 import { useToolFilters } from "@/hooks/use-tool-filters";
+import { slugify } from "@/lib/utils";
 
 interface ToolFiltersProps {
   categories: string[];
@@ -18,7 +19,7 @@ export function ToolFilter({
   const { filters, setFilters } = useToolFilters();
 
   const categoryOptions = categories.map((cat) => ({
-    value: cat,
+    value: slugify(cat),
     label: cat,
     count: categoryCounts[cat] || 0,
   }));

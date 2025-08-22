@@ -5,6 +5,7 @@ import { toolSortOptions } from "@/config/tool-options";
 import { Icons } from "@/components/icons";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { unslugify } from "@/lib/utils";
 
 function FilterPill({
   label,
@@ -59,12 +60,12 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
     }
   }
 
-  const categoryFilters = filters.category.map((categoryName) => ({
-    key: `category-${categoryName}`,
-    label: categoryName,
+  const categoryFilters = filters.category.map((categorySlug) => ({
+    key: `category-${categorySlug}`,
+    label: unslugify(categorySlug),
     clear: () =>
       setFilters({
-        category: filters.category.filter((name) => name !== categoryName),
+        category: filters.category.filter((name) => name !== categorySlug),
       }),
   }));
 
@@ -93,72 +94,79 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
     onClearAll();
   };
 
-  if (totalActiveFilters === 0) {
-    return null;
-  }
-
   return (
-    <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
-        <AnimatePresence>
-          {/* Render non-grouped filters first */}
-          {searchFilters.map((filter) => (
-            <FilterPill
-              key={filter.key}
-              label={filter.label}
-              onClear={filter.clear}
-            />
-          ))}
-          {sortFilters.map((filter) => (
-            <FilterPill
-              key={filter.key}
-              label={filter.label}
-              onClear={filter.clear}
-            />
-          ))}
-
-          {/* Render Category group */}
-          {categoryFilters.length > 0 && (
-            <div key="category-group" className="flex items-center gap-2">
-              <span className="text-sm font-medium text-neutral-600">
-                Categories:
-              </span>
-              {categoryFilters.map((filter) => (
-                <FilterPill
-                  key={filter.key}
-                  label={filter.label}
-                  onClear={filter.clear}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Render Pricing group */}
-          {pricingFilters.length > 0 && (
-            <div className="flex items-center gap-2" key="pricing-group">
-              <span className="text-sm font-medium text-neutral-600">
-                Pricing:
-              </span>
-              {pricingFilters.map((filter) => (
-                <FilterPill
-                  key={filter.key}
-                  label={filter.label}
-                  onClear={filter.clear}
-                />
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-      {totalActiveFilters > 1 && (
-        <Button
-          onClick={handleClearAll}
-          className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-2 py-1 text-xs h-auto gap-x-2"
+    <AnimatePresence>
+      {totalActiveFilters > 0 && (
+        <motion.div
+          layout
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="flex items-center justify-between gap-4 mb-4 flex-wrap"
         >
-          <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
-          Clear all
-        </Button>
+          <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
+            <AnimatePresence>
+              {/* Render non-grouped filters first */}
+              {searchFilters.map((filter) => (
+                <FilterPill
+                  key={filter.key}
+                  label={filter.label}
+                  onClear={filter.clear}
+                />
+              ))}
+              {sortFilters.map((filter) => (
+                <FilterPill
+                  key={filter.key}
+                  label={filter.label}
+                  onClear={filter.clear}
+                />
+              ))}
+
+              {/* Render Category group */}
+              {categoryFilters.length > 0 && (
+                <div key="category-group" className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-neutral-600">
+                    Categories:
+                  </span>
+                  {categoryFilters.map((filter) => (
+                    <FilterPill
+                      key={filter.key}
+                      label={filter.label}
+                      onClear={filter.clear}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Render Pricing group */}
+              {pricingFilters.length > 0 && (
+                <div className="flex items-center gap-2" key="pricing-group">
+                  <span className="text-sm font-medium text-neutral-600">
+                    Pricing:
+                  </span>
+                  {pricingFilters.map((filter) => (
+                    <FilterPill
+                      key={filter.key}
+                      label={filter.label}
+                      onClear={filter.clear}
+                    />
+                  ))}
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+          {totalActiveFilters > 1 && (
+            <Button
+              onClick={handleClearAll}
+              className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-2 py-1 text-xs h-auto gap-x-2"
+            >
+              <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
+              Clear all
+            </Button>
+          )}
+        </motion.div>
       )}
-    </div>
+    </AnimatePresence>
   );
 }

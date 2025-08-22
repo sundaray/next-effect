@@ -26,6 +26,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@react-email/components": "^0.5.0",
     "@react-email/render": "^1.2.0",
+    "@sindresorhus/slugify": "^2.2.1",
     "@tiptap/pm": "^3.0.9",
     "@tiptap/react": "^3.0.9",
     "@tiptap/starter-kit": "^3.0.9",

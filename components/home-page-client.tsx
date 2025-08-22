@@ -63,7 +63,9 @@ export function HomePageClient({
       <div className="max-w-6xl mx-auto px-4">
         {/* Search, Filter, and Sort Controls */}
         <LayoutGroup>
-          <ActiveFilters onClearAll={() => setShowFilters(false)} />
+          <AnimatePresence>
+            <ActiveFilters onClearAll={() => setShowFilters(false)} />
+          </AnimatePresence>
           <motion.div
             layout
             transition={{ duration: 0.2, ease: "easeInOut" }}

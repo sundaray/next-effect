@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import slugifyLib from "@sindresorhus/slugify";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -25,4 +26,17 @@ export function formatBytes(bytes: number, decimals = 2): string {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+
+export function slugify(text: string): string {
+  return slugifyLib(text);
+}
+
+export function unslugify(slug: string): string {
+  return slug
+    .replace(/-/g, " ")
+    .replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
 }
