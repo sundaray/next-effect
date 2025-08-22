@@ -1,42 +1,87 @@
 "use client";
 
-import { useTransition } from "react";
-import { useDebouncedCallback } from "use-debounce";
+import { useState } from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useQueryState, parseAsString } from "nuqs";
+import { useTransition } from "react";
 
-import { Input } from "@/components/ui/input";
-import { Icons } from "@/components/icons";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-export function ToolOrderBy({ page }: { page: string }) {
-  const [isPending, startTransition] = useTransition();
+const sortOptions = [
+  { value: "latest", label: "Latest" },
+  { value: "name-asc", label: "Name (A to Z)" },
+  { value: "name-desc", label: "Name (Z to A)" },
+  { value: "bookmarks-desc", label: "Most Bookmarks" },
+];
 
-  // Set up query parameter for search term
-  const [query, setQuery] = useQueryState(
-    "query",
-    parseAsString.withDefault("").withOptions({
+export function ToolOrderBy() {
+  const [open, setOpen] = useState(false);
+  const [_isPending, startTransition] = useTransition();
+
+  const [orderBy, setOrderBy] = useQueryState(
+    "orderBy",
+    parseAsString.withDefault("latest").withOptions({
       startTransition,
       shallow: false,
     })
   );
 
-  // Set up access to page parameter just to reset it
-  const [_, setPage] = useQueryState(
-    "page",
-    parseAsString.withDefault("1").withOptions({
-      startTransition,
-      shallow: false,
-    })
+  const selectedLabel =
+    sortOptions.find((option) => option.value === orderBy)?.label || "Latest";
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full sm:w-[220px] justify-between border-neutral-300 bg-transparent h-10"
+        >
+          <span>
+            Sort by: <span className="font-semibold">{selectedLabel}</span>
+          </span>
+          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[220px] p-0">
+        <Command>
+          <CommandList>
+            <CommandGroup>
+              {sortOptions.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  value={option.value}
+                  onSelect={(currentValue) => {
+                    setOrderBy(currentValue);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      orderBy === option.value ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {option.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
-
-  // Handle search with debounce
-  const handleSearch = useDebouncedCallback((term: string) => {
-    setQuery(term);
-
-    // Only reset page if we're using the podcast search
-    if (page === "podcasts") {
-      setPage("1");
-    }
-  }, 250);
-
-  return <div></div>;
 }

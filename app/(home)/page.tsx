@@ -2,13 +2,14 @@ import { getTools } from "@/lib/get-tools";
 import { ToolCard } from "@/components/tool-card";
 
 import { ToolSearch } from "@/components/tool-search";
+import { ToolOrderBy } from "@/components/tool-order-by";
 
 export default async function HomePage() {
   const tools = await getTools();
 
   return (
     <div>
-      <div className="@container w-full h-100 overflow-hidden relative">
+      <div className="w-full h-100 overflow-hidden relative">
         <div
           className="
         w-full h-full
@@ -41,8 +42,13 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl">
-        <ToolSearch page="search" />
+      <div className="mx-auto max-w-6xl px-4">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+          <div className="flex-1">
+            <ToolSearch page="search" />
+          </div>
+          <ToolOrderBy />
+        </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
           {tools && tools.length > 0 ? (
             <>
