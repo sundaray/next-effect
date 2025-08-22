@@ -1,4 +1,12 @@
-import { parseAsInteger, parseAsString, parseAsArrayOf } from "nuqs/server";
+import {
+  parseAsInteger,
+  parseAsString,
+  parseAsArrayOf,
+  parseAsStringLiteral,
+} from "nuqs/server";
+import { pricingOptions } from "@/lib/schema";
+
+const validPricing = pricingOptions as readonly ["free", "paid", "freemium"];
 
 export const toolSearchParams = {
   page: parseAsInteger.withDefault(1),
@@ -9,5 +17,5 @@ export const toolSearchParams = {
 
   category: parseAsArrayOf(parseAsString).withDefault([]),
 
-  pricing: parseAsArrayOf(parseAsString).withDefault([]),
+  pricing: parseAsArrayOf(parseAsStringLiteral(validPricing)).withDefault([]),
 };
