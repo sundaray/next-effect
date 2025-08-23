@@ -170,7 +170,7 @@ export function CategoryInput<
                   >
                     <button
                       type="button"
-                      className="w-full px-3 py-2.5 text-sm font-medium text-sky-600 hover:bg-sky-100 focus:bg-sky-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
+                      className="w-full px-3 py-2.5 text-sm font-medium text-sky-800 hover:bg-sky-100 focus:bg-sky-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
                       onClick={() => addCategory(categoryInput)}
                     >
                       <Plus className="size-4" />

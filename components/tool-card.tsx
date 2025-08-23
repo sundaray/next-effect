@@ -9,13 +9,13 @@ import { motion } from "motion/react";
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
     case "free":
-      return "border-emerald-200 bg-emerald-100 text-emerald-800";
+      return "border-emerald-200 bg-emerald-100 text-emerald-900 rounded-full";
     case "freemium":
-      return "border-sky-200 bg-sky-100 text-sky-800";
+      return "border-sky-200 bg-sky-100 text-sky-900 rounded-full";
     case "paid":
       return "bg-purple-100 text-purple-900 rounded-full border-purple-200";
     default:
-      return "border-neutral-200 bg-neutral-100 text-neutral-800";
+      return "border-neutral-200 bg-neutral-100 text-neutral-900 rounded-full";
   }
 };
 
@@ -30,7 +30,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="group relative flex h-full flex-col rounded-lg border border-neutral-200 bg-neutral-100 p-6 shadow-sm transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg"
+      className="group relative flex h-full flex-col rounded-md border border-neutral-200 bg-white p-6 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg"
     >
       <Link
         href={`/tool/${slug}`}
@@ -49,7 +49,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
             className="size-12 rounded-xl object-cover"
           />
         ) : (
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-white">
             <span className="text-xl font-semibold text-neutral-700">
               {tool.name.charAt(0).toUpperCase()}
             </span>
@@ -65,7 +65,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
       </div>
 
       {/* Description */}
-      <p className="line-clamp-2 text-sm leading-relaxed text-neutral-600">
+      <p className="line-clamp-2 text-sm leading-relaxed text-neutral-700 mb-auto">
         {tool.tagline}
       </p>
 
@@ -74,7 +74,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
         {primaryCategory && (
           <Badge
             variant="secondary"
-            className=" bg-white font-semibold text-neutral-700 rounded-full border-neutral-200"
+            className=" bg-neutral-100 font-semibold text-neutral-700 rounded-full border-neutral-200"
           >
             {primaryCategory}
           </Badge>
