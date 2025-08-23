@@ -25,7 +25,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
 
   return (
     <motion.article
-      layout="position"
+      layout
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

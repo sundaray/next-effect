@@ -99,24 +99,25 @@ export function HomePageClient({
         </LayoutGroup>
 
         {/* Tool Grid */}
-        <AnimatePresence>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
-            {tools && tools.length > 0 ? (
-              tools.map((tool) => <ToolCard key={tool.id} tool={tool} />)
-            ) : (
-              <motion.p
-                key="no-tools-message"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="text-neutral-700 col-span-full text-center"
-              >
-                No tools found matching your criteria.
-              </motion.p>
-            )}
-          </div>
-        </AnimatePresence>
+        <LayoutGroup>
+          <motion.div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
+            <AnimatePresence mode="wait">
+              {tools && tools.length > 0 ? (
+                tools.map((tool) => <ToolCard tool={tool} key={tool.id} />)
+              ) : (
+                <motion.p
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="text-neutral-700 col-span-full text-center"
+                >
+                  No tools found matching your criteria.
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </LayoutGroup>
       </div>
     </div>
   );
