@@ -2,7 +2,7 @@ import "server-only";
 
 import { Effect } from "effect";
 // 1. Import Drizzle query helpers
-import { desc, and, ilike, or, inArray, sql, SQL } from "drizzle-orm";
+import { desc, and, ilike, inArray, arrayOverlaps, SQL } from "drizzle-orm";
 import { DatabaseService } from "@/lib/services/database-service";
 import { serverRuntime } from "@/lib/server-runtime";
 import { tools } from "@/db/schema";
@@ -12,7 +12,7 @@ import type { ToolFilters } from "@/lib/tool-search-params";
 
 // 3. Update the function to accept searchParams
 export async function getTools(filters: Partial<ToolFilters>) {
-  // 5. Build an array of dynamic query conditions
+  // This array will hold all the WHERE clauses for our final query
   const conditions: SQL[] = [];
 
   const categories = filters.category ?? [];
@@ -20,15 +20,15 @@ export async function getTools(filters: Partial<ToolFilters>) {
 
   // Search condition
   if (filters.search) {
-    conditions.push(or(ilike(tools.name, `%${filters.search}%`))!);
+    conditions.push(ilike(tools.name, `%${filters.search}%`));
   }
 
   // Category condition
   if (categories.length > 0) {
-    // Should not we pass a function to map?
-    const originalCategoryNames = categories.map(unslugify);
-    // Use SQL's && operator to check for array overlap in Postgres
-    conditions.push(sql`${tools.categories} && ${originalCategoryNames}`);
+    const originalCategoryNames = categories.map((category) =>
+      unslugify(category)
+    );
+    conditions.push(arrayOverlaps(tools.categories, originalCategoryNames));
   }
 
   // Pricing condition
