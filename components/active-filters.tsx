@@ -43,7 +43,8 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
   if (filters.search) {
     searchFilters.push({
       key: "search",
-      label: `Search: "${filters.search}"`,
+      prefix: "Search:",
+      value: `${filters.search}`,
       clear: () => setFilters({ search: null }),
     });
   }
@@ -104,12 +105,14 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
             <AnimatePresence>
               {/* Render non-grouped filters first */}
               {searchFilters.map((filter) => (
-                <FilterPill
-                  key={filter.key}
-                  label={filter.label}
-                  onClear={filter.clear}
-                />
+                <div key={filter.key} className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-neutral-500">
+                    {filter.prefix}
+                  </span>
+                  <FilterPill label={filter.value} onClear={filter.clear} />
+                </div>
               ))}
+
               {sortFilters.map((filter) => (
                 <FilterPill
                   key={filter.key}
@@ -121,7 +124,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
               {/* Render Category group */}
               {categoryFilters.length > 0 && (
                 <div key="category-group" className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-neutral-600">
+                  <span className="text-sm font-medium text-neutral-500">
                     Categories:
                   </span>
                   {categoryFilters.map((filter) => (
@@ -137,7 +140,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
               {/* Render Pricing group */}
               {pricingFilters.length > 0 && (
                 <div className="flex items-center gap-2" key="pricing-group">
-                  <span className="text-sm font-medium text-neutral-600">
+                  <span className="text-sm font-medium text-neutral-500">
                     Pricing:
                   </span>
                   {pricingFilters.map((filter) => (

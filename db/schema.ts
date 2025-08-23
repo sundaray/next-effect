@@ -8,6 +8,7 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 
 export const pricingTypeEnum = pgEnum("pricing", ["free", "paid", "freemium"]);
 
@@ -63,6 +64,8 @@ export const tools = pgTable("tools", {
   rejectionCount: integer("rejection_count").notNull().default(0),
   bookmarkCount: integer("bookmark_count").notNull().default(0),
 });
+
+export type Tool = InferSelectModel<typeof tools>;
 
 export const toolHistory = pgTable("tool_history", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion, LayoutGroup } from "motion/react";
-import type { Tool } from "@/components/tool-card";
+import type { Tool } from "@/db/schema";
 import { ToolCard } from "@/components/tool-card";
 import { ToolSearch } from "@/components/tool-search";
 import { ToolSort } from "@/components/tool-sort";
@@ -49,14 +49,14 @@ export function HomePageClient({
           <h1 className="text-4xl tracking-tight font-bold text-neutral-900">
             The Ultimate AI Apps Directory
           </h1>
-          <p className="text-neutral-700 font-medium leading-relaxed mt-4">
+          {/* <p className="text-neutral-700 font-medium leading-relaxed mt-4">
             Explore AI applications across industries and use cases.{" "}
             <span className="text-sky-700 font-semibold">
               List your AI app for free,
             </span>{" "}
             get a backlink to boost your SEO and connect with your target
             audience.
-          </p>
+          </p> */}
         </div>
       </div>
 
@@ -99,15 +99,24 @@ export function HomePageClient({
         </LayoutGroup>
 
         {/* Tool Grid */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
-          {tools && tools.length > 0 ? (
-            tools.map((tool) => <ToolCard key={tool.id} tool={tool} />)
-          ) : (
-            <p className="text-neutral-600 col-span-full text-center">
-              No tools have been submitted yet. Be the first!
-            </p>
-          )}
-        </div>
+        <AnimatePresence>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
+            {tools && tools.length > 0 ? (
+              tools.map((tool) => <ToolCard key={tool.id} tool={tool} />)
+            ) : (
+              <motion.p
+                key="no-tools-message"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="text-neutral-700 col-span-full text-center"
+              >
+                No tools found matching your criteria.
+              </motion.p>
+            )}
+          </div>
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -2,17 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import type { InferSelectModel } from "drizzle-orm";
-import type { tools } from "@/db/schema";
+import type { Tool } from "@/db/schema";
+import { slugify } from "@/lib/utils";
+import { motion } from "motion/react";
 
-// This type is automatically inferred from your database schema to stay in sync.
-export type Tool = InferSelectModel<typeof tools>;
-
-interface ToolCardProps {
-  tool: Tool;
-}
-
-// Helper to get styles for the pricing pills
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
     case "free":
@@ -26,21 +19,19 @@ const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   }
 };
 
-// Helper to create a URL-friendly slug from the tool name
-const createSlug = (name: string) => {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
-    .replace(/[\s-]+/g, "-"); // Replace spaces and hyphens with a single hyphen
-};
-
-export function ToolCard({ tool }: ToolCardProps) {
+export function ToolCard({ tool }: { tool: Tool }) {
   const primaryCategory = tool.categories[0];
-  const slug = createSlug(tool.name);
+  const slug = slugify(tool.name);
 
   return (
-    <article className="group relative flex h-full flex-col rounded-lg border border-neutral-200 bg-neutral-100 p-6 shadow-sm transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg">
+    <motion.article
+      layout="position"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      className="group relative flex h-full flex-col rounded-lg border border-neutral-200 bg-neutral-100 p-6 shadow-sm transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg"
+    >
       <Link
         href={`/tool/${slug}`}
         className="absolute inset-0 z-10"
@@ -97,6 +88,6 @@ export function ToolCard({ tool }: ToolCardProps) {
           {tool.pricing}
         </Badge>
       </div>
-    </article>
+    </motion.article>
   );
 }
