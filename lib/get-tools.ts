@@ -1,16 +1,13 @@
 import "server-only";
 
 import { Effect } from "effect";
-// 1. Import Drizzle query helpers
 import { desc, and, ilike, inArray, arrayOverlaps, SQL } from "drizzle-orm";
 import { DatabaseService } from "@/lib/services/database-service";
 import { serverRuntime } from "@/lib/server-runtime";
 import { tools } from "@/db/schema";
-// 2. Import nuqs tools for server-side parsing
 import { unslugify } from "@/lib/utils";
 import type { ToolFilters } from "@/lib/tool-search-params";
 
-// 3. Update the function to accept searchParams
 export async function getTools(filters: Partial<ToolFilters>) {
   // This array will hold all the WHERE clauses for our final query
   const conditions: SQL[] = [];
@@ -32,7 +29,6 @@ export async function getTools(filters: Partial<ToolFilters>) {
   }
 
   // Pricing condition
-  // Pricing is a literal string type, so wht are we checking the length here?
   if (pricing.length > 0) {
     conditions.push(inArray(tools.pricing, pricing));
   }
@@ -46,7 +42,9 @@ export async function getTools(filters: Partial<ToolFilters>) {
     case "name-desc":
       orderByClause = desc(tools.name);
       break;
-    // Add the bookmarks-desc case
+    case "bookmarks-desc":
+      orderByClause = desc(tools.bookmarkCount);
+      break;
     case "latest":
     default:
       orderByClause = desc(tools.submittedAt);
@@ -56,7 +54,6 @@ export async function getTools(filters: Partial<ToolFilters>) {
   const program = Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
-    // 7. Construct and execute the final Drizzle query
     const filteredTools = yield* dbService.use((db) =>
       db
         .select()

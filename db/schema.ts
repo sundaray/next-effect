@@ -61,6 +61,7 @@ export const tools = pgTable("tools", {
   approvedAt: timestamp("approved_at", { withTimezone: true }).defaultNow(),
 
   rejectionCount: integer("rejection_count").notNull().default(0),
+  bookmarkCount: integer("bookmark_count").notNull().default(0),
 });
 
 export const toolHistory = pgTable("tool_history", {
