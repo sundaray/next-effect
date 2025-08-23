@@ -34,7 +34,7 @@ export function ToolSort() {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full sm:w-[220px] justify-between border-neutral-300 bg-transparent h-10"
+          className="w-full md:w-[220px] justify-between border-neutral-300 bg-transparent h-10"
         >
           <span>
             <span className="text-neutral-500">Sort by: </span>

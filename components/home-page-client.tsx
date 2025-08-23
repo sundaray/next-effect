@@ -69,7 +69,7 @@ export function HomePageClient({
           <motion.div
             layout
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="my-8 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4"
+            className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4"
           >
             <div>
               <ToolSearch
