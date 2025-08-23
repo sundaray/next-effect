@@ -7,8 +7,6 @@ import {
 import { pricingOptions } from "@/lib/schema";
 import { createSearchParamsCache } from "nuqs/server";
 
-const validPricing = pricingOptions as readonly ["free", "paid", "freemium"];
-
 export const toolSearchParams = {
   page: parseAsInteger.withDefault(1),
 
@@ -18,7 +16,7 @@ export const toolSearchParams = {
 
   category: parseAsArrayOf(parseAsString).withDefault([]),
 
-  pricing: parseAsArrayOf(parseAsStringLiteral(validPricing)).withDefault([]),
+  pricing: parseAsArrayOf(parseAsStringLiteral(pricingOptions)).withDefault([]),
 };
 
 export const toolSearchParamsCache = createSearchParamsCache(toolSearchParams);

@@ -34,7 +34,7 @@ export async function getTools(filters: Partial<ToolFilters>) {
   // Pricing condition
   // Pricing is a literal string type, so wht are we checking the length here?
   if (pricing.length > 0) {
-    conditions.push(inArray(tools.pricing, filters.pricing));
+    conditions.push(inArray(tools.pricing, pricing));
   }
 
   // 6. Build the dynamic ORDER BY clause
