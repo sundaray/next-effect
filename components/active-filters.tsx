@@ -43,7 +43,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
   if (filters.search) {
     searchFilters.push({
       key: "search",
-      label: `Query: "${filters.search}"`,
+      label: `Search: "${filters.search}"`,
       clear: () => setFilters({ search: null }),
     });
   }
@@ -85,12 +85,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
     pricingFilters.length;
 
   const handleClearAll = () => {
-    setFilters({
-      search: null,
-      sort: null,
-      category: null,
-      pricing: null,
-    });
+    setFilters(null);
     onClearAll();
   };
 

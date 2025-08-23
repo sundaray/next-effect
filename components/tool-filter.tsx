@@ -5,6 +5,10 @@ import { pricingOptions } from "@/lib/schema";
 import { useToolFilters } from "@/hooks/use-tool-filters";
 import { slugify } from "@/lib/utils";
 
+type Pricing = (typeof pricingOptions)[number];
+const isPricing = (v: string): v is Pricing =>
+  (pricingOptions as readonly string[]).includes(v);
+
 interface ToolFiltersProps {
   categories: string[];
   categoryCounts: Record<string, number>;
@@ -45,7 +49,7 @@ export function ToolFilter({
         options={pricingOptionsFormatted}
         selectedValues={filters.pricing}
         onValueChange={(newPricing) => {
-          setFilters({ pricing: newPricing });
+          setFilters({ pricing: newPricing.filter(isPricing) });
         }}
       />
     </div>

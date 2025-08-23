@@ -2,14 +2,19 @@ import { getTools } from "@/lib/get-tools";
 import { getCategories } from "@/lib/get-categories";
 import { HomePageClient } from "@/components/home-page-client";
 import type { SearchParams } from "nuqs/server";
+import { toolSearchParamsCache } from "@/lib/tool-search-params";
 
 type HomePageProps = {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 };
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const tools = await getTools(searchParams);
+  const filters = await toolSearchParamsCache.parse(searchParams);
+
+  const tools = await getTools(filters);
+
   const allToolsForCounts = await getTools({});
+
   const categories = await getCategories();
 
   const categoryCounts: Record<string, number> = {};
