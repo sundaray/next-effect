@@ -21,7 +21,7 @@ import {
 
 export function ToolSort() {
   const [open, setOpen] = useState(false);
-  const { filters, setFilters } = useToolFilters();
+  const { isPending, filters, setFilters } = useToolFilters();
 
   const selectedLabel =
     toolSortOptions.find((option) => option.value === filters.sort)?.label ||
@@ -34,6 +34,7 @@ export function ToolSort() {
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          data-pending={isPending ? "" : undefined}
           className="w-full md:w-[220px] justify-between border-neutral-300 bg-transparent h-10"
         >
           <span>

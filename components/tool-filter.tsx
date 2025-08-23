@@ -20,7 +20,7 @@ export function ToolFilter({
   categoryCounts,
   pricingCounts,
 }: ToolFiltersProps) {
-  const { filters, setFilters } = useToolFilters();
+  const { isPending, filters, setFilters } = useToolFilters();
 
   const categoryOptions = categories.map((cat) => ({
     value: slugify(cat),
@@ -35,7 +35,10 @@ export function ToolFilter({
   }));
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-center">
+    <div
+      className="flex flex-col sm:flex-row gap-4 items-center"
+      data-pending={isPending ? "" : undefined}
+    >
       <MultiSelectCommand
         placeholder="Search categories..."
         options={categoryOptions}

@@ -27,7 +27,7 @@ export function HomePageClient({
   const tools = initialTools;
 
   return (
-    <div>
+    <div className="group">
       <div className="w-full h-100 overflow-hidden relative">
         <div
           className="
@@ -99,7 +99,7 @@ export function HomePageClient({
         </LayoutGroup>
 
         {/* Tool Grid */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12 group-has-[[data-pending]]:animate-pulse">
           <AnimatePresence mode="wait">
             {tools && tools.length > 0 ? (
               tools.map((tool) => <ToolCard tool={tool} key={tool.id} />)
