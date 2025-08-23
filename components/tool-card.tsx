@@ -24,14 +24,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const slug = slugify(tool.name);
 
   return (
-    <motion.article
-      layout
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="group relative flex h-full flex-col rounded-md border border-neutral-200 bg-white p-6 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg"
-    >
+    <article className="group relative flex h-full flex-col rounded-md border border-neutral-200 bg-white p-6 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg">
       <Link
         href={`/tool/${slug}`}
         className="absolute inset-0 z-10"
@@ -57,10 +50,10 @@ export function ToolCard({ tool }: { tool: Tool }) {
         )}
 
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-lg font-semibold text-neutral-900">
+          <h3 className="text-lg font-semibold text-neutral-900">
             {tool.name}
           </h3>
-          <p className="truncate text-xs text-neutral-700">{tool.website}</p>
+          <p className="text-xs text-neutral-700">{tool.website}</p>
         </div>
       </div>
 
@@ -88,6 +81,6 @@ export function ToolCard({ tool }: { tool: Tool }) {
           {tool.pricing}
         </Badge>
       </div>
-    </motion.article>
+    </article>
   );
 }
