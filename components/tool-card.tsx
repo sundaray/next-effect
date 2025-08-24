@@ -24,7 +24,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const slug = slugify(tool.name);
 
   return (
-    <article className="group relative flex h-full flex-col rounded-md border border-neutral-200 bg-white p-6 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:border-neutral-300 hover:shadow-lg">
+    <article className="group relative flex h-full flex-col bg-neutral-100 rounded-md border border-neutral-300 p-6 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:shadow-lg">
       <Link
         href={`/tool/${slug}`}
         className="absolute inset-0 z-10"
