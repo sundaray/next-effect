@@ -24,7 +24,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const slug = slugify(tool.name);
 
   return (
-    <article className="group relative flex h-full flex-col bg-neutral-100 rounded-md border border-neutral-300 p-6 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:shadow-lg">
+    <article className="group relative flex h-full flex-col bg-neutral-100 rounded-md border border-neutral-300 p-4 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:shadow-lg">
       <Link
         href={`/tool/${slug}`}
         className="absolute inset-0 z-10"
@@ -50,15 +50,15 @@ export function ToolCard({ tool }: { tool: Tool }) {
         )}
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold text-neutral-900">
+          <h3 className="text-lg font-bold text-neutral-900 tracking-tight">
             {tool.name}
           </h3>
-          <p className="text-xs text-neutral-700">{tool.website}</p>
+          <p className="text-sm text-neutral-700">{tool.website}</p>
         </div>
       </div>
 
       {/* Description */}
-      <p className="line-clamp-2 text-sm leading-relaxed text-neutral-700 mb-auto">
+      <p className="line-clamp-2 text-sm/6 text-neutral-700 mb-auto">
         {tool.tagline}
       </p>
 
@@ -67,7 +67,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
         {primaryCategory && (
           <Badge
             variant="secondary"
-            className=" bg-neutral-100 font-semibold text-neutral-700 rounded-full border-neutral-200"
+            className=" bg-neutral-100 font-medium text-neutral-900 rounded-full border-neutral-200"
           >
             {primaryCategory}
           </Badge>
