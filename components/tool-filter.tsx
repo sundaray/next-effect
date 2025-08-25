@@ -40,7 +40,7 @@ export function ToolFilter({
       initial={{ height: 0, opacity: 0, y: 0 }}
       animate={{ height: "auto", opacity: 1, y: 8 }}
       exit={{ height: 0, opacity: 0, y: 0 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
+      transition={{ duration: 0.15, ease: "easeInOut" }}
       className="flex flex-col sm:flex-row gap-4 items-center"
       data-pending={isPending ? "" : undefined}
     >
