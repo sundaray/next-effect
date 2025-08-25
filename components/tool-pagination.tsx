@@ -1,7 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
-import { useQueryState, parseAsInteger } from "nuqs";
 import { useMemo } from "react";
 
 import {
@@ -15,31 +13,24 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { calculatePaginationRange } from "@/lib/calculate-pagination-range";
+import { useToolFilters } from "@/hooks/use-tool-filters";
 
 const SIBLING_COUNT = 1; // Number of pages to show on each side of the current page
 
-type PodcastPaginationProps = {
+type ToolPaginationProps = {
   totalPages: number;
   className?: string;
 };
 
-export function ToolPagination({
-  totalPages,
-  className,
-}: PodcastPaginationProps) {
-  const [isLoading, startTransition] = useTransition();
-  const [page, setPage] = useQueryState(
-    "page",
-    parseAsInteger.withDefault(1).withOptions({
-      startTransition,
-      shallow: false,
-    }),
-  );
+export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
+  const { isPending, filters, setFilters } = useToolFilters();
+
+  const currentPage = filters.page;
 
   // Use the extracted pagination range calculation
   const paginationRange = useMemo(
-    () => calculatePaginationRange(page, totalPages, SIBLING_COUNT),
-    [page, totalPages],
+    () => calculatePaginationRange(currentPage, totalPages, SIBLING_COUNT),
+    [currentPage, totalPages]
   );
 
   // Don't render if only one page
@@ -47,36 +38,33 @@ export function ToolPagination({
     return null;
   }
 
-  const isFirstPage = page === 1;
-  const isLastPage = page === totalPages;
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage === totalPages;
 
   return (
     <Pagination
-      className={cn("pt-32", className)}
-      data-pending={isLoading ? "" : undefined}
+      className={cn(className, "my-12")}
+      data-pending={isPending ? "" : undefined}
     >
-      <PaginationContent>
+      <PaginationContent className="w-full justify-center">
         {/* Previous Button */}
-        <PaginationItem>
+        <PaginationItem className="mr-auto">
           <PaginationPrevious
             href="#"
             aria-disabled={isFirstPage}
             tabIndex={isFirstPage ? -1 : undefined}
             className={cn(
-              "text-sky-600 hover:text-sky-700",
-              isFirstPage && "pointer-events-none opacity-50",
+              "ng-transparent hover:bg-transparent",
+              isFirstPage && "pointer-events-none opacity-50"
             )}
-            onClick={() => setPage(page - 1)}
+            onClick={() => setFilters({ page: currentPage - 1 })}
           />
         </PaginationItem>
 
         {/* Page Numbers & Ellipses */}
         {paginationRange.map((pageNumberOrEllipsis, index) => {
           // Render Ellipsis component if the item is one of our string identifiers
-          if (
-            pageNumberOrEllipsis === "ellipsis-left" ||
-            pageNumberOrEllipsis === "ellipsis-right"
-          ) {
+          if (typeof pageNumberOrEllipsis === "string") {
             return (
               <PaginationItem key={`${pageNumberOrEllipsis}-${index}`}>
                 <PaginationEllipsis />
@@ -85,15 +73,19 @@ export function ToolPagination({
           }
 
           // Otherwise, it's a page number - render the link
-          const pageNumber = pageNumberOrEllipsis as number; // Type assertion
-          const isActive = page === pageNumber;
+          const pageNumber = pageNumberOrEllipsis;
+          const isActive = currentPage === pageNumber;
           return (
             <PaginationItem key={pageNumber}>
               <PaginationLink
                 href="#"
                 isActive={isActive}
-                className={cn("text-gray-900", isActive && "text-white")}
-                onClick={() => setPage(pageNumber)}
+                className={cn(
+                  "text-gray-900",
+                  isActive &&
+                    "border-sky-600 bg-sky-600 text-white hover:bg-sky-700 hover:border-sky-700 hover:text-white"
+                )}
+                onClick={() => setFilters({ page: pageNumber })}
               >
                 {pageNumber}
               </PaginationLink>
@@ -102,16 +94,16 @@ export function ToolPagination({
         })}
 
         {/* Next Button */}
-        <PaginationItem>
+        <PaginationItem className="ml-auto">
           <PaginationNext
             href="#"
             aria-disabled={isLastPage}
             tabIndex={isLastPage ? -1 : undefined}
             className={cn(
-              "text-sky-600 hover:text-sky-700",
-              isLastPage && "pointer-events-none opacity-50",
+              "bg-transparent hover:bg-transparent",
+              isLastPage && "pointer-events-none opacity-50"
             )}
-            onClick={() => setPage(page + 1)}
+            onClick={() => setFilters({ page: currentPage + 1 })}
           />
         </PaginationItem>
       </PaginationContent>

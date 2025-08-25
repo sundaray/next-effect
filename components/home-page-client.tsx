@@ -7,24 +7,25 @@ import { ToolCard } from "@/components/tool-card";
 import { ToolSearch } from "@/components/tool-search";
 import { ToolSort } from "@/components/tool-sort";
 import { ToolFilter } from "@/components/tool-filter";
+import { ToolPagination } from "@/components/tool-pagination";
 import { ActiveFilters } from "@/components/active-filters";
 
 interface HomePageClientProps {
-  initialTools: Tool[];
+  totalPages: number;
+  paginatedTools: Tool[];
   allCategories: string[];
   categoryCounts: Record<string, number>;
   pricingCounts: Record<string, number>;
 }
 
 export function HomePageClient({
-  initialTools,
+  totalPages,
+  paginatedTools,
   allCategories,
   categoryCounts,
   pricingCounts,
 }: HomePageClientProps) {
   const [showFilters, setShowFilters] = useState(false);
-
-  const tools = initialTools;
 
   return (
     <div className="group">
@@ -101,8 +102,10 @@ export function HomePageClient({
         {/* Tool Grid */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-12 group-has-[[data-pending]]:animate-pulse">
           <AnimatePresence mode="wait">
-            {tools && tools.length > 0 ? (
-              tools.map((tool) => <ToolCard tool={tool} key={tool.id} />)
+            {paginatedTools && paginatedTools.length > 0 ? (
+              paginatedTools.map((tool) => (
+                <ToolCard tool={tool} key={tool.id} />
+              ))
             ) : (
               <motion.p
                 initial={{ opacity: 0, y: 4 }}
@@ -116,6 +119,7 @@ export function HomePageClient({
             )}
           </AnimatePresence>
         </div>
+        <ToolPagination totalPages={2} />
       </div>
     </div>
   );

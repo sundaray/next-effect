@@ -67,7 +67,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
         {primaryCategory && (
           <Badge
             variant="secondary"
-            className=" bg-neutral-100 font-medium text-neutral-900 rounded-full border-neutral-200"
+            className=" text-neutral-900 rounded-full border-neutral-200"
           >
             {primaryCategory}
           </Badge>

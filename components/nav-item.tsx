@@ -13,7 +13,7 @@ export function NavItem({ href, title }: NavItemType) {
     <Link
       className={cn(
         // Base styles for the link
-        "relative py-2 text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-700",
+        "relative py-2 text-sm text-neutral-700 transition-colors hover:text-neutral-700",
 
         // Pseudo-element for the underline
         "after:content-[''] after:absolute after:bottom-1.5 after:left-0 after:h-[1.5px] after:w-0 after:bg-neutral-900 after:transition-all after:duration-200 after:ease-out",

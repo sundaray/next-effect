@@ -11,7 +11,7 @@ type MainNavProps = {
 
 export function MainNav({ items }: MainNavProps) {
   return (
-    <div className="fixed inset-x-0 top-0 z-50 mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
+    <div className="fixed inset-x-0 top-0 z-50 mx-auto flex h-20 max-w-6xl items-center justify-between px-4">
       <Link
         href="/"
         aria-label="Go to homepage"
