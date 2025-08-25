@@ -8,23 +8,22 @@ import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 interface ToolSearchProps {
-  page: string;
   className?: string;
   onFilterClick: () => void;
-  isFilterOpen: boolean;
+  onSearch: () => void;
 }
 
 export function ToolSearch({
-  page,
   className,
   onFilterClick,
-  isFilterOpen,
+  onSearch,
 }: ToolSearchProps) {
   const { isPending, filters, setFilters } = useToolFilters();
 
   // Handle search with debounce
-  const handleSearch = useDebouncedCallback((term: string) => {
-    setFilters({ search: term, page: 1 });
+  const handleSearch = useDebouncedCallback((search: string) => {
+    onSearch();
+    setFilters({ search, page: 1 });
   }, 250);
 
   return (

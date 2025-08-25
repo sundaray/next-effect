@@ -57,7 +57,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
       <DropdownMenuTrigger
         className={cn("flex items-center space-x-1 rounded-full px-4 py-2")}
       >
-        <span className="text-sm font-medium text-neutral-600">My Account</span>
+        <span className="text-sm text-neutral-700">My Account</span>
         <Icons.chevronDown className="inline-block size-4 text-neutral-500" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

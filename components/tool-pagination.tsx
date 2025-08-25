@@ -54,7 +54,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
             aria-disabled={isFirstPage}
             tabIndex={isFirstPage ? -1 : undefined}
             className={cn(
-              "ng-transparent hover:bg-transparent",
+              "bg-transparent hover:bg-transparent",
               isFirstPage && "pointer-events-none opacity-50"
             )}
             onClick={() => setFilters({ page: currentPage - 1 })}
@@ -80,11 +80,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
               <PaginationLink
                 href="#"
                 isActive={isActive}
-                className={cn(
-                  "text-gray-900",
-                  isActive &&
-                    "border-sky-600 bg-sky-600 text-white hover:bg-sky-700 hover:border-sky-700 hover:text-white"
-                )}
+                className={cn("text-neutral-900 border-neutral-300")}
                 onClick={() => setFilters({ page: pageNumber })}
               >
                 {pageNumber}

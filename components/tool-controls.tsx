@@ -32,24 +32,16 @@ export function ToolControls({
       >
         <div>
           <ToolSearch
-            page="search"
-            isFilterOpen={showFilters}
             onFilterClick={() => setShowFilters(!showFilters)}
+            onSearch={() => setShowFilters(false)}
           />
           <AnimatePresence>
             {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0, y: 0 }}
-                animate={{ height: "auto", opacity: 1, y: 8 }}
-                exit={{ height: 0, opacity: 0, y: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-              >
-                <ToolFilter
-                  categories={allCategories}
-                  categoryCounts={categoryCounts}
-                  pricingCounts={pricingCounts}
-                />
-              </motion.div>
+              <ToolFilter
+                categories={allCategories}
+                categoryCounts={categoryCounts}
+                pricingCounts={pricingCounts}
+              />
             )}
           </AnimatePresence>
         </div>

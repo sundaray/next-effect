@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { MultiSelectCommand } from "@/components/multi-select-command";
 import { pricingOptions } from "@/lib/schema";
 import { useToolFilters } from "@/hooks/use-tool-filters";
@@ -35,7 +36,11 @@ export function ToolFilter({
   }));
 
   return (
-    <div
+    <motion.div
+      initial={{ height: 0, opacity: 0, y: 0 }}
+      animate={{ height: "auto", opacity: 1, y: 8 }}
+      exit={{ height: 0, opacity: 0, y: 0 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
       className="flex flex-col sm:flex-row gap-4 items-center"
       data-pending={isPending ? "" : undefined}
     >
@@ -55,6 +60,6 @@ export function ToolFilter({
           setFilters({ pricing: newPricing.filter(isPricing) });
         }}
       />
-    </div>
+    </motion.div>
   );
 }

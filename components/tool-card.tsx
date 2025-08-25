@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { Tool } from "@/db/schema";
 import { slugify } from "@/lib/utils";
-import { motion } from "motion/react";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {

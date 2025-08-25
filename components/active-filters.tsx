@@ -51,11 +51,14 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
 
   const sortFilters = [];
   if (filters.sort !== "latest") {
-    const option = toolSortOptions.find((o) => o.value === filters.sort);
+    const option = toolSortOptions.find(
+      (option) => option.value === filters.sort
+    );
     if (option) {
       sortFilters.push({
         key: "sort",
-        label: option.label,
+        prefix: "Sort:",
+        value: option.label,
         clear: () => setFilters({ sort: null }),
       });
     }
@@ -114,11 +117,12 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
               ))}
 
               {sortFilters.map((filter) => (
-                <FilterPill
-                  key={filter.key}
-                  label={filter.label}
-                  onClear={filter.clear}
-                />
+                <div key={filter.key} className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-neutral-500">
+                    {filter.prefix}
+                  </span>
+                  <FilterPill label={filter.value} onClear={filter.clear} />
+                </div>
               ))}
 
               {/* Render Category group */}
