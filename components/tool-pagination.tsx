@@ -43,7 +43,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
 
   return (
     <Pagination
-      className={cn(className, "my-12")}
+      className={cn(className)}
       data-pending={isPending ? "" : undefined}
     >
       <PaginationContent className="w-full justify-center">

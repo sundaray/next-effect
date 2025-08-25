@@ -1,8 +1,11 @@
 import { getTools } from "@/lib/get-tools";
 import { getCategories } from "@/lib/get-categories";
-import { HomePageClient } from "@/components/home-page-client";
 import type { SearchParams } from "nuqs/server";
 import { toolSearchParamsCache } from "@/lib/tool-search-params";
+import { ToolHero } from "@/components/tool-hero";
+import { ToolControls } from "@/components/tool-controls";
+import { ToolGrid } from "@/components/tool-grid";
+import { ToolPagination } from "@/components/tool-pagination";
 
 type HomePageProps = {
   searchParams: Promise<SearchParams>;
@@ -42,12 +45,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const paginatedTools = allFilteredTools.slice(startIndex, endIndex);
 
   return (
-    <HomePageClient
-      totalPages={totalPages}
-      paginatedTools={paginatedTools}
-      allCategories={categories}
-      categoryCounts={categoryCounts}
-      pricingCounts={pricingCounts}
-    />
+    <div className="w-6xl max-w-6xl mx-auto group">
+      <ToolHero />
+      <ToolControls
+        allCategories={categories}
+        categoryCounts={categoryCounts}
+        pricingCounts={pricingCounts}
+      />
+      <ToolGrid tools={paginatedTools} />
+      <ToolPagination totalPages={totalPages} />
+    </div>
   );
 }
