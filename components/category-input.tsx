@@ -9,6 +9,18 @@ import {
   FieldValues,
   FieldPath,
 } from "react-hook-form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 type CategoryInputProps<
   TFieldValues extends FieldValues,
@@ -32,7 +44,7 @@ export function CategoryInput<
   categories,
 }: CategoryInputProps<TFieldValues, TName>) {
   const [categoryInput, setCategoryInput] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const fieldError = fieldState.error;
 
@@ -57,7 +69,6 @@ export function CategoryInput<
     ) {
       field.onChange([...selectedCategories, trimmedCategory]);
       setCategoryInput("");
-      setShowSuggestions(false);
     }
   }
 
@@ -95,108 +106,110 @@ export function CategoryInput<
       )}
 
       {/* Category input */}
-      <div className="relative">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
-          <Input
-            id="categories"
-            className="border-neutral-300 mt-2 pl-8"
-            disabled={isDisabled}
-            value={categoryInput}
-            onChange={(e) => {
-              setCategoryInput(e.target.value);
-              setShowSuggestions(true);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                if (categoryInput.trim()) {
-                  addCategory(categoryInput);
+      <Popover
+        open={open}
+        onOpenChange={(newOpenState) => {
+          if (isDisabled && newOpenState) {
+            return;
+          }
+          setOpen(newOpenState);
+        }}
+      >
+        <PopoverTrigger asChild>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
+            <Input
+              id="categories"
+              className="border-neutral-300 mt-2 pl-8"
+              disabled={isDisabled}
+              value={categoryInput}
+              onChange={(e) => {
+                setCategoryInput(e.target.value);
+                setOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (categoryInput.trim()) {
+                    addCategory(categoryInput);
+                  }
                 }
-              }
-              if (e.key === "Escape") {
-                setShowSuggestions(false);
-              }
-            }}
-            onFocus={() => {
-              setShowSuggestions(true);
-              // Show all categories when focusing with empty input
-              if (!categoryInput) {
-                setCategoryInput("");
-              }
-            }}
-            onBlur={() => {
-              field.onBlur();
-              // Delay to allow clicking on suggestions
-              setTimeout(() => setShowSuggestions(false), 200);
-            }}
-            placeholder="ex: Image upscaler, Image enhancer"
-            aria-invalid={fieldError ? "true" : "false"}
-            aria-describedby={fieldError ? fieldErrorId : undefined}
-            autoComplete="off"
-          />
-        </div>
-
-        {/* Suggestions Dropdown */}
-        {showSuggestions && !isDisabled && (
-          <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-48 overflow-y-auto">
-            {categoryInput ? (
-              <>
-                {/* Filtered suggestions */}
-                {filteredSuggestions.length > 0 ? (
-                  filteredSuggestions.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-neutral-100 focus:bg-neutral-50 focus:outline-none transition-colors"
-                      onClick={() => addCategory(suggestion)}
-                    >
-                      {suggestion}
-                    </button>
-                  ))
-                ) : (
-                  /* No matches found */
-                  <div className="p-3 text-center text-sm text-neutral-700">
-                    No matching categories
-                  </div>
-                )}
-
-                {/* Create new category option */}
-                {!categories.some(
-                  (cat) => cat.toLowerCase() === categoryInput.toLowerCase()
-                ) && (
-                  <div
-                    className={filteredSuggestions.length > 0 ? "border-t" : ""}
-                  >
-                    <button
-                      type="button"
-                      className="w-full px-3 py-2.5 text-sm font-medium text-sky-800 hover:bg-sky-100 focus:bg-sky-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
-                      onClick={() => addCategory(categoryInput)}
-                    >
-                      <Plus className="size-4" />
-                      Create "{categoryInput}"
-                    </button>
-                  </div>
-                )}
-              </>
-            ) : (
-              /* Show all available categories when no search input */
-              categories
-                .filter((cat) => !selectedCategories.includes(cat))
-                .map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className="w-full px-3 py-2.5 text-left text-sm hover:bg-neutral-100 focus:bg-neutral-50 focus:outline-none transition-colors"
-                    onClick={() => addCategory(category)}
-                  >
-                    {category}
-                  </button>
-                ))
-            )}
+              }}
+              placeholder="ex: Image upscaler, Image enhancer"
+              aria-invalid={fieldError ? "true" : "false"}
+              aria-describedby={fieldError ? fieldErrorId : undefined}
+              autoComplete="off"
+              role="combobox"
+              aria-expanded={open}
+            />
           </div>
-        )}
-      </div>
+        </PopoverTrigger>
+
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <Command>
+            <CommandList>
+              <CommandEmpty>
+                <div className="p-3 text-center text-sm text-neutral-700">
+                  No matching categories found.
+                </div>
+              </CommandEmpty>
+
+              <CommandGroup>
+                {categoryInput === ""
+                  ? categories
+                      .filter((cat) => !selectedCategories.includes(cat))
+                      .map((category) => (
+                        <CommandItem
+                          key={category}
+                          value={category}
+                          onSelect={() => {
+                            addCategory(category);
+                            setOpen(false);
+                          }}
+                        >
+                          {category}
+                        </CommandItem>
+                      ))
+                  : filteredSuggestions.map((suggestion) => (
+                      <CommandItem
+                        key={suggestion}
+                        value={suggestion}
+                        onSelect={() => {
+                          addCategory(suggestion);
+                          setOpen(false);
+                        }}
+                      >
+                        {suggestion}
+                      </CommandItem>
+                    ))}
+              </CommandGroup>
+
+              {categoryInput &&
+                !categories.some(
+                  (c) => c.toLowerCase() === categoryInput.toLowerCase()
+                ) && (
+                  <CommandGroup className="border-t">
+                    <CommandItem
+                      onSelect={() => {
+                        addCategory(categoryInput);
+                        setOpen(false);
+                      }}
+                      className="text-sky-900 font-medium data-[selected=true]:text-sky-900"
+                    >
+                      <div className="flex items-center justify-center gap-2 w-full">
+                        <Plus className="size-4" />
+                        <span>Create "{categoryInput}"</span>
+                      </div>
+                    </CommandItem>
+                  </CommandGroup>
+                )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
