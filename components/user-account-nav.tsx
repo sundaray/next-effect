@@ -1,10 +1,12 @@
 import React from "react";
 import Link from "next/link";
+import { headers } from "next/headers";
 import { getUser } from "@/lib/get-user";
 import { UserAccountNavClient } from "@/components/user-account-nav-client";
 
 export async function UserAccountNav() {
-  const user = await getUser();
+  const requestHeaders = await headers();
+  const user = await getUser(requestHeaders);
 
   return (
     <div className="hidden md:block">

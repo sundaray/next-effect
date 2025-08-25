@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import tools from "@/lib/tools";
-import user from "@/lib/user";
 import auth from "@/lib/auth";
-import { protectRouteMiddleware } from "@/lib/middleware/protect-route";
-import { loadSessionMiddleware } from "@/lib/middleware/session";
+import { protectRouteMiddleware } from "@/middlewares/protect-route";
+import { loadSessionMiddleware } from "@/middlewares/session";
 import type { AuthType } from "@/lib/services/auth-service";
 
 const app = new Hono<{
@@ -14,10 +13,7 @@ const app = new Hono<{
 app.use("*", loadSessionMiddleware);
 app.use("/tools/*", protectRouteMiddleware);
 
-const routes = app
-  .route("/tools", tools)
-  .route("/user", user)
-  .route("/auth", auth);
+const routes = app.route("/tools", tools).route("/auth", auth);
 
 export const GET = handle(app);
 export const POST = handle(app);

@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hc } from "hono/client";
-import type { ApiRoutes } from "@/app/api/[[...path]]/route";
+import { getUser } from "@/lib/get-user";
 
 const guestOnlyPaths = ["/signin"];
 const adminOnlyPaths = ["/admin"];
 const protectedPaths = ["/submit"];
 
 export async function middleware(request: NextRequest) {
-  const baseUrl = new URL(request.url).origin;
-
-  const client = hc<ApiRoutes>(baseUrl);
-
   const path = request.nextUrl.pathname;
-
-  const cookieHeader = request.headers.get("cookie");
 
   const isOnGuestPath = guestOnlyPaths.some(
     (route) => path === route || path.startsWith(`${route}/`)
@@ -26,31 +19,7 @@ export async function middleware(request: NextRequest) {
     (route) => path === route || path.startsWith(`${route}/`)
   );
 
-  let user = null;
-
-  try {
-    const response = await client.api.user.$get(
-      {},
-      {
-        headers: {
-          cookie: cookieHeader ?? "",
-        },
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      user = data.user;
-    } else {
-      user = null;
-    }
-  } catch (error) {
-    console.error(
-      "[Next.js middleware] Failed to fetch from /api/user:",
-      error
-    );
-    user = null;
-  }
+  const user = await getUser(request.headers);
 
   // --- Core Routing Logic ---
 
@@ -85,6 +54,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  runtime: "nodejs",
   matcher: [
     // Skip all static files and Next.js internals
     "/((?!api|_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",

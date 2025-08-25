@@ -11,7 +11,7 @@ type HomePageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-const TOOLS_PER_PAGE = 1;
+const TOOLS_PER_PAGE = 40;
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const filters = await toolSearchParamsCache.parse(searchParams);
@@ -27,21 +27,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     }
   }
 
-  // Calculate pricing counts
   const pricingCounts: Record<string, number> = {};
   for (const tool of allFilteredTools) {
     pricingCounts[tool.pricing] = (pricingCounts[tool.pricing] || 0) + 1;
   }
 
-  // 4. Calculate total pages based on the full list.
   const totalPages = Math.ceil(allFilteredTools.length / TOOLS_PER_PAGE);
 
-  // 5. Calculate the start and end indexes for slicing the array.
-  //    The `filters.page` comes directly from the URL search params.
   const startIndex = (filters.page - 1) * TOOLS_PER_PAGE;
   const endIndex = startIndex + TOOLS_PER_PAGE;
 
-  // 6. Create the paginated list of tools to send to the client.
   const paginatedTools = allFilteredTools.slice(startIndex, endIndex);
 
   return (

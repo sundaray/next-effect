@@ -12,7 +12,7 @@
 
 import { createMiddleware } from "hono/factory";
 import type { Next, Context } from "hono";
-import { Effect, Data, pipe, Option } from "effect";
+import { Effect, pipe, Option } from "effect";
 import { AuthService, AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
 

@@ -15,7 +15,4 @@ app.on(["GET", "POST"], "/*", async (ctx) => {
   return await serverRuntime.runPromise(program);
 });
 
-
-
-
 export default app;

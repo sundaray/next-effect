@@ -79,7 +79,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
             <PaginationItem key={pageNumber}>
               <PaginationLink
                 href="#"
-                isActive={isActive}
+              isActive={isActive}
                 className={cn("text-neutral-900 border-neutral-300")}
                 onClick={() => setFilters({ page: pageNumber })}
               >

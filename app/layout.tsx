@@ -35,7 +35,7 @@ export default function RootLayout({
           <MainNav items={navbarLinks.main} />
         </header>
 
-        <main className="flex-1 max-w-6xl mx-auto group">
+        <main className="flex-1 ">
           <NuqsAdapter>{children}</NuqsAdapter>
         </main>
       </body>
