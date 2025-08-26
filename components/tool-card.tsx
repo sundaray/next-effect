@@ -8,11 +8,11 @@ import { slugify } from "@/lib/utils";
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
     case "free":
-      return "border-emerald-200 bg-emerald-100 text-emerald-900 rounded-full";
+      return "border-emerald-200 bg-emerald-200 text-emerald-900 rounded-full";
     case "freemium":
-      return "border-sky-200 bg-sky-100 text-sky-900 rounded-full";
+      return "border-sky-200 bg-sky-200 text-sky-900 rounded-full";
     case "paid":
-      return "bg-purple-100 text-purple-900 rounded-full border-purple-200";
+      return "bg-purple-200 text-purple-900 rounded-full border-purple-200";
     default:
       return "border-neutral-200 bg-neutral-100 text-neutral-900 rounded-full";
   }
@@ -64,10 +64,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
       {/* Footer with Pills */}
       <div className="flex items-center justify-between gap-2 border-neutral-200 mt-4">
         {primaryCategory && (
-          <Badge
-            variant="secondary"
-            className=" text-neutral-900 rounded-full border-neutral-200"
-          >
+          <Badge className=" text-neutral-900 rounded-full border-neutral-200 bg-neutral-200">
             {primaryCategory}
           </Badge>
         )}

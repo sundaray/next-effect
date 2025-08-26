@@ -1,15 +1,12 @@
-// app/tool/[slug]/page.tsx
-
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { getToolBySlug } from "@/lib/get-tool-by-slug";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import type { Metadata } from "next";
 import type { Tool } from "@/db/schema";
+import { createSafeHtml } from "@/lib/create-safe-html";
 
 // This helper function ensures consistent styling for the pricing pill.
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
@@ -36,6 +33,8 @@ export default async function ToolDetailsPage({
   if (!tool) {
     notFound();
   }
+
+  const safeDescriptionHtml = createSafeHtml(tool.description);
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 sm:py-16">
@@ -65,7 +64,7 @@ export default async function ToolDetailsPage({
               </h1>
             </div>
 
-            <p className="text-lg text-neutral-700 max-w-2xl">{tool.tagline}</p>
+            <p className="text-lg text-neutral-700">{tool.tagline}</p>
 
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <Badge
@@ -108,9 +107,8 @@ export default async function ToolDetailsPage({
           />
         </div>
 
-        {/* --- Description Section --- */}
-        <div className="prose prose-neutral max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: tool.description }} />
+        <div className="prose prose-neutral">
+          <div dangerouslySetInnerHTML={safeDescriptionHtml} />
         </div>
       </article>
     </div>

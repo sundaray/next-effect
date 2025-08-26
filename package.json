@@ -43,6 +43,7 @@
     "hono": "^4.9.2",
     "html-react-parser": "^5.2.6",
     "input-otp": "^1.4.2",
+    "isomorphic-dompurify": "^2.26.0",
     "lucide-react": "^0.536.0",
     "motion": "^12.23.12",
     "next": "^15.5.0",
