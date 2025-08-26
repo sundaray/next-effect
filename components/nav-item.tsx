@@ -22,7 +22,7 @@ export function NavItem({ href, title }: NavItemType) {
         "hover:after:w-full",
 
         // Active state styles
-        isActive && "text-neutral-900 font-semibold"
+        isActive && "text-neutral-900 font-medium"
       )}
       href={href}
     >

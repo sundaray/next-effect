@@ -147,6 +147,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         type="text"
         control={control}
         disabled={isProcessing}
+        required={true}
       />
 
       <FormField
@@ -156,6 +157,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         placeholder="https://clarityai.co"
         control={control}
         disabled={isProcessing}
+        required={true}
       />
 
       <FormField
@@ -170,6 +172,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         type="text"
         control={control}
         disabled={isProcessing}
+        required={true}
       />
 
       <FormField
@@ -191,6 +194,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
             fieldErrorId={fieldErrorId}
           />
         )}
+        required={true}
       />
 
       <FormField
@@ -213,6 +217,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
             categories={categories}
           />
         )}
+        required={true}
       />
 
       <FormField
@@ -249,6 +254,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
             </Select>
           );
         }}
+        required={true}
       />
 
       <FormField
@@ -296,6 +302,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
             fieldErrorId={fieldErrorId}
           />
         )}
+        required={true}
       />
       <Button type="submit" disabled={isProcessing}>
         {isProcessing ? "Submitting..." : "Submit"}

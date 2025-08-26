@@ -17,18 +17,19 @@ type InputProps = React.ComponentPropsWithoutRef<"input">;
 
 export type RenderFieldProps<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 > = {
   id: string;
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
   fieldErrorId: string;
+  required: boolean;
 };
 
 type FormFieldProps<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 > = {
   id: string;
   name: TName;
@@ -44,11 +45,12 @@ type FormFieldProps<
   renderField?: (
     props: RenderFieldProps<TFieldValues, TName>
   ) => React.ReactNode;
+  required?: boolean;
 } & Omit<InputProps, "id" | "name">;
 
 export function FormField<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 >({
   id: propId,
   name,
@@ -59,6 +61,7 @@ export function FormField<
   control,
   renderField,
   disabled,
+  required,
   ...props
 }: FormFieldProps<TFieldValues, TName>) {
   const id = useId();
@@ -67,6 +70,7 @@ export function FormField<
       <div className="flex justify-between">
         <Label
           htmlFor={propId}
+          className={cn(required && "after:content-['*'] after:text-red-600")}
           onClick={() => {
             if (renderField) {
               // For custom components like the RichTextEditor,
@@ -115,6 +119,7 @@ export function FormField<
                   fieldState,
                   disabled: !!disabled,
                   fieldErrorId,
+                  required: !!required,
                 })
               ) : (
                 <Input
