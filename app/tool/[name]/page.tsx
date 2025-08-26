@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import type { Tool } from "@/db/schema";
 import { createSafeHtml } from "@/lib/create-safe-html";
+import { getWebPVariantUrl } from "@/lib/utils";
 
 // This helper function ensures consistent styling for the pricing pill.
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
@@ -36,8 +37,16 @@ export default async function ToolDetailsPage({
 
   const safeDescriptionHtml = createSafeHtml(tool.description);
 
+  // Generate the srcSet for WebP images
+  const webpSrcSet = `
+    ${getWebPVariantUrl(tool.showcaseImageUrl, "sm")} 640w,
+    ${getWebPVariantUrl(tool.showcaseImageUrl, "md")} 768w,
+    ${getWebPVariantUrl(tool.showcaseImageUrl, "lg")} 1024w,
+    ${getWebPVariantUrl(tool.showcaseImageUrl, "xl")} 1280w
+  `;
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 sm:py-16">
+    <div className="max-w-3xl mx-auto px-4 py-24">
       <article className="space-y-10">
         {/* --- Header Section --- */}
         <header className="flex flex-col md:flex-row justify-between items-start gap-8">
@@ -97,14 +106,22 @@ export default async function ToolDetailsPage({
         </header>
 
         {/* --- Showcase Image Section --- */}
-        <div className="relative w-full aspect-video overflow-hidden rounded-lg border border-neutral-300 shadow-md">
-          <image
-            src={tool.showcaseImageUrl}
-            alt={`${tool.name} showcase image`}
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="relative w-full aspect-video rounded-md border border-neutral-300">
+          <picture className="absolute inset-0 size-full">
+            <source
+              type="image/webp"
+              srcSet={webpSrcSet}
+              sizes="(min-width: 768px) 768px, 100vw"
+            />
+            <img
+              src={getWebPVariantUrl(tool.showcaseImageUrl, "lg")}
+              alt={`${tool.name} showcase image`}
+              className="size-full object-cover rounded-md"
+              width="1280"
+              height="720"
+              loading="eager"
+            />
+          </picture>
         </div>
 
         <div className="prose prose-neutral prose-ul:*:my-0 prose-ol:*:my-0">

@@ -40,3 +40,12 @@ export function unslugify(slug: string): string {
       (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     );
 }
+
+export function getWebPVariantUrl(
+  originalUrl: string,
+  variant: "sm" | "md" | "lg" | "xl" | "original"
+): string {
+  const lastDotIndex = originalUrl.lastIndexOf(".");
+  const baseUrl = originalUrl.substring(0, lastDotIndex);
+  return `${baseUrl}-${variant}.webp`;
+}
