@@ -41,6 +41,7 @@
     "effect": "^3.17.6",
     "eslint-plugin-neverthrow": "^1.1.4",
     "hono": "^4.9.2",
+    "html-react-parser": "^5.2.6",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.536.0",
     "motion": "^12.23.12",

@@ -30,6 +30,8 @@ export const tools = pgTable("tools", {
 
   name: text("name").notNull(),
 
+  slug: text("slug").notNull().unique(),
+
   website: text("website").notNull(),
 
   tagline: text("tagline").notNull(),

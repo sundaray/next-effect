@@ -2,6 +2,7 @@ import { Effect, Config, Data } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
 import { tools } from "@/db/schema";
 import { saveToolPayload } from "@/lib/schema";
+import { slugify } from "@/lib/utils";
 
 class SaveToolError extends Data.TaggedError("SaveToolError")<{
   message: string;
@@ -18,12 +19,15 @@ export function saveTool(body: saveToolPayload, userId: string) {
     const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
     const showcaseImageUrl = `${s3BaseUrl}/${body.showcaseImageKey}`;
 
+    const slug = slugify(body.name);
+
     const result = yield* dbService
       .use((db) =>
         db
           .insert(tools)
           .values({
             name: body.name,
+            slug,
             website: body.website,
             tagline: body.tagline,
             description: body.description,
