@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { X, Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -83,25 +84,38 @@ export function CategoryInput<
       {/* Selected Categories */}
       {selectedCategories.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-2">
-          {selectedCategories.map((category: string, index: number) => (
-            <div
-              key={`${category}-${index}`}
-              className="inline-flex items-center gap-2 rounded-full bg-neutral-700 px-3 py-1"
-            >
-              <span className="text-xs text-neutral-300">
-                {index === 0 ? "Primary" : `Secondary`}:
-              </span>
-              <span className="text-neutral-100 text-xs">{category}</span>
-              <button
-                type="button"
-                onClick={() => removeCategory(category)}
-                className="text-neutral-500 hover:text-neutral-300 hover:bg-neutral-600 rounded-full p-1.5 transition"
-                aria-label={`Remove ${category}`}
+          <AnimatePresence>
+            {selectedCategories.map((category: string, index: number) => (
+              <div
+                key={`${category}-${index}`}
+                className="flex items-center gap-2"
               >
-                <X className="size-4" />
-              </button>
-            </div>
-          ))}
+                <span className="text-xs text-neutral-500 font-medium">
+                  {index === 0 ? "Primary:" : "Secondary:"}
+                </span>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="flex items-center gap-x-2 rounded-full bg-neutral-200 px-2 py-1 border"
+                >
+                  <span className="text-xs text-neutral-700 font-semibold">
+                    {category}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeCategory(category)}
+                    className="text-neutral-500 hover:text-neutral-700 transition-colors"
+                    aria-label={`Remove ${category}`}
+                  >
+                    <X className="size-4" />
+                  </button>
+                </motion.div>
+              </div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
