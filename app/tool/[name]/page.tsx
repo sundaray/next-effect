@@ -107,7 +107,7 @@ export default async function ToolDetailsPage({
           />
         </div>
 
-        <div className="prose prose-neutral">
+        <div className="prose prose-neutral prose-ul:*:my-0 prose-ol:*:my-0">
           <div dangerouslySetInnerHTML={safeDescriptionHtml} />
         </div>
       </article>
