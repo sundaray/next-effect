@@ -11,7 +11,6 @@ import {
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/kibo-ui/spinner";
 import { signOut } from "@/lib/auth/client";
 import type { User } from "@/lib/services/auth-service";
 
@@ -86,10 +85,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
             >
               {isPending ? (
                 <>
-                  <Spinner
-                    className="size-4 inline-block"
-                    variant="circle-filled"
-                  />
+                  <Icons.spinner className="size-4 inline-block" />
                   <p className="text-sm">Signing out...</p>
                 </>
               ) : (
