@@ -9,6 +9,8 @@ import { getWebPVariantUrl } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 import { ensureAbsoluteUrl } from "@/lib/utils";
 import { ToolCategories } from "@/components/tool-categories";
+import { ToolBreadcrumb } from "@/components/tool-breadcrumb";
+import { unslugify } from "@/lib/utils";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
@@ -46,7 +48,8 @@ export default async function ToolDetailsPage({
   `;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-36">
+    <div className="max-w-3xl mx-auto px-4 py-36 space-y-8">
+      <ToolBreadcrumb toolName={unslugify(tool.name)} />
       <article className="space-y-10">
         {/* --- Header Section --- */}
         <header className="flex flex-col md:flex-row justify-between items-start gap-8">
