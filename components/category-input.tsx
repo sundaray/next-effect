@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/popover";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
@@ -165,40 +164,27 @@ export function CategoryInput<
         >
           <Command>
             <CommandList>
-              <CommandEmpty>
+              {categoryInput && filteredSuggestions.length === 0 && (
                 <div className="p-3 text-center text-sm text-neutral-700">
-                  No matching categories found.
+                  No category named{" "}
+                  <span className="font-semibold">{categoryInput}</span> was
+                  found.
                 </div>
-              </CommandEmpty>
+              )}
 
               <CommandGroup>
-                {categoryInput === ""
-                  ? categories
-                      .filter((cat) => !selectedCategories.includes(cat))
-                      .map((category) => (
-                        <CommandItem
-                          key={category}
-                          value={category}
-                          onSelect={() => {
-                            addCategory(category);
-                            setOpen(false);
-                          }}
-                        >
-                          {category}
-                        </CommandItem>
-                      ))
-                  : filteredSuggestions.map((suggestion) => (
-                      <CommandItem
-                        key={suggestion}
-                        value={suggestion}
-                        onSelect={() => {
-                          addCategory(suggestion);
-                          setOpen(false);
-                        }}
-                      >
-                        {suggestion}
-                      </CommandItem>
-                    ))}
+                {filteredSuggestions.map((suggestion) => (
+                  <CommandItem
+                    key={suggestion}
+                    value={suggestion}
+                    onSelect={() => {
+                      addCategory(suggestion);
+                      setOpen(false);
+                    }}
+                  >
+                    {suggestion}
+                  </CommandItem>
+                ))}
               </CommandGroup>
 
               {categoryInput &&
