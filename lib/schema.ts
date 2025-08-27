@@ -16,8 +16,19 @@ export const ToolSubmissionFormSchema = Schema.Struct({
       message: () => "Name is required.",
     })
   ),
-  website: Schema.String.pipe(
+  websiteUrl: Schema.String.pipe(
     Schema.nonEmptyString({ message: () => "Website URL is required." }),
+    Schema.filter(
+      (url) =>
+        !url.startsWith("http://") ||
+        "'http://' is not allowed. Please use 'https://'"
+    ),
+    Schema.filter(
+      (url) =>
+        url.startsWith("https://") ||
+        url.startsWith("www.") ||
+        "URL is incomplete. It must start with 'https://' or 'www.'"
+    ),
     Schema.pattern(
       /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
       {

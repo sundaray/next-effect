@@ -45,7 +45,7 @@ export default async function ToolDetailsPage({
   `;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-24">
+    <div className="max-w-3xl mx-auto px-4 py-36">
       <article className="space-y-10">
         {/* --- Header Section --- */}
         <header className="flex flex-col md:flex-row justify-between items-start gap-8">
@@ -96,10 +96,15 @@ export default async function ToolDetailsPage({
           </div>
 
           {/* Call-to-action Button */}
-          <Link href={tool.website} target="_blank" rel="noopener noreferrer">
+          <a
+            href={tool.website}
+            target="_blank"
+            rel="noopener"
+            className={cn(buttonVariants({ variant: "default", size: "sm" }))}
+          >
             Visit Website
-            <Icons.arrowUpRight className="inline-block size-4 text-neutral-500" />
-          </Link>
+            <Icons.arrowUpRight className="size-4 text-neutral-500" />
+          </a>
         </header>
 
         {/* --- Showcase Image Section --- */}

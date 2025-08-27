@@ -4,7 +4,7 @@ import { getCategories } from "@/lib/get-categories";
 export default async function Submit() {
   const categories = await getCategories();
   return (
-    <div className="max-w-xl mx-auto px-4 my-24">
+    <div className="max-w-xl mx-auto px-4 my-36">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-900 text-pretty">
           Submit your AI app for free

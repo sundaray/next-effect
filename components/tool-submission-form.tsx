@@ -50,7 +50,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
       reValidateMode: "onChange",
       defaultValues: {
         name: "",
-        website: "",
+        websiteUrl: "",
         tagline: "",
         description: "",
         categories: [],
@@ -151,10 +151,10 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
       />
 
       <FormField
-        id="website"
-        name="website"
-        label="Website"
-        placeholder="https://clarityai.co"
+        id="websiteUrl"
+        name="websiteUrl"
+        label="Website URL"
+        placeholder="www.clarityai.co"
         control={control}
         disabled={isProcessing}
         required={true}
