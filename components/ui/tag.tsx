@@ -20,13 +20,15 @@ import { cn } from "@/lib/utils";
 type MyTagProps = Omit<TagProps, "children"> & {
   children?: React.ReactNode;
   className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
-function MyTag({ children, className, ...props }: MyTagProps) {
+function MyTag({ children, className, ref, ...props }: MyTagProps) {
   const textValue = typeof children === "string" ? children : undefined;
 
   return (
     <Tag
+      ref={ref}
       textValue={textValue}
       {...props}
       className={cn(

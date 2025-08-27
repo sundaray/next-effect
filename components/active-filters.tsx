@@ -6,6 +6,7 @@ import { Icons } from "@/components/icons";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { unslugify } from "@/lib/utils";
+import { MyTagGroup, MyTag } from "@/components/ui/tag";
 
 function FilterPill({
   label,

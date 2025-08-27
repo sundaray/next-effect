@@ -28,7 +28,7 @@ export function saveTool(body: saveToolPayload, userId: string) {
           .values({
             name: body.name,
             slug,
-            website: body.website,
+            websiteUrl: body.websiteUrl,
             tagline: body.tagline,
             description: body.description,
             // Create a new, mutable array from the readonly 'categories' array.
