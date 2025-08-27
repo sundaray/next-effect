@@ -12,9 +12,9 @@ export function FormMessage({ message, type }: FormMessageProps) {
       {message && (
         <motion.div
           key="form-message"
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -5 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
           transition={{
             ease: "easeOut",
             duration: 0.2,

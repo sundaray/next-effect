@@ -8,6 +8,7 @@ import { FormMessage } from "@/components/form-message";
 import { signIn } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
 import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";
+import { Button } from "@/components/ui/button";
 
 export function SignInWitjGoogleForm() {
   const [isPending, setIsPending] = useState(false);
@@ -74,15 +75,15 @@ export function SignInWitjGoogleForm() {
   return (
     <div>
       <FormMessage message={errorMessage} type="error" />
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={handleSignInWithGoogle}
         disabled={isPending}
-        className="flex items-center justify-center w-full  bg-white rounded-md border border-neutral-300 h-10 text-sm font-medium text-neutral-900 shadow-xs disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full border border-neutral-300 h-10 hover:bg-white"
       >
         <Icons.google className="mr-2 inline-block size-5" />
         Sign in with Google
-      </button>
+      </Button>
     </div>
   );
 }

@@ -49,3 +49,11 @@ export function getWebPVariantUrl(
   const baseUrl = originalUrl.substring(0, lastDotIndex);
   return `${baseUrl}-${variant}.webp`;
 }
+
+export function ensureAbsoluteUrl(url: string): string {
+  if (url.startsWith("https://")) {
+    return url;
+  }
+
+  return `https://${url}`;
+}

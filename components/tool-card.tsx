@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { Tool } from "@/db/schema";
@@ -33,18 +32,17 @@ export function ToolCard({ tool }: { tool: Tool }) {
       {/* Card Header: Logo, Name, Tagline */}
       <div className="mb-4 flex items-start gap-4">
         {tool.logoUrl ? (
-          <Image
+          <img
             src={tool.logoUrl}
             alt={`${tool.name} logo`}
             width={48}
             height={48}
-            className="size-12 rounded-xl object-cover"
+            loading="eager"
+            className="size-12 object-contain rounded-md shrink-0"
           />
         ) : (
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-white">
-            <span className="text-xl font-semibold text-neutral-700">
-              {tool.name.charAt(0).toUpperCase()}
-            </span>
+          <div className="flex size-12 items-center justify-center rounded-md text-2xl font-medium text-neutral-700 border border-neutral-200 bg-white">
+            {tool.name.charAt(0).toUpperCase()}
           </div>
         )}
 
@@ -52,7 +50,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
           <h3 className="text-lg font-bold text-neutral-900 tracking-tight">
             {tool.name}
           </h3>
-          <p className="text-sm text-neutral-700">{tool.website}</p>
+          <p className="text-sm text-neutral-700">{tool.websiteUrl}</p>
         </div>
       </div>
 

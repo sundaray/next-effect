@@ -24,7 +24,7 @@ import {
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { authClient } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
-import { Spinner } from "@/components/ui/kibo-ui/spinner";
+import { Icons } from "@/components/icons";
 
 class SendVerificationOtpError extends Data.TaggedError(
   "SendVerificationOtpError"
@@ -206,9 +206,9 @@ export function SignInWithEmailOtpForm() {
         {step === "email" ? (
           <motion.form
             key="email-step"
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
+            initial={{ opacity: 0, y: 5, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -5, height: 0 }}
             transition={{
               ease: "easeOut",
               duration: 0.2,
@@ -227,7 +227,7 @@ export function SignInWithEmailOtpForm() {
                     {...field}
                     id="email"
                     type="email"
-                    className="mt-2 border-neutral-300 bg-white"
+                    className="mt-2 border-neutral-300"
                     placeholder="john@gmail.com"
                     disabled={isProcessing}
                     aria-invalid={errors.email ? "true" : "false"}
@@ -244,10 +244,7 @@ export function SignInWithEmailOtpForm() {
             <Button type="submit" disabled={isProcessing} className="h-10 mt-2">
               {isProcessing ? (
                 <>
-                  <Spinner
-                    className="size-4 inline-block"
-                    variant="circle-filled"
-                  />
+                  <Icons.spinner className="size-4 inline-block animate-spin" />
                   Sending OTP...
                 </>
               ) : (
@@ -258,11 +255,11 @@ export function SignInWithEmailOtpForm() {
         ) : (
           <motion.form
             key="otp-step"
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
+            exit={{ opacity: 0, y: -4 }}
             transition={{
-              ease: "easeOut",
+              ease: "easeInOut",
               duration: 0.2,
             }}
             className="grid"
@@ -332,10 +329,7 @@ export function SignInWithEmailOtpForm() {
             >
               {isProcessing ? (
                 <>
-                  <Spinner
-                    className="size-4 inline-block"
-                    variant="circle-filled"
-                  />
+                  <Icons.spinner className="size-4 inline-block animate-spin" />
                   Verifying OTP...
                 </>
               ) : (

@@ -30,7 +30,7 @@ export const ToolSubmissionFormSchema = Schema.Struct({
         "URL is incomplete. It must start with 'https://' or 'www.'"
     ),
     Schema.pattern(
-      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+      /^(https:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
       {
         message: () => "Please enter a valid website URL",
       }
@@ -39,9 +39,9 @@ export const ToolSubmissionFormSchema = Schema.Struct({
   tagline: Schema.String.pipe(
     Schema.nonEmptyString({ message: () => "Tagline is required." }),
     Schema.filter(
-      (text) => text.trim().split(/\s+/).filter(Boolean).length <= 20,
+      (text) => text.trim().split(/\s+/).filter(Boolean).length <= 15,
       {
-        message: () => "Tagline must be 20 words or fewer.",
+        message: () => "Tagline must be 15 words or fewer.",
       }
     )
   ),

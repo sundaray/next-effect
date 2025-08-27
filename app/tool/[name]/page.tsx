@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getToolBySlug } from "@/lib/get-tool-by-slug";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -8,6 +7,8 @@ import type { Tool } from "@/db/schema";
 import { createSafeHtml } from "@/lib/create-safe-html";
 import { getWebPVariantUrl } from "@/lib/utils";
 import { Icons } from "@/components/icons";
+import { ensureAbsoluteUrl } from "@/lib/utils";
+import { ToolCategories } from "@/components/tool-categories";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
@@ -52,22 +53,21 @@ export default async function ToolDetailsPage({
           {/* Main content: Logo, Name, Tagline, and Pills */}
           <div className="flex-grow space-y-4">
             <div className="flex items-center gap-4">
-              {/* {tool.logoUrl ? (
-                <image
+              {tool.logoUrl ? (
+                <img
                   src={tool.logoUrl}
                   alt={`${tool.name} logo`}
-                  width={64}
-                  height={64}
-                  className="size-16 rounded-xl object-cover border border-neutral-200"
+                  width={48}
+                  height={48}
+                  loading="eager"
+                  className="size-12 object-contain rounded-md shrink-0"
                 />
               ) : (
-                <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white">
-                  <span className="text-3xl font-semibold text-neutral-700">
-                    {tool.name.charAt(0).toUpperCase()}
-                  </span>
+                <div className="flex size-12 items-center justify-center rounded-md border border-neutral-200 bg-white text-2xl font-medium text-neutral-700">
+                  {tool.name.charAt(0).toUpperCase()}
                 </div>
-              )} */}
-              <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
+              )}
+              <h1 className="text-4xl font-bold tracking-tight text-neutral-900 text-pretty">
                 {tool.name}
               </h1>
             </div>
@@ -77,27 +77,18 @@ export default async function ToolDetailsPage({
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <Badge
                 className={cn(
-                  "font-medium capitalize",
+                  "font-medium capitalize text-sm",
                   getPricingPillStyles(tool.pricing)
                 )}
               >
                 {tool.pricing}
               </Badge>
-              {tool.categories.map((category) => (
-                <Badge
-                  key={category}
-                  variant="secondary"
-                  className="text-neutral-900 rounded-full border-neutral-200"
-                >
-                  {category}
-                </Badge>
-              ))}
             </div>
           </div>
 
-          {/* Call-to-action Button */}
+          {/* Visit Website Button */}
           <a
-            href={tool.website}
+            href={ensureAbsoluteUrl(tool.websiteUrl)}
             target="_blank"
             rel="noopener"
             className={cn(buttonVariants({ variant: "default", size: "sm" }))}
@@ -108,7 +99,7 @@ export default async function ToolDetailsPage({
         </header>
 
         {/* --- Showcase Image Section --- */}
-        <div className="relative w-full aspect-video rounded-md">
+        <div className="relative w-full aspect-[16/9] rounded-md">
           <picture className="absolute inset-0 size-full">
             <source
               type="image/webp"
@@ -129,6 +120,9 @@ export default async function ToolDetailsPage({
         <div className="prose prose-neutral prose-ul:*:my-0 prose-ol:*:my-0">
           <div dangerouslySetInnerHTML={safeDescriptionHtml} />
         </div>
+        {tool.categories && tool.categories.length > 0 && (
+          <ToolCategories categories={tool.categories} />
+        )}
       </article>
     </div>
   );

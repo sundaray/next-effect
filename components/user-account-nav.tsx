@@ -3,6 +3,8 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { getUser } from "@/lib/get-user";
 import { UserAccountNavClient } from "@/components/user-account-nav-client";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export async function UserAccountNav() {
   const requestHeaders = await headers();
@@ -15,7 +17,7 @@ export async function UserAccountNav() {
       ) : (
         <Link
           href="/signin"
-          className="inline-flex items-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-900/90"
+          className={cn(buttonVariants({ variant: "default", size: "sm" }))}
         >
           Sign In
         </Link>
