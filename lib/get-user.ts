@@ -1,6 +1,5 @@
 import "server-only";
 
-import { headers } from "next/headers";
 import { Effect, Option } from "effect";
 import { AuthService } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";

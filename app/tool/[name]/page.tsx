@@ -2,24 +2,23 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getToolBySlug } from "@/lib/get-tool-by-slug";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import type { Tool } from "@/db/schema";
 import { createSafeHtml } from "@/lib/create-safe-html";
 import { getWebPVariantUrl } from "@/lib/utils";
+import { Icons } from "@/components/icons";
 
-// This helper function ensures consistent styling for the pricing pill.
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
     case "free":
-      return "border-emerald-200 bg-emerald-100 text-emerald-900 rounded-full";
+      return "border-emerald-200 bg-emerald-200 text-emerald-900 rounded-full";
     case "freemium":
-      return "border-sky-200 bg-sky-100 text-sky-900 rounded-full";
+      return "border-sky-200 bg-sky-200 text-sky-900 rounded-full";
     case "paid":
-      return "bg-purple-100 text-purple-900 rounded-full border-purple-200";
+      return "bg-purple-200 text-purple-900 rounded-full border-purple-200";
     default:
-      return "border-neutral-200 bg-neutral-100 text-neutral-900 rounded-full";
+      return "border-neutral-200 bg-neutral-200 text-neutral-900 rounded-full";
   }
 };
 
@@ -97,16 +96,14 @@ export default async function ToolDetailsPage({
           </div>
 
           {/* Call-to-action Button */}
-          <Button asChild className="shrink-0 w-full md:w-auto">
-            <Link href={tool.website} target="_blank" rel="noopener noreferrer">
-              Visit Website
-              <ArrowTopRightOnSquareIcon className="ml-2 size-4" />
-            </Link>
-          </Button>
+          <Link href={tool.website} target="_blank" rel="noopener noreferrer">
+            Visit Website
+            <Icons.arrowUpRight className="inline-block size-4 text-neutral-500" />
+          </Link>
         </header>
 
         {/* --- Showcase Image Section --- */}
-        <div className="relative w-full aspect-video rounded-md border border-neutral-300">
+        <div className="relative w-full aspect-video rounded-md">
           <picture className="absolute inset-0 size-full">
             <source
               type="image/webp"
