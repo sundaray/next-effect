@@ -65,7 +65,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
   if (filters.search) {
     allFiltersMap.set("search", {
       label: filters.search,
-      clear: () => setFilters({ search: null }),
+      clear: () => setFilters({ search: "" }),
       group: "Search:",
     });
   }
@@ -74,7 +74,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
     if (option) {
       allFiltersMap.set("sort", {
         label: option.label,
-        clear: () => setFilters({ sort: null }),
+        clear: () => setFilters({ sort: "" }),
         group: "Sort:",
       });
     }

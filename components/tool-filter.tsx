@@ -37,9 +37,9 @@ export function ToolFilter({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: -8 }}
+      initial={{ opacity: 0, scale: 0.95, y: -4 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: -8 }}
+      exit={{ opacity: 0, scale: 0.95, y: -4 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className="flex flex-col sm:flex-row gap-4 items-center origin-top-right"
       data-pending={isPending ? "" : undefined}

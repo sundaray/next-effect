@@ -32,7 +32,7 @@ function MyTag({ children, className, ref, ...props }: MyTagProps) {
       textValue={textValue}
       {...props}
       className={cn(
-        "flex cursor-pointer items-center gap-x-2 rounded-full  bg-neutral-200 px-3 py-1 text-sm font-medium text-neutral-900 transition-colors outline-none hover:bg-neutral-900 hover:text-neutral-200",
+        "flex items-center gap-x-2 rounded-full  bg-neutral-200 px-3 py-1.5 text-sm font-medium text-neutral-900 transition-colors outline-none",
         "data-[focus-visible]:ring-2 data-[focus-visible]:ring-sky-600 data-[focus-visible]:ring-offset-2",
         className
       )}
@@ -43,7 +43,7 @@ function MyTag({ children, className, ref, ...props }: MyTagProps) {
           {allowsRemoving && (
             <Button
               slot="remove"
-              className="p-0 h-auto text-neutral-500 hover:text-neutral-700 hover:bg-transparent transition-colors data-[hovered]:text-neutral-400 data-[hovered]:hover:text-neutral-200"
+              className="p-1 group h-auto text-neutral-500 transition-colors  data-[hovered]:text-neutral-700 data-[hovered]:bg-neutral-300/50 rounded-full"
             >
               <Icons.x className="size-4" />
             </Button>
