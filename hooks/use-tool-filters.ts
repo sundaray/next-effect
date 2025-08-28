@@ -22,7 +22,6 @@ export function useToolFilters() {
     const updateAndRefresh = async () => {
       // Step A: Update the URL on the client-side instantly.
       // We `await` this to get the `newSearchParams` object.
-      // Because `shallow: true`, this is still a very fast, client-side only operation.
       const newSearchParams = await setFiltersOriginal(newFilters);
 
       // Step B: Manually trigger a server-side navigation with the new URL.

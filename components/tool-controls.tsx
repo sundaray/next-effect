@@ -25,11 +25,7 @@ export function ToolControls({
       <AnimatePresence>
         <ActiveFilters onClearAll={() => setShowFilters(false)} />
       </AnimatePresence>
-      <motion.div
-        layout
-        transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4"
-      >
+      <motion.div className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 border">
         <div>
           <ToolSearch
             onFilterClick={() => setShowFilters(!showFilters)}

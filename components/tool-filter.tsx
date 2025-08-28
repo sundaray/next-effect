@@ -37,11 +37,11 @@ export function ToolFilter({
 
   return (
     <motion.div
-      initial={{ height: 0, opacity: 0, y: 0 }}
-      animate={{ height: "auto", opacity: 1, y: 8 }}
-      exit={{ height: 0, opacity: 0, y: 0 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex flex-col sm:flex-row gap-4 items-center"
+      initial={{ opacity: 0, scale: 0.95, y: -8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -8 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
+      className="flex flex-col sm:flex-row gap-4 items-center origin-top-right"
       data-pending={isPending ? "" : undefined}
     >
       <MultiSelectCommand
