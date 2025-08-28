@@ -5,159 +5,152 @@ import { toolSortOptions } from "@/config/tool-options";
 import { Icons } from "@/components/icons";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { MyTagGroup, MyTag } from "@/components/ui/tag";
 import { unslugify } from "@/lib/utils";
+import { Key, useState, useEffect, useRef } from "react";
 
-function FilterPill({
-  label,
-  onClear,
-}: {
-  label: string;
-  onClear: () => void;
-}) {
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="flex items-center gap-x-2 rounded-full bg-neutral-200 px-2 py-1 border"
-    >
-      <span className="text-xs text-neutral-700 font-semibold">{label}</span>
-      <button
-        onClick={onClear}
-        className="text-neutral-500 hover:text-neutral-700 transition-colors"
-        aria-label={`Remove ${label} filter`}
-      >
-        <Icons.x className="size-4" />
-      </button>
-    </motion.div>
-  );
-}
+// Helper function to get a flat list of all active filter keys
+const getActiveFilterKeys = (
+  filters: ReturnType<typeof useToolFilters>["filters"]
+) => {
+  const keys = new Set<string>();
+  if (filters.search) keys.add("search");
+  if (filters.sort !== "latest") keys.add("sort");
+  filters.category.forEach((cat) => keys.add(`category-${cat}`));
+  filters.pricing.forEach((price) => keys.add(`pricing-${price}`));
+  return keys;
+};
 
 export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
   const { filters, setFilters } = useToolFilters();
 
-  // --- Create separate filter groups ---
-  const searchFilters = [];
+  // --- STATE FOR ORDERING ---
+  // This state will hold the unique keys of active filters in the order they were added.
+  const [orderedFilterKeys, setOrderedFilterKeys] = useState<string[]>([]);
+  // Ref to store the previous filters state for comparison.
+  const prevFiltersRef = useRef(filters);
+
+  // --- EFFECT TO DETECT CHANGES AND UPDATE ORDER ---
+  useEffect(() => {
+    const prevKeys = getActiveFilterKeys(prevFiltersRef.current);
+    const currentKeys = getActiveFilterKeys(filters);
+
+    // Find newly added keys
+    const addedKeys = [...currentKeys].filter((key) => !prevKeys.has(key));
+
+    // Find removed keys
+    const removedKeys = [...prevKeys].filter((key) => !currentKeys.has(key));
+
+    if (addedKeys.length > 0 || removedKeys.length > 0) {
+      setOrderedFilterKeys((currentOrderedKeys) => {
+        // First, filter out any keys that were removed
+        const remainingKeys = currentOrderedKeys.filter(
+          (key) => !removedKeys.includes(key)
+        );
+        // Then, add the new keys to the end
+        return [...remainingKeys, ...addedKeys];
+      });
+    }
+
+    // Update the ref for the next render
+    prevFiltersRef.current = filters;
+  }, [filters]);
+
+  // --- Create filter data structures ---
+  const allFiltersMap = new Map<
+    string,
+    { label: string; clear: () => void; group: string }
+  >();
+
   if (filters.search) {
-    searchFilters.push({
-      key: "search",
-      prefix: "Search:",
-      value: `${filters.search}`,
+    allFiltersMap.set("search", {
+      label: filters.search,
       clear: () => setFilters({ search: null }),
+      group: "Search:",
     });
   }
-
-  const sortFilters = [];
   if (filters.sort !== "latest") {
-    const option = toolSortOptions.find(
-      (option) => option.value === filters.sort
-    );
+    const option = toolSortOptions.find((opt) => opt.value === filters.sort);
     if (option) {
-      sortFilters.push({
-        key: "sort",
-        prefix: "Sort:",
-        value: option.label,
+      allFiltersMap.set("sort", {
+        label: option.label,
         clear: () => setFilters({ sort: null }),
+        group: "Sort:",
       });
     }
   }
+  filters.category.forEach((slug) => {
+    allFiltersMap.set(`category-${slug}`, {
+      label: unslugify(slug),
+      clear: () =>
+        setFilters({ category: filters.category.filter((c) => c !== slug) }),
+      group: "Categories:",
+    });
+  });
+  filters.pricing.forEach((price) => {
+    allFiltersMap.set(`pricing-${price}`, {
+      label: price.charAt(0).toUpperCase() + price.slice(1),
+      clear: () =>
+        setFilters({ pricing: filters.pricing.filter((p) => p !== price) }),
+      group: "Pricing:",
+    });
+  });
 
-  const categoryFilters = filters.category.map((categorySlug) => ({
-    key: `category-${categorySlug}`,
-    label: unslugify(categorySlug),
-    clear: () =>
-      setFilters({
-        category: filters.category.filter((name) => name !== categorySlug),
-      }),
-  }));
-
-  const pricingFilters = filters.pricing.map((price) => ({
-    key: `pricing-${price}`,
-    label: price.charAt(0).toUpperCase() + price.slice(1),
-    clear: () =>
-      setFilters({
-        pricing: filters.pricing.filter((p) => p !== price),
-      }),
-  }));
-
-  const totalActiveFilters =
-    searchFilters.length +
-    sortFilters.length +
-    categoryFilters.length +
-    pricingFilters.length;
+  const totalActiveFilters = allFiltersMap.size;
 
   const handleClearAll = () => {
     setFilters(null);
     onClearAll();
   };
 
+  const handleRemove = (keys: Set<Key>) => {
+    const keyToRemove = Array.from(keys)[0] as string;
+    allFiltersMap.get(keyToRemove)?.clear();
+  };
+
+  // Group the ordered keys by their filter group
+  const groupedAndOrderedFilters = orderedFilterKeys.reduce(
+    (acc, key) => {
+      const filter = allFiltersMap.get(key);
+      if (filter) {
+        if (!acc[filter.group]) {
+          acc[filter.group] = [];
+        }
+        acc[filter.group].push({ id: key, label: filter.label });
+      }
+      return acc;
+    },
+    {} as Record<string, { id: string; label: string }[]>
+  );
+
   return (
     <AnimatePresence>
       {totalActiveFilters > 0 && (
         <motion.div
           layout
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
+          initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+          animate={{ opacity: 1, height: "auto", marginBottom: "1rem" }}
+          exit={{ opacity: 0, height: 0, marginBottom: 0 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="flex items-center justify-between gap-4 mb-4 flex-wrap"
+          className="flex items-center justify-between gap-4 flex-wrap"
         >
           <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
-            <AnimatePresence>
-              {/* Render non-grouped filters first */}
-              {searchFilters.map((filter) => (
-                <div key={filter.key} className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-neutral-500">
-                    {filter.prefix}
-                  </span>
-                  <FilterPill label={filter.value} onClear={filter.clear} />
-                </div>
-              ))}
-
-              {sortFilters.map((filter) => (
-                <div key={filter.key} className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-neutral-500">
-                    {filter.prefix}
-                  </span>
-                  <FilterPill label={filter.value} onClear={filter.clear} />
-                </div>
-              ))}
-
-              {/* Render Category group */}
-              {categoryFilters.length > 0 && (
-                <div key="category-group" className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-neutral-500">
-                    Categories:
-                  </span>
-                  {categoryFilters.map((filter) => (
-                    <FilterPill
-                      key={filter.key}
-                      label={filter.label}
-                      onClear={filter.clear}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Render Pricing group */}
-              {pricingFilters.length > 0 && (
-                <div className="flex items-center gap-2" key="pricing-group">
-                  <span className="text-sm font-medium text-neutral-500">
-                    Pricing:
-                  </span>
-                  {pricingFilters.map((filter) => (
-                    <FilterPill
-                      key={filter.key}
-                      label={filter.label}
-                      onClear={filter.clear}
-                    />
-                  ))}
-                </div>
-              )}
-            </AnimatePresence>
+            {Object.entries(groupedAndOrderedFilters).map(
+              ([groupLabel, items]) => (
+                <MyTagGroup
+                  key={groupLabel}
+                  items={items}
+                  label={groupLabel}
+                  onRemove={handleRemove}
+                  className="flex items-center gap-2"
+                  labelClassName="text-sm font-medium text-neutral-500"
+                >
+                  {(item) => <MyTag id={item.id}>{item.label}</MyTag>}
+                </MyTagGroup>
+              )
+            )}
           </div>
+
           {totalActiveFilters > 1 && (
             <Button
               onClick={handleClearAll}
