@@ -3,9 +3,7 @@ import { getCategories } from "@/lib/get-categories";
 import type { SearchParams } from "nuqs/server";
 import { toolSearchParamsCache } from "@/lib/tool-search-params";
 import { ToolHero } from "@/components/tool-hero";
-import { ToolControls } from "@/components/tool-controls";
-import { ToolGrid } from "@/components/tool-grid";
-import { ToolPagination } from "@/components/tool-pagination";
+import { ToolsDisplay } from "@/components/tools-display";
 
 type HomePageProps = {
   searchParams: Promise<SearchParams>;
@@ -42,13 +40,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <div className="w-6xl max-w-6xl mx-auto group px-4">
       <ToolHero />
-      <ToolControls
+      <ToolsDisplay
         allCategories={categories}
         categoryCounts={categoryCounts}
         pricingCounts={pricingCounts}
+        paginatedTools={paginatedTools}
+        totalPages={totalPages}
       />
-      <ToolGrid tools={paginatedTools} />
-      <ToolPagination totalPages={totalPages} />
     </div>
   );
 }

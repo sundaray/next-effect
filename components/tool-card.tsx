@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { Tool } from "@/db/schema";
@@ -22,7 +23,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const slug = slugify(tool.name);
 
   return (
-    <article className="group relative flex h-full flex-col bg-neutral-100 rounded-md border border-neutral-300 p-4 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:shadow-lg">
+    <motion.article className="group relative flex h-full flex-col bg-neutral-100 rounded-md border border-neutral-300 p-4 shadow-xs transition-all duration-200 ease-in-out hover:scale-102 hover:shadow-lg">
       <Link
         href={`/tools/${slug}`}
         className="absolute inset-0 z-10"
@@ -75,6 +76,6 @@ export function ToolCard({ tool }: { tool: Tool }) {
           {tool.pricing}
         </Badge>
       </div>
-    </article>
+    </motion.article>
   );
 }
