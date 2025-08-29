@@ -8,15 +8,25 @@ interface ToolGridProps {
   tools: Tool[];
 }
 
+const gridVariants = {
+  hidden: { opacity: 0, y: 4 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 4 },
+};
+
 export function ToolGrid({ tools }: ToolGridProps) {
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       {tools.length > 0 ? (
         <motion.div
           key="tool-grid"
-          layoutId="tool-grid-container"
           layout="position"
-          transition={{ layout: { duration: 0.15 } }}
+          layoutId="tool-grid-container"
+          variants={gridVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={{ duration: 0.15, ease: "easeOut" }}
           className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12 group-has-[[data-pending]]:animate-pulse"
         >
           {tools.map((tool) => (
@@ -26,13 +36,14 @@ export function ToolGrid({ tools }: ToolGridProps) {
       ) : (
         <motion.p
           key="no-tools-message"
-          layoutId="tool-grid-container"
           layout="position"
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
+          layoutId="tool-grid-container"
+          variants={gridVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="text-neutral-700 col-span-full text-center"
+          className="text-neutral-700 col-span-full text-center my-12"
         >
           No tools found matching your criteria.
         </motion.p>
