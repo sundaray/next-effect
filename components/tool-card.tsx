@@ -23,7 +23,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const slug = slugify(tool.name);
 
   return (
-    <article className="group group-has-[[data-pending]]:pointer-events-none group-has-[[data-pending]]:opacity-50 relative flex h-full flex-col bg-neutral-100 rounded-md border border-neutral-300 p-4 shadow-xs transition-all hover:scale-102 hover:shadow-lg">
+    <article className="group group-has-[[data-pending]]:pointer-events-none group-has-[[data-pending]]:opacity-50 relative flex h-full flex-col rounded-lg border border-neutral-300 p-4 shadow-xs transition-all hover:scale-102 hover:shadow-lg">
       <Link
         href={`/tools/${slug}`}
         className="absolute inset-0 z-10"

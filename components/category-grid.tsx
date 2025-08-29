@@ -22,7 +22,7 @@ export function CategoryGrid({ categories, search }: CategoryGridProps) {
   if (!hasCategories) {
     return (
       <AnimatePresence initial={false} mode="wait">
-        <motion.div
+        <motion.p
           key="no-categories-message"
           layoutId="category-container"
           layout="position"
@@ -31,12 +31,10 @@ export function CategoryGrid({ categories, search }: CategoryGridProps) {
           animate="visible"
           exit="exit"
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="mt-12 text-center"
+          className="mt-12 text-center text-sm"
         >
-          <p className="text-lg text-neutral-700">
-            No categories found matching "{search}"
-          </p>
-        </motion.div>
+          No categories found matching "{search}"
+        </motion.p>
       </AnimatePresence>
     );
   }

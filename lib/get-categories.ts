@@ -6,13 +6,10 @@ import { DatabaseService } from "@/lib/services/database-service";
 import { serverRuntime } from "@/lib/server-runtime";
 import { tools } from "@/db/schema";
 
-export async function getCategories(search: string = "") {
+export async function getCategories(search: string) {
   const program = Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
-    // This query uses an implicit LATERAL JOIN to first "unnest" the categories array
-    // into a set of rows, and then applies the filter to those individual rows.
-    // This is the correct way to filter on the contents of an array in PostgreSQL.
     const query = search
       ? sql`
           SELECT DISTINCT category 

@@ -30,7 +30,7 @@ export function ToolGrid({ tools }: ToolGridProps) {
           animate="visible"
           exit="exit"
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="text-neutral-700 col-span-full text-sm text-center my-12"
+          className="text-neutral-700 text-sm text-center my-12"
         >
           No tools found matching your criteria.
         </motion.p>
