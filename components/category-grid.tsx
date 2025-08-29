@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { MyTag, MyTagGroup } from "@/components/ui/tag";
 import { slugify } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { useCategoryFilters } from "@/hooks/use-category-filters";
 
 interface CategoryGridProps {
   categories: Record<string, string[]>;
@@ -17,6 +18,7 @@ const gridVariants = {
 };
 
 export function CategoryGrid({ categories, search }: CategoryGridProps) {
+  const { isPending } = useCategoryFilters();
   const hasCategories = Object.keys(categories).length > 0;
 
   if (!hasCategories) {
@@ -50,10 +52,7 @@ export function CategoryGrid({ categories, search }: CategoryGridProps) {
         animate="visible"
         exit="exit"
         transition={{ duration: 0.15, ease: "easeOut" }}
-        className={cn(
-          "mt-12 space-y-8",
-          "group-has-[[data-pending]]:opacity-50 group-has-[[data-pending]]:pointer-events-none transition-all"
-        )}
+        className={cn("mt-12 space-y-12")}
       >
         {Object.entries(categories).map(([letter, cats]) => (
           <section key={letter} aria-labelledby={`category-letter-${letter}`}>
@@ -75,6 +74,7 @@ export function CategoryGrid({ categories, search }: CategoryGridProps) {
                 {(item) => (
                   <MyTag
                     href={`/?category=${slugify(item.id)}`}
+                    isDisabled={isPending}
                     className="cursor-pointer hover:bg-neutral-900 hover:text-neutral-200 transition-colors"
                   >
                     {item.id}

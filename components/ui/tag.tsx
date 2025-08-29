@@ -32,8 +32,9 @@ function MyTag({ children, className, ref, ...props }: MyTagProps) {
       textValue={textValue}
       {...props}
       className={cn(
-        "flex items-center gap-x-2 rounded-full  bg-neutral-200 px-3 py-1.5 text-sm font-medium text-neutral-900 transition-colors outline-none",
+        "flex items-center gap-x-2 rounded-full  bg-neutral-200 px-3 py-1.5 text-sm font-medium text-neutral-900 outline-none",
         "data-[focus-visible]:ring-2 data-[focus-visible]:ring-sky-600 data-[focus-visible]:ring-offset-2",
+        "group-has-[[data-pending]]:opacity-50 group-has-[[data-pending]]:pointer-events-none transition-all",
         className
       )}
     >
