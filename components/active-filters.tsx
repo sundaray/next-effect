@@ -9,7 +9,6 @@ import { MyTagGroup, MyTag } from "@/components/ui/tag";
 import { unslugify } from "@/lib/utils";
 import { Key, useState, useEffect, useRef } from "react";
 
-// Helper function to get a flat list of all active filter keys
 const getActiveFilterKeys = (
   filters: ReturnType<typeof useToolFilters>["filters"]
 ) => {
@@ -24,39 +23,29 @@ const getActiveFilterKeys = (
 export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
   const { filters, setFilters } = useToolFilters();
 
-  // --- STATE FOR ORDERING ---
-  // This state will hold the unique keys of active filters in the order they were added.
   const [orderedFilterKeys, setOrderedFilterKeys] = useState<string[]>([]);
-  // Ref to store the previous filters state for comparison.
   const prevFiltersRef = useRef(filters);
 
-  // --- EFFECT TO DETECT CHANGES AND UPDATE ORDER ---
   useEffect(() => {
     const prevKeys = getActiveFilterKeys(prevFiltersRef.current);
     const currentKeys = getActiveFilterKeys(filters);
 
-    // Find newly added keys
     const addedKeys = [...currentKeys].filter((key) => !prevKeys.has(key));
 
-    // Find removed keys
     const removedKeys = [...prevKeys].filter((key) => !currentKeys.has(key));
 
     if (addedKeys.length > 0 || removedKeys.length > 0) {
       setOrderedFilterKeys((currentOrderedKeys) => {
-        // First, filter out any keys that were removed
         const remainingKeys = currentOrderedKeys.filter(
           (key) => !removedKeys.includes(key)
         );
-        // Then, add the new keys to the end
         return [...remainingKeys, ...addedKeys];
       });
     }
 
-    // Update the ref for the next render
     prevFiltersRef.current = filters;
   }, [filters]);
 
-  // --- Create filter data structures ---
   const allFiltersMap = new Map<
     string,
     { label: string; clear: () => void; group: string }
@@ -108,7 +97,6 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
     allFiltersMap.get(keyToRemove)?.clear();
   };
 
-  // Group the ordered keys by their filter group
   const groupedAndOrderedFilters = orderedFilterKeys.reduce(
     (acc, key) => {
       const filter = allFiltersMap.get(key);
@@ -153,7 +141,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
           {totalActiveFilters > 1 && (
             <Button
               onClick={handleClearAll}
-              className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-2 py-1 text-xs h-auto gap-x-2"
+              className="shrink-0 rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-3 py-1.5 gap-x-2"
             >
               <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
               Clear all

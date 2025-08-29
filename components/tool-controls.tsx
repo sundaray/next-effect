@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, LayoutGroup } from "motion/react";
 import { ToolSearch } from "@/components/tool-search";
 import { ToolSort } from "@/components/tool-sort";
@@ -19,12 +19,32 @@ export function ToolControls({
   pricingCounts,
 }: ToolControlsProps) {
   const [showFilters, setShowFilters] = useState(false);
+  const controlsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        controlsRef.current &&
+        !controlsRef.current.contains(event.target as Node)
+      ) {
+        setShowFilters(false);
+      }
+    }
+
+    if (showFilters) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showFilters]);
 
   return (
     <LayoutGroup>
       <ActiveFilters onClearAll={() => setShowFilters(false)} />
       <div className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
-        <div className="space-y-1">
+        <div className="space-y-1" ref={controlsRef}>
           <ToolSearch
             onFilterClick={() => setShowFilters(!showFilters)}
             onSearch={() => setShowFilters(false)}

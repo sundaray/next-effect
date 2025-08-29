@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "motion/react";
 import type { Tool } from "@/db/schema";
 import { ToolCard } from "@/components/tool-card";
+import { Icons } from "@/components/icons";
+import { cn } from "@/lib/utils";
 
 interface ToolGridProps {
   tools: Tool[];
@@ -16,18 +18,20 @@ const gridVariants = {
 
 export function ToolGrid({ tools }: ToolGridProps) {
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence initial={false} mode="wait">
       {tools.length > 0 ? (
         <motion.div
           key="tool-grid"
-          layout="position"
           layoutId="tool-grid-container"
+          layout="position"
           variants={gridVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12 group-has-[[data-pending]]:animate-pulse"
+          className={cn(
+            "grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12"
+          )}
         >
           {tools.map((tool) => (
             <ToolCard tool={tool} key={tool.id} />
@@ -36,8 +40,8 @@ export function ToolGrid({ tools }: ToolGridProps) {
       ) : (
         <motion.p
           key="no-tools-message"
-          layout="position"
           layoutId="tool-grid-container"
+          layout="position"
           variants={gridVariants}
           initial="hidden"
           animate="visible"

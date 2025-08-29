@@ -38,7 +38,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const paginatedTools = allFilteredTools.slice(startIndex, endIndex);
 
   return (
-    <div className="w-6xl max-w-6xl mx-auto group px-4">
+    <div className="mx-auto max-w-6xl group px-4">
       <ToolHero />
       <ToolsDisplay
         allCategories={categories}
