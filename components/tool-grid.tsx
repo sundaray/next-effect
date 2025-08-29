@@ -16,27 +16,11 @@ const gridVariants = {
 };
 
 export function ToolGrid({ tools }: ToolGridProps) {
-  return (
-    <AnimatePresence initial={false} mode="wait">
-      {tools.length > 0 ? (
-        <motion.div
-          key="tool-grid"
-          layoutId="tool-grid-container"
-          layout="position"
-          variants={gridVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          transition={{ duration: 0.15, ease: "easeOut" }}
-          className={cn(
-            "grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12"
-          )}
-        >
-          {tools.map((tool) => (
-            <ToolCard tool={tool} key={tool.id} />
-          ))}
-        </motion.div>
-      ) : (
+  const hasTools = tools.length > 0;
+
+  if (!hasTools) {
+    return (
+      <AnimatePresence initial={false} mode="wait">
         <motion.p
           key="no-tools-message"
           layoutId="tool-grid-container"
@@ -50,7 +34,28 @@ export function ToolGrid({ tools }: ToolGridProps) {
         >
           No tools found matching your criteria.
         </motion.p>
-      )}
+      </AnimatePresence>
+    );
+  }
+  return (
+    <AnimatePresence initial={false} mode="wait">
+      <motion.div
+        key="tool-grid"
+        layoutId="tool-grid-container"
+        layout="position"
+        variants={gridVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ duration: 0.15, ease: "easeOut" }}
+        className={cn(
+          "grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12"
+        )}
+      >
+        {tools.map((tool) => (
+          <ToolCard tool={tool} key={tool.id} />
+        ))}
+      </motion.div>
     </AnimatePresence>
   );
 }
