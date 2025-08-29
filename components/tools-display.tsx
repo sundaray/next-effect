@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, LayoutGroup } from "motion/react";
+import { LayoutGroup } from "motion/react";
 import type { Tool } from "@/db/schema";
 import { ToolControls } from "@/components/tool-controls";
 import { ToolGrid } from "@/components/tool-grid";
