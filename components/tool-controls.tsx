@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion, LayoutGroup } from "motion/react";
+import { AnimatePresence, LayoutGroup } from "motion/react";
 import { ToolSearch } from "@/components/tool-search";
 import { ToolSort } from "@/components/tool-sort";
 import { ToolFilter } from "@/components/tool-filter";
@@ -22,11 +22,8 @@ export function ToolControls({
 
   return (
     <LayoutGroup>
-      <motion.div layout>
-        <ActiveFilters onClearAll={() => setShowFilters(false)} />
-      </motion.div>
-
-      <div className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 border">
+      <ActiveFilters onClearAll={() => setShowFilters(false)} />
+      <div className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
         <div className="space-y-1">
           <ToolSearch
             onFilterClick={() => setShowFilters(!showFilters)}

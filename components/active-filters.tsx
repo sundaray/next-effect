@@ -127,7 +127,10 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
     <AnimatePresence>
       {totalActiveFilters > 0 && (
         <motion.div
-          layout
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
           className="flex items-center justify-between gap-4 flex-wrap"
         >
           <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
