@@ -32,7 +32,7 @@ export function ToolGrid({ tools }: ToolGridProps) {
           transition={{ duration: 0.15, ease: "easeOut" }}
           className="text-neutral-700 text-sm text-center my-12"
         >
-          No tools found matching your criteria.
+          No apps found matching your filter criteria.
         </motion.p>
       </AnimatePresence>
     );

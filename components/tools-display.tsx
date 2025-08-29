@@ -3,6 +3,7 @@
 import { LayoutGroup } from "motion/react";
 import type { Tool } from "@/db/schema";
 import { ToolControls } from "@/components/tool-controls";
+import { ToolFilterSummary } from "@/components/tool-filter-summary";
 import { ToolGrid } from "@/components/tool-grid";
 import { ToolPagination } from "@/components/tool-pagination";
 
@@ -32,19 +33,11 @@ export function ToolsDisplay({
         categoryCounts={categoryCounts}
         pricingCounts={pricingCounts}
       />
-      {isFiltered && filteredToolCount > 0 && (
-        <div className="text-sm text-neutral-700">
-          Showing{" "}
-          <span className="font-medium text-neutral-900">
-            {paginatedTools.length}{" "}
-          </span>
-          of{" "}
-          <span className="font-medium text-neutral-900">
-            {filteredToolCount}
-          </span>{" "}
-          app{filteredToolCount !== 1 ? "s" : ""} matching your filter criteria.
-        </div>
-      )}
+      <ToolFilterSummary
+        isFiltered={isFiltered}
+        filteredToolCount={filteredToolCount}
+        paginatedToolCount={paginatedTools.length}
+      />
       <ToolGrid tools={paginatedTools} />
       <ToolPagination totalPages={totalPages} />
     </LayoutGroup>
