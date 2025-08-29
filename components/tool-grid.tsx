@@ -11,7 +11,8 @@ interface ToolGridProps {
 export function ToolGrid({ tools }: ToolGridProps) {
   return (
     <motion.div
-      layout="position"
+      layout
+      transition={{ layout: { duration: 0.15 } }}
       className="grid border grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12 group-has-[[data-pending]]:animate-pulse"
     >
       {tools.length > 0 ? (

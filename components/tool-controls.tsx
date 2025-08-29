@@ -21,8 +21,11 @@ export function ToolControls({
   const [showFilters, setShowFilters] = useState(false);
 
   return (
-    <>
-      <ActiveFilters onClearAll={() => setShowFilters(false)} />
+    <LayoutGroup>
+      <motion.div layout>
+        <ActiveFilters onClearAll={() => setShowFilters(false)} />
+      </motion.div>
+
       <div className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 border">
         <div className="space-y-1">
           <ToolSearch
@@ -41,6 +44,6 @@ export function ToolControls({
         </div>
         <ToolSort />
       </div>
-    </>
+    </LayoutGroup>
   );
 }

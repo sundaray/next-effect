@@ -124,9 +124,12 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
   );
 
   return (
-    <>
+    <AnimatePresence>
       {totalActiveFilters > 0 && (
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+        <motion.div
+          layout
+          className="flex items-center justify-between gap-4 flex-wrap"
+        >
           <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
             {Object.entries(groupedAndOrderedFilters).map(
               ([groupLabel, items]) => (
@@ -153,8 +156,8 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
               Clear all
             </Button>
           )}
-        </div>
+        </motion.div>
       )}
-    </>
+    </AnimatePresence>
   );
 }
