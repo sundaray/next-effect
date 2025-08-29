@@ -40,7 +40,11 @@ export function ToolSearch({
           onChange={(e) => handleSearch(e.target.value)}
           aria-label="Search for apps by name..."
         />
-        <Icons.search className="pointer-events-none col-start-1 row-start-1 size-5 sm:size-4 text-neutral-500 ml-3 self-center" />
+        {isPending ? (
+          <Icons.spinner className="size-4 ml-3 inline-block animate-spin text-neutral-500 col-start-1 row-start-1 self-center" />
+        ) : (
+          <Icons.search className="pointer-events-none col-start-1 row-start-1 size-5 sm:size-4 text-neutral-500 ml-3 self-center" />
+        )}
       </div>
       <button
         type="button"
