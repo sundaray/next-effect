@@ -16,7 +16,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const allFilteredTools = await getTools(filters);
 
-  const categories = await getCategories();
+  const categories = await getCategories(filters.search);
 
   const categoryCounts: Record<string, number> = {};
   for (const tool of allFilteredTools) {

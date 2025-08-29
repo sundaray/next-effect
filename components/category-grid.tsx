@@ -1,0 +1,92 @@
+"use client";
+
+import { AnimatePresence, motion } from "motion/react";
+import { MyTag, MyTagGroup } from "@/components/ui/tag";
+import { slugify } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+
+interface CategoryGridProps {
+  categories: Record<string, string[]>;
+  search: string;
+}
+
+const gridVariants = {
+  hidden: { opacity: 0, y: 4 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 4 },
+};
+
+export function CategoryGrid({ categories, search }: CategoryGridProps) {
+  const hasCategories = Object.keys(categories).length > 0;
+
+  if (!hasCategories) {
+    return (
+      <AnimatePresence initial={false} mode="wait">
+        <motion.div
+          key="no-categories-message"
+          layoutId="category-container"
+          layout="position"
+          variants={gridVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="mt-12 text-center"
+        >
+          <p className="text-lg text-neutral-700">
+            No categories found matching "{search}"
+          </p>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  return (
+    <AnimatePresence initial={false} mode="wait">
+      <motion.div
+        key="category-grid"
+        layoutId="category-container"
+        layout="position"
+        variants={gridVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ duration: 0.15, ease: "easeOut" }}
+        className={cn(
+          "mt-12 space-y-8",
+          "group-has-[[data-pending]]:opacity-50 group-has-[[data-pending]]:pointer-events-none transition-all"
+        )}
+      >
+        {Object.entries(categories).map(([letter, cats]) => (
+          <section key={letter} aria-labelledby={`category-letter-${letter}`}>
+            <div className="flex items-center gap-4">
+              <h2
+                id={`category-letter-${letter}`}
+                className="text-2xl font-bold text-neutral-900"
+              >
+                {letter}
+              </h2>
+              <div className="flex-grow h-px bg-neutral-200"></div>
+            </div>
+            <div className="mt-4">
+              <MyTagGroup
+                aria-labelledby={`category-letter-${letter}`}
+                items={cats.map((category) => ({ id: category }))}
+                listClassName="flex flex-wrap gap-3"
+              >
+                {(item) => (
+                  <MyTag
+                    href={`/?category=${slugify(item.id)}`}
+                    className="cursor-pointer hover:bg-neutral-900 hover:text-neutral-200 transition-colors"
+                  >
+                    {item.id}
+                  </MyTag>
+                )}
+              </MyTagGroup>
+            </div>
+          </section>
+        ))}
+      </motion.div>
+    </AnimatePresence>
+  );
+}

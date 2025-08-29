@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { navbarLinks } from "@/config/navbar";
 import { MainNav } from "@/components/main-nav";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import NextTopLoader from "nextjs-toploader";
+import { RouterProvider } from "@/components/router-provider";
 
 import "./globals.css";
 
@@ -31,12 +33,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased`}
       >
+        <NextTopLoader showSpinner={false} color="#0284c7" shadow={false} />
         <header>
           <MainNav items={navbarLinks.main} />
         </header>
 
         <main className="flex-1">
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <RouterProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </RouterProvider>
         </main>
       </body>
     </html>

@@ -7,7 +7,7 @@ export function ToolCategories({ categories }: { categories: string[] }) {
     <MyTagGroup
       label="Categories:"
       items={categories.map((category) => ({ id: category, name: category }))}
-      className="flex flex-col gap-2 sm:flex-row sm:items-center"
+      className="flex flex-col gap-3 sm:flex-row sm:items-center"
     >
       {(item) => (
         <MyTag

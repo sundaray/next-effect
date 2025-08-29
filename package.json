@@ -47,6 +47,7 @@
     "lucide-react": "^0.536.0",
     "motion": "^12.23.12",
     "next": "^15.5.0",
+    "nextjs-toploader": "^3.8.16",
     "nuqs": "^2.4.3",
     "postgres": "^3.4.7",
     "react": "^19.1.1",
