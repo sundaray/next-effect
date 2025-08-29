@@ -12,6 +12,8 @@ interface ToolsDisplayProps {
   pricingCounts: Record<string, number>;
   paginatedTools: Tool[];
   totalPages: number;
+  filteredToolCount: number;
+  isFiltered: boolean;
 }
 
 export function ToolsDisplay({
@@ -20,6 +22,8 @@ export function ToolsDisplay({
   pricingCounts,
   paginatedTools,
   totalPages,
+  filteredToolCount,
+  isFiltered,
 }: ToolsDisplayProps) {
   return (
     <LayoutGroup>
@@ -28,6 +32,19 @@ export function ToolsDisplay({
         categoryCounts={categoryCounts}
         pricingCounts={pricingCounts}
       />
+      {isFiltered && filteredToolCount > 0 && (
+        <div className="text-sm text-neutral-700">
+          Showing{" "}
+          <span className="font-medium text-neutral-900">
+            {paginatedTools.length}{" "}
+          </span>
+          of{" "}
+          <span className="font-medium text-neutral-900">
+            {filteredToolCount}
+          </span>{" "}
+          app{filteredToolCount !== 1 ? "s" : ""} matching your filter criteria.
+        </div>
+      )}
       <ToolGrid tools={paginatedTools} />
       <ToolPagination totalPages={totalPages} />
     </LayoutGroup>

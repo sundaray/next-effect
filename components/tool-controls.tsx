@@ -43,7 +43,7 @@ export function ToolControls({
   return (
     <LayoutGroup>
       <ActiveFilters onClearAll={() => setShowFilters(false)} />
-      <div className="my-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
+      <div className="mt-8 mb-12 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
         <div className="space-y-1" ref={controlsRef}>
           <ToolSearch
             onFilterClick={() => setShowFilters(!showFilters)}

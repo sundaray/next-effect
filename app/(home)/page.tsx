@@ -14,7 +14,15 @@ const TOOLS_PER_PAGE = 40;
 export default async function HomePage({ searchParams }: HomePageProps) {
   const filters = await toolSearchParamsCache.parse(searchParams);
 
+  const isFiltered =
+    filters.search !== "" ||
+    filters.category.length > 0 ||
+    filters.pricing.length > 0 ||
+    filters.sort !== "latest";
+
   const allFilteredTools = await getTools(filters);
+
+  console.log("All filtered tools length: ", allFilteredTools.length);
 
   const categories = await getCategories(filters.search);
 
@@ -46,6 +54,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         pricingCounts={pricingCounts}
         paginatedTools={paginatedTools}
         totalPages={totalPages}
+        filteredToolCount={allFilteredTools.length}
+        isFiltered={isFiltered}
       />
     </div>
   );
