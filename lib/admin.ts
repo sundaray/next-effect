@@ -39,83 +39,66 @@ const app = new Hono<{
     const admin = ctx.get("user");
 
     const program = Effect.gen(function* () {
-      // const dbService = yield* DatabaseService;
-      // const [toolDetails] = yield* dbService.use((db) =>
-      //   db
-      //     .select({
-      //       name: tools.name,
-      //       slug: tools.slug,
-      //       submittedByEmail: users.email,
-      //     })
-      //     .from(tools)
-      //     .leftJoin(users, eq(tools.submittedBy, users.id))
-      //     .where(eq(tools.id, toolId))
-      //     .limit(1)
-      // );
-      // if (!toolDetails) return yield* Effect.fail(new ToolNotFoundError());
-      // if (!toolDetails.submittedByEmail)
-      //   return yield* Effect.fail(new SubmitterEmailNotFoundError());
-      // yield* dbService.use((db) =>
-      //   db
-      //     .update(tools)
-      //     .set({ adminApprovalStatus: "approved", approvedAt: new Date() })
-      //     .where(eq(tools.id, toolId))
-      // );
-      // yield* dbService.use((db) =>
-      //   db.insert(toolHistory).values({
-      //     toolId: toolId,
-      //     userId: admin!.id,
-      //     eventType: "approved",
-      //   })
-      // );
-      // yield* sendSubmissionUpdateEmail({
-      //   type: "approval",
-      //   to: toolDetails.submittedByEmail,
-      //   appName: toolDetails.name,
-      //   slug: toolDetails.slug,
-      // });
-      // return ctx.json({ success: true });
-
-      return yield* Effect.fail(
-        new ApprovalSimulationError({
-          message: "This is a simulated approval error from the server.",
+      const dbService = yield* DatabaseService;
+      const [toolDetails] = yield* dbService.use((db) =>
+        db
+          .select({
+            name: tools.name,
+            slug: tools.slug,
+            submittedByEmail: users.email,
+          })
+          .from(tools)
+          .leftJoin(users, eq(tools.submittedBy, users.id))
+          .where(eq(tools.id, toolId))
+          .limit(1)
+      );
+      if (!toolDetails) return yield* Effect.fail(new ToolNotFoundError());
+      if (!toolDetails.submittedByEmail)
+        return yield* Effect.fail(new SubmitterEmailNotFoundError());
+      yield* dbService.use((db) =>
+        db
+          .update(tools)
+          .set({ adminApprovalStatus: "approved", approvedAt: new Date() })
+          .where(eq(tools.id, toolId))
+      );
+      yield* dbService.use((db) =>
+        db.insert(toolHistory).values({
+          toolId: toolId,
+          userId: admin!.id,
+          eventType: "approved",
         })
       );
+      yield* sendSubmissionUpdateEmail({
+        type: "approval",
+        to: toolDetails.submittedByEmail,
+        appName: toolDetails.name,
+        slug: toolDetails.slug,
+      });
+      return ctx.json({ success: true });
     });
 
     const handledProgram = pipe(
       program,
-      // Effect.catchTag("ToolNotFoundError", () =>
-      //   Effect.succeed(
-      //     ctx.json(
-      //       {
-      //         _tag: "ToolNotFoundError",
-      //         message: "The submission could not be found. Please try again.",
-      //       },
-      //       { status: 404 }
-      //     )
-      //   )
-      // ),
-      // Effect.catchTag("SubmitterEmailNotFoundError", () =>
-      //   Effect.succeed(
-      //     ctx.json(
-      //       {
-      //         _tag: "SubmitterEmailNotFoundError",
-      //         message:
-      //           "Could not find the email of the user who submitted this app.",
-      //       },
-      //       { status: 404 }
-      //     )
-      //   )
-      // ),
-      Effect.catchTag("ApprovalSimulationError", (error) =>
+      Effect.catchTag("ToolNotFoundError", () =>
         Effect.succeed(
           ctx.json(
             {
-              _tag: "ApprovalSimulationError",
-              message: error.message,
+              _tag: "ToolNotFoundError",
+              message: "The submission could not be found. Please try again.",
             },
-            { status: 500 }
+            { status: 404 }
+          )
+        )
+      ),
+      Effect.catchTag("SubmitterEmailNotFoundError", () =>
+        Effect.succeed(
+          ctx.json(
+            {
+              _tag: "SubmitterEmailNotFoundError",
+              message:
+                "Could not find the email of the user who submitted this app.",
+            },
+            { status: 404 }
           )
         )
       ),
