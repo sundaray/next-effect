@@ -4,7 +4,6 @@ import type {
   TagGroupProps,
   TagListProps,
   TagProps,
-  LabelProps,
 } from "react-aria-components";
 import {
   TagGroup,
