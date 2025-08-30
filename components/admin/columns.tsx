@@ -1,9 +1,11 @@
+// components/admin/columns.tsx
+
 "use client";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, CheckCircle, XCircle } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { hc, parseResponse, DetailedError } from "hono/client";
 import type { ApiRoutes } from "@/app/api/[[...path]]/route";
 
@@ -51,11 +53,13 @@ function RowActions({ row }: { row: { original: Submission } }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
 
   function handleApprove() {
     if (!submission.submittedByEmail) return;
+    setError(null);
     startTransition(async () => {
       setError(null);
       try {
@@ -81,8 +85,8 @@ function RowActions({ row }: { row: { original: Submission } }) {
 
   function handleReject() {
     if (!reason.trim() || !submission.submittedByEmail) return;
+    setError(null);
     startTransition(async () => {
-      setError(null);
       try {
         await parseResponse(
           client.api.admin.submissions[":id"].reject.$post({
@@ -106,7 +110,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
@@ -123,9 +127,9 @@ function RowActions({ row }: { row: { original: Submission } }) {
               onSelect={() => {
                 setError(null);
                 setIsApproveDialogOpen(true);
+                setIsDropdownOpen(false);
               }}
             >
-              <CheckCircle className="mr-2 h-4 w-4" aria-hidden="true" />
               Approve
             </DropdownMenuItem>
           )}
@@ -137,9 +141,9 @@ function RowActions({ row }: { row: { original: Submission } }) {
                 setError(null);
                 setReason("");
                 setIsRejectDialogOpen(true);
+                setIsDropdownOpen(false);
               }}
             >
-              <XCircle className="mr-2 h-4 w-4" aria-hidden="true" />
               Reject
             </DropdownMenuItem>
           )}
@@ -152,7 +156,11 @@ function RowActions({ row }: { row: { original: Submission } }) {
         onOpenChange={setIsApproveDialogOpen}
       >
         <AlertDialogContent>
-          {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+          {error && (
+            <div className="text-sm text-red-600 rounded-md px-3 py-2 bg-red-100 border border-red-200">
+              <p>{error}</p>
+            </div>
+          )}
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Submission?</AlertDialogTitle>
             <AlertDialogDescription className="text-neutral-700">
@@ -166,16 +174,14 @@ function RowActions({ row }: { row: { original: Submission } }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               onClick={handleApprove}
               disabled={isPending}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isPending && (
-                <Icons.spinner className="mr-2 size-4 animate-spin" />
-              )}
+              {isPending && <Icons.spinner className="size-4 animate-spin" />}
               Approve
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -209,16 +215,14 @@ function RowActions({ row }: { row: { original: Submission } }) {
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               onClick={handleReject}
               disabled={isPending || !reason.trim()}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isPending && (
-                <Icons.spinner className="mr-2 size-4 animate-spin" />
-              )}
+              {isPending && <Icons.spinner className="size-4 animate-spin" />}
               Reject
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
