@@ -94,7 +94,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
             >
               {isPending ? (
                 <>
-                  <Icons.spinner className="size-4 inline-block" />
+                  <Icons.spinner className="size-4 inline-block animate-spin" />
                   <p className="text-sm">Signing out...</p>
                 </>
               ) : (

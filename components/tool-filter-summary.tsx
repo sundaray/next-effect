@@ -11,7 +11,7 @@ export function ToolFilterSummary({
   filteredToolCount,
   paginatedToolCount,
 }: ResultsCountProps) {
-  if (!isFiltered) {
+  if (!isFiltered || filteredToolCount === 0) {
     return null;
   }
 

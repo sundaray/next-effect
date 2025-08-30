@@ -24,7 +24,7 @@ export default async function DashboardPage() {
         <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
           My Submissions
         </h1>
-        <p className="text-neutral-700 mt-2">
+        <p className="text-neutral-700 mt-4">
           View the status of all your app submissions.
         </p>
       </div>

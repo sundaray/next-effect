@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 export default async function SignIn() {
   return (
     <div className="my-36 px-4 mx-auto max-w-[440px]">
-      <h2 className="text-center text-2xl font-semibold tracking-tight text-neutral-900">
+      <h2 className="text-center text-4xl font-bold tracking-tight text-neutral-900">
         Welcome
       </h2>
-      <p className="text-center text-neutral-700 mt-2">
+      <p className="text-center text-neutral-700 mt-4">
         Sign in to your account
       </p>
       <Suspense>
