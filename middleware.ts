@@ -3,7 +3,7 @@ import { getUser } from "@/lib/get-user";
 
 const guestOnlyPaths = ["/signin"];
 const adminOnlyPaths = ["/admin"];
-const protectedPaths = ["/submit"];
+const protectedPaths = ["/submit", "/dashboard"];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
