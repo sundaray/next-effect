@@ -1,5 +1,3 @@
-// components/admin/columns.tsx
-
 "use client";
 
 import { useState, useTransition } from "react";
@@ -23,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -57,6 +54,11 @@ function RowActions({ row }: { row: { original: Submission } }) {
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
 
+  /*************************************************
+   *
+   * Approval Handler
+   *
+   *************************************************/
   function handleApprove() {
     if (!submission.submittedByEmail) return;
     setError(null);
@@ -68,11 +70,9 @@ function RowActions({ row }: { row: { original: Submission } }) {
             param: { id: submission.id },
           })
         );
-        // Only close dialog on SUCCESS
         setIsApproveDialogOpen(false);
         router.refresh();
       } catch (err) {
-        // Dialog stays open, error message will be shown
         if (err instanceof DetailedError) {
           const { data } = await err.detail;
           setError(data.message);
@@ -82,6 +82,12 @@ function RowActions({ row }: { row: { original: Submission } }) {
       }
     });
   }
+
+  /*************************************************
+   *
+   * Rejection Handler
+   *
+   *************************************************/
 
   function handleReject() {
     if (!reason.trim() || !submission.submittedByEmail) return;
@@ -150,7 +156,11 @@ function RowActions({ row }: { row: { original: Submission } }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Approve Dialog */}
+      {/*************************************************
+       *
+       * Approve Dialog
+       *
+       *************************************************/}
       <AlertDialog
         open={isApproveDialogOpen}
         onOpenChange={setIsApproveDialogOpen}
@@ -179,14 +189,25 @@ function RowActions({ row }: { row: { original: Submission } }) {
               disabled={isPending}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isPending && <Icons.spinner className="size-4 animate-spin" />}
-              Approve
+              {isPending ? (
+                <>
+                  <Icons.spinner className="size-4 animate-spin" />
+                  Approving...
+                </>
+              ) : (
+                "Approve"
+              )}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Reject Dialog */}
+      {/*************************************************
+       *
+       * Reject Dialog
+       *
+       *************************************************/}
+
       <AlertDialog
         open={isRejectDialogOpen}
         onOpenChange={setIsRejectDialogOpen}
@@ -220,8 +241,14 @@ function RowActions({ row }: { row: { original: Submission } }) {
               disabled={isPending || !reason.trim()}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isPending && <Icons.spinner className="size-4 animate-spin" />}
-              Reject
+              {isPending ? (
+                <>
+                  <Icons.spinner className="size-4 animate-spin" />
+                  Rejecting...
+                </>
+              ) : (
+                "Reject"
+              )}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
