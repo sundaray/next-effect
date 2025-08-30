@@ -77,10 +77,24 @@ export function UserAccountNavClient({ user }: { user: User }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/dashboard">
-            <Icons.dashboard className="size-4 text-neutral-500" />
+            <Icons.dashboard
+              className="size-3 text-neutral-500"
+              aria-hidden="true"
+            />
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
+        {user?.role === "admin" && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin">
+              <Icons.lock
+                className="size-3 text-neutral-500"
+                aria-hidden="true"
+              />
+              <span>Admin</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <div className="px-2 py-1">
           <div className="flex w-full flex-col items-center">
