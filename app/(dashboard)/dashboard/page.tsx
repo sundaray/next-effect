@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 my-36 group">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-neutral-900">
+        <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
           My Submissions
         </h1>
         <p className="text-neutral-700 mt-2">

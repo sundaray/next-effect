@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -72,6 +74,13 @@ export function UserAccountNavClient({ user }: { user: User }) {
             )}
           </div>
         </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard">
+            <Icons.dashboard className="size-4 text-neutral-500" />
+            <span>Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <div className="px-2 py-1">
           <div className="flex w-full flex-col items-center">
