@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/get-user";
 import { getUserSubmissions } from "@/lib/get-user-submissions";
-import { columns } from "@/components/dashboard/columns";
+import { DashboardClient } from "@/components/dashboard/dashboard-client";
 import { DataTable } from "@/components/dashboard/data-table";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
         </p>
       </div>
       {submissions.length > 0 ? (
-        <DataTable columns={columns} data={submissions} />
+        <DashboardClient submissions={submissions} />
       ) : (
         <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-neutral-300 rounded-md">
           <p className="text-neutral-700">

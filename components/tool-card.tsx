@@ -56,7 +56,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
       </div>
 
       {/* Description */}
-      <p className="line-clamp-2 text-sm/6 text-neutral-700 mb-auto">
+      <p className="line-clamp-3 text-sm/6 text-neutral-700 mb-auto">
         {tool.tagline}
       </p>
 

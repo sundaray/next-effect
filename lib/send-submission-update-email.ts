@@ -4,32 +4,34 @@ import { Effect, Config, Data } from "effect";
 import { render } from "@react-email/render";
 import { EmailService } from "@/lib/services/email-service";
 import { SendEmailCommand, SendEmailCommandInput } from "@aws-sdk/client-ses";
-import { ensureAbsoluteUrl } from "./utils";
 
 // --- Email Templates ---
 
 function ApprovalEmailTemplate(appName: string, toolLink: string) {
   return `
     <p>Hi,</p>
-    <p>We're excited to let you know that your submission for <strong>${appName}</strong> has been reviewed and approved!</p>
+    <p>I'm excited to let you know that your submission for <strong>${appName}</strong> has been reviewed and approved!</p>
     <p>It is now live in our directory and visible to all users. You can view your listing here:</p>
     <a href="${toolLink}">${toolLink}</a>
     <p>Thank you for contributing to our community.</p>
-    <p>The IndieAITools Team</p>
+    <p>Hemanta Sundaray</p>
   `;
 }
 
-function RejectionEmailTemplate(appName: string, reason: string) {
-  const dashboardLink = ensureAbsoluteUrl("/dashboard");
+function RejectionEmailTemplate(
+  appName: string,
+  reason: string,
+  dashboardLink: string
+) {
   return `
     <p>Hi,</p>
-    <p>Thank you for your submission of <strong>${appName}</strong>. After reviewing your app, we are unable to approve it at this time.</p>
+    <p>Thank you for your submission of <strong>${appName}</strong>. After reviewing your app, I am unable to approve it at this time.</p>
     <p><strong>Reason for rejection:</strong></p>
     <p>${reason}</p>
     <p>Please review the feedback above, make the necessary changes, and feel free to resubmit your app through your dashboard.</p>
     <a href="${dashboardLink}">${dashboardLink}</a>
     <p>We look forward to seeing your updated submission.</p>
-    <p>The IndieAITools Team</p>
+    <p>Hemanta Sundaray</p>
   `;
 }
 
@@ -51,17 +53,23 @@ export function sendSubmissionUpdateEmail(params: SendEmailParams) {
   return Effect.gen(function* () {
     const emailService = yield* EmailService;
     const emailFrom = yield* Config.string("EMAIL_FROM");
+    const baseUrl = yield* Config.string("NEXT_PUBLIC_BASE_URL");
 
     let subject = "";
     let bodyHtml = "";
 
     if (params.type === "approval") {
       subject = `Congratulations! Your app ${params.appName} has been approved.`;
-      const toolLink = ensureAbsoluteUrl(`/tools/${params.slug}`);
+      const toolLink = `${baseUrl}/tools/${params.slug}`;
       bodyHtml = ApprovalEmailTemplate(params.appName, toolLink);
     } else {
       subject = `An update on your app submission for ${params.appName}`;
-      bodyHtml = RejectionEmailTemplate(params.appName, params.reason);
+      const dashboardLink = `${baseUrl}/dashboard`;
+      bodyHtml = RejectionEmailTemplate(
+        params.appName,
+        params.reason,
+        dashboardLink
+      );
     }
 
     const emailInput: SendEmailCommandInput = {
