@@ -119,7 +119,7 @@ const Toolbar = ({
 
 type RichTextEditorProps<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 > = {
   id: string;
   field: ControllerRenderProps<TFieldValues, TName>;
@@ -130,7 +130,7 @@ type RichTextEditorProps<
 
 export function RichTextEditor<
   TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues>,
 >({
   id,
   field,
@@ -146,6 +146,9 @@ export function RichTextEditor<
       StarterKit.configure({
         heading: {
           levels: [3],
+        },
+        link: {
+          autolink: false,
         },
       }),
     ],
