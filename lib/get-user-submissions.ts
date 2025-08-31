@@ -10,9 +10,7 @@ export async function getUserSubmissions(userId: string) {
   const program = Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
-    // 🔽 MODIFIED: The entire query is now in a single .use() call
     const submissions = yield* dbService.use(async (db) => {
-      // Step 1: Define the CTE (subquery) builder
       const latestRejection = db.$with("latest_rejection").as(
         db
           .select({
@@ -27,7 +25,6 @@ export async function getUserSubmissions(userId: string) {
           .where(eq(toolHistory.eventType, "rejected"))
       );
 
-      // Step 2: Use the CTE in the main query and execute it
       return await db
         .with(latestRejection)
         .select({

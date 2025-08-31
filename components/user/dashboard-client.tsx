@@ -1,8 +1,8 @@
 "use client";
 
-import { SubmissionColumns } from "@/components/dashboard/columns";
-import { DataTable } from "@/components/dashboard/data-table";
-import type { Submission } from "@/components/dashboard/columns";
+import { SubmissionColumns } from "@/components/user/columns";
+import { DataTable } from "@/components/user/data-table";
+import type { Submission } from "@/components/user/columns";
 
 interface DashboardClientProps {
   submissions: Submission[];

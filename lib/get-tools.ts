@@ -1,16 +1,23 @@
 import "server-only";
 
 import { Effect } from "effect";
-import { desc, and, ilike, inArray, arrayOverlaps, SQL } from "drizzle-orm";
+import { desc, and, ilike, inArray, arrayOverlaps, SQL, eq } from "drizzle-orm";
 import { DatabaseService } from "@/lib/services/database-service";
 import { serverRuntime } from "@/lib/server-runtime";
 import { tools } from "@/db/schema";
 import { unslugify } from "@/lib/utils";
 import type { ToolFilters } from "@/lib/tool-search-params";
 
-export async function getTools(filters: Partial<ToolFilters>) {
+export async function getTools(
+  filters: Partial<ToolFilters>,
+  userRole: string | null
+) {
   // This array will hold all the WHERE clauses for our final query
   const conditions: SQL[] = [];
+
+  if (userRole !== "admin") {
+    conditions.push(eq(tools.adminApprovalStatus, "approved"));
+  }
 
   const categories = filters.category ?? [];
   const pricing = filters.pricing ?? [];

@@ -1,8 +1,9 @@
 import { Effect, Config, Data } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
-import { tools } from "@/db/schema";
+import { tools, users } from "@/db/schema";
 import { saveToolPayload } from "@/lib/schema";
 import { slugify } from "@/lib/utils";
+import { eq, sql } from "drizzle-orm";
 
 class SaveToolError extends Data.TaggedError("SaveToolError")<{
   message: string;
@@ -23,28 +24,37 @@ export function saveTool(body: saveToolPayload, userId: string) {
 
     const result = yield* dbService
       .use((db) =>
-        db
-          .insert(tools)
-          .values({
-            name: body.name,
-            slug,
-            websiteUrl: body.websiteUrl,
-            tagline: body.tagline,
-            description: body.description,
-            // Create a new, mutable array from the readonly 'categories' array.
-            // Drizzle's 'insert' method expects a mutable 'string[]' to match the database schema,
-            categories: [...body.categories],
-            pricing: body.pricing,
-            logoUrl,
-            showcaseImageUrl,
-            adminApprovalStatus: "pending",
-            submittedBy: userId,
-          })
-          .returning({ id: tools.id })
+        db.transaction(async (tx) => {
+          const newTool = await tx
+            .insert(tools)
+            .values({
+              name: body.name,
+              slug,
+              websiteUrl: body.websiteUrl,
+              tagline: body.tagline,
+              description: body.description,
+              categories: [...body.categories],
+              pricing: body.pricing,
+              logoUrl,
+              showcaseImageUrl,
+              adminApprovalStatus: "pending",
+              submittedBy: userId,
+            })
+            .returning({ id: tools.id });
+
+          await tx
+            .update(users)
+            .set({
+              submissionCount: sql`${users.submissionCount} + 1`,
+            })
+            .where(eq(users.id, userId));
+
+          return newTool;
+        })
       )
       .pipe(
         Effect.tapError((error) =>
-          Effect.logError("Database error in saveTool: ", error)
+          Effect.logError("Database error in saveTool(): ", error)
         ),
         Effect.mapError(
           () =>

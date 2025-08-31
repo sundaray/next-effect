@@ -65,13 +65,13 @@ export const SubmissionColumns = () => {
             {isRejectedWithReason && (
               <Button
                 variant="link"
-                className="h-auto p-0 text-sky-600 text-sm"
+                className="h-auto p-0 text-sky-600 text-xs"
                 onClick={() => {
                   setSelectedSubmission(submission);
                   setDialogOpen(true);
                 }}
               >
-                Read reason
+                Read Reason
               </Button>
             )}
           </div>

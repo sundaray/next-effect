@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { cn, getStatusPillStyles } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 
@@ -40,6 +48,7 @@ export type Submission = {
   submittedAt: Date;
   status: "pending" | "approved" | "rejected";
   submittedByEmail: string | null;
+  rejectionReason: string | null;
 };
 
 // --- RowActions Component ---
@@ -54,16 +63,10 @@ function RowActions({ row }: { row: { original: Submission } }) {
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
 
-  /*************************************************
-   *
-   * Approval Handler
-   *
-   *************************************************/
   function handleApprove() {
     if (!submission.submittedByEmail) return;
     setError(null);
     startTransition(async () => {
-      setError(null);
       try {
         await parseResponse(
           client.api.admin.submissions[":id"].approve.$post({
@@ -82,12 +85,6 @@ function RowActions({ row }: { row: { original: Submission } }) {
       }
     });
   }
-
-  /*************************************************
-   *
-   * Rejection Handler
-   *
-   *************************************************/
 
   function handleReject() {
     if (!reason.trim() || !submission.submittedByEmail) return;
@@ -126,7 +123,6 @@ function RowActions({ row }: { row: { original: Submission } }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-
           {submission.status !== "approved" && (
             <DropdownMenuItem
               className="text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50"
@@ -139,7 +135,6 @@ function RowActions({ row }: { row: { original: Submission } }) {
               Approve
             </DropdownMenuItem>
           )}
-
           {submission.status !== "rejected" && (
             <DropdownMenuItem
               className="text-red-600 focus:text-red-600 focus:bg-red-50"
@@ -156,21 +151,12 @@ function RowActions({ row }: { row: { original: Submission } }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/*************************************************
-       *
-       * Approve Dialog
-       *
-       *************************************************/}
       <AlertDialog
         open={isApproveDialogOpen}
         onOpenChange={setIsApproveDialogOpen}
       >
         <AlertDialogContent>
-          {error && (
-            <div className="text-sm text-red-600 rounded-md px-3 py-2 bg-red-100 border border-red-200">
-              <p>{error}</p>
-            </div>
-          )}
+          {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Submission?</AlertDialogTitle>
             <AlertDialogDescription className="text-neutral-700">
@@ -191,7 +177,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
             >
               {isPending ? (
                 <>
-                  <Icons.spinner className="size-4 animate-spin" />
+                  <Icons.spinner className="mr-2 size-4 animate-spin" />
                   Approving...
                 </>
               ) : (
@@ -201,12 +187,6 @@ function RowActions({ row }: { row: { original: Submission } }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/*************************************************
-       *
-       * Reject Dialog
-       *
-       *************************************************/}
 
       <AlertDialog
         open={isRejectDialogOpen}
@@ -243,7 +223,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
             >
               {isPending ? (
                 <>
-                  <Icons.spinner className="size-4 animate-spin" />
+                  <Icons.spinner className="mr-2 size-4 animate-spin" />
                   Rejecting...
                 </>
               ) : (
@@ -257,38 +237,81 @@ function RowActions({ row }: { row: { original: Submission } }) {
   );
 }
 
-// --- Columns Definition ---
-export const columns: ColumnDef<Submission>[] = [
-  {
-    accessorKey: "name",
-    header: "App Name",
-  },
-  {
-    accessorKey: "submittedAt",
-    header: "Submission Date",
-    cell: ({ row }) =>
-      new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-        row.getValue("submittedAt")
-      ),
-  },
-  {
-    accessorKey: "submittedByEmail",
-    header: "Submitted By",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as Submission["status"];
-      return (
-        <Badge className={cn("capitalize", getStatusPillStyles(status))}>
-          {status}
-        </Badge>
-      );
+// --- Component to manage columns and dialog state ---
+export const AdminSubmissionColumns = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<Submission | null>(null);
+
+  const columns: ColumnDef<Submission>[] = [
+    {
+      accessorKey: "name",
+      header: "App Name",
     },
-  },
-  {
-    id: "actions",
-    cell: RowActions,
-  },
-];
+    {
+      accessorKey: "submittedAt",
+      header: "Submission Date",
+      cell: ({ row }) =>
+        new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
+          row.getValue("submittedAt")
+        ),
+    },
+    {
+      accessorKey: "submittedByEmail",
+      header: "Submitted By",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const submission = row.original;
+        const status = submission.status;
+        const isRejectedWithReason =
+          status === "rejected" && submission.rejectionReason;
+
+        return (
+          <div className="flex items-center gap-x-2">
+            <Badge className={cn("capitalize", getStatusPillStyles(status))}>
+              {status}
+            </Badge>
+            {isRejectedWithReason && (
+              <Button
+                variant="link"
+                className="h-auto p-0 text-sky-600 text-xs"
+                onClick={() => {
+                  setSelectedSubmission(submission);
+                  setDialogOpen(true);
+                }}
+              >
+                Read Reason
+              </Button>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      id: "actions",
+      cell: RowActions,
+    },
+  ];
+
+  const dialog = (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Rejection Reason for "{selectedSubmission?.name}"
+          </DialogTitle>
+          <ScrollArea className="max-h-64 mt-4 pr-6">
+            <DialogDescription className="text-neutral-700 text-base">
+              {selectedSubmission?.rejectionReason || "No reason was provided."}
+            </DialogDescription>
+          </ScrollArea>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+
+  return { columns, dialog };
+};

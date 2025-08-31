@@ -4,6 +4,8 @@ import type { SearchParams } from "nuqs/server";
 import { toolSearchParamsCache } from "@/lib/tool-search-params";
 import { ToolHero } from "@/components/tool-hero";
 import { ToolsDisplay } from "@/components/tools-display";
+import { headers } from "next/headers";
+import { getUser } from "@/lib/get-user";
 
 type HomePageProps = {
   searchParams: Promise<SearchParams>;
@@ -14,15 +16,17 @@ const TOOLS_PER_PAGE = 40;
 export default async function HomePage({ searchParams }: HomePageProps) {
   const filters = await toolSearchParamsCache.parse(searchParams);
 
+  const requestHeaders = await headers();
+  const user = await getUser(requestHeaders);
+  const userRole = user?.role ?? null;
+
   const isFiltered =
     filters.search !== "" ||
     filters.category.length > 0 ||
     filters.pricing.length > 0 ||
     filters.sort !== "latest";
 
-  const allFilteredTools = await getTools(filters);
-
-  console.log("All filtered tools length: ", allFilteredTools.length);
+  const allFilteredTools = await getTools(filters, userRole);
 
   const categories = await getCategories(filters.search);
 

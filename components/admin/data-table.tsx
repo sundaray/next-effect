@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/icons";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -89,24 +90,36 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+      {table.getPageCount() > 1 && (
+        <div className="flex items-center justify-between py-4">
+          <Button
+            variant="ghost"
+            size="default"
+            className="group/previous gap-1"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <Icons.arrowLeft
+              className="transition-transform group-hover/previous:-translate-x-1 text-neutral-500"
+              aria-hidden="true"
+            />
+            <span className="hidden sm:block">Previous</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="default"
+            className="group/next gap-1"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <span className="hidden sm:block">Next</span>
+            <Icons.arrowRight
+              className="transition-transform group-hover/next:translate-x-1 text-neutral-500"
+              aria-hidden="true"
+            />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

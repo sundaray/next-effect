@@ -1,6 +1,6 @@
 import "server-only";
 
-import { Effect, Data } from "effect";
+import { Effect } from "effect";
 import { sql } from "drizzle-orm";
 import { DatabaseService } from "@/lib/services/database-service";
 import { serverRuntime } from "@/lib/server-runtime";
