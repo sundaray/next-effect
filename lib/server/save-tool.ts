@@ -1,7 +1,7 @@
 import "server-only";
 import { Effect, Config, Data } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
-import { tools, users } from "@/db/schema";
+import { tools, users, toolHistory } from "@/db/schema";
 import { saveToolPayload } from "@/lib/schema";
 import { slugify } from "@/lib/utils";
 import { eq, sql } from "drizzle-orm";
@@ -62,24 +62,34 @@ export function saveTool(body: saveToolPayload, userId: string) {
         // Run the database update and S3 deletion in parallel
         const [updateResult] = yield* Effect.all([
           dbService
-            .use((db) =>
-              db
-                .update(tools)
-                .set({
-                  name: body.name,
-                  websiteUrl: body.websiteUrl,
-                  tagline: body.tagline,
-                  description: body.description,
-                  categories: [...body.categories],
-                  pricing: body.pricing,
-                  logoUrl,
-                  showcaseImageUrl,
-                  adminApprovalStatus: "pending",
-                  submittedAt: new Date(),
-                })
-                .where(eq(tools.id, existingTool.id))
-                .returning({ id: tools.id })
-            )
+            .use(async (db) => {
+              return await db.transaction(async (tx) => {
+                const updatedTool = await tx
+                  .update(tools)
+                  .set({
+                    name: body.name,
+                    websiteUrl: body.websiteUrl,
+                    tagline: body.tagline,
+                    description: body.description,
+                    categories: [...body.categories],
+                    pricing: body.pricing,
+                    logoUrl,
+                    showcaseImageUrl,
+                    adminApprovalStatus: "pending",
+                    submittedAt: new Date(),
+                  })
+                  .where(eq(tools.id, existingTool.id))
+                  .returning({ id: tools.id });
+
+                await tx.insert(toolHistory).values({
+                  toolId: existingTool.id,
+                  userId: userId,
+                  eventType: "updated",
+                });
+
+                return updatedTool;
+              });
+            })
             .pipe(
               Effect.tapError((error) =>
                 Effect.logError(
@@ -137,6 +147,12 @@ export function saveTool(body: saveToolPayload, userId: string) {
               submittedBy: userId,
             })
             .returning({ id: tools.id });
+
+          await tx.insert(toolHistory).values({
+            toolId: insertedTool[0].id,
+            userId: userId,
+            eventType: "submitted",
+          });
 
           await tx
             .update(users)
