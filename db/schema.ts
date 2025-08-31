@@ -16,6 +16,7 @@ export const adminApprovalStatusEnum = pgEnum("admin_approval_status", [
   "pending",
   "approved",
   "rejected",
+  "permanently_rejected",
 ]);
 
 export const toolHistoryEventEnum = pgEnum("tool_history_event", [

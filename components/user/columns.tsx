@@ -14,11 +14,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { adminApprovalStatusEnum } from "@/db/schema";
 
 export type Submission = {
   name: string;
   submittedAt: Date;
-  status: "pending" | "approved" | "rejected";
+  status: (typeof adminApprovalStatusEnum.enumValues)[number];
   rejectionReason: string | null;
 };
 

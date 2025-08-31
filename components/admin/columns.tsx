@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn, getStatusPillStyles } from "@/lib/utils";
 import { Icons } from "@/components/icons";
+import { adminApprovalStatusEnum } from "@/db/schema";
 
 const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
 
@@ -47,7 +48,7 @@ export type Submission = {
   name: string;
   slug: string;
   submittedAt: Date;
-  status: "pending" | "approved" | "rejected";
+  status: (typeof adminApprovalStatusEnum.enumValues)[number];
   submittedByEmail: string | null;
   rejectionReason: string | null;
 };

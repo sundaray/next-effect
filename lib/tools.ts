@@ -7,6 +7,7 @@ import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-im
 import { saveTool } from "@/lib/server/save-tool";
 import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
 import type { AuthType } from "@/lib/services/auth-service";
+import { checkForPermanentRejection } from "@/lib/check-for-permanent-rejection";
 
 class UserSessionNotFoundError extends Data.TaggedError(
   "UserSessionNotFoundError"
@@ -37,6 +38,8 @@ const app = new Hono<{
       const validatedToolSubmissionFormData =
         yield* validateToolSubmissionFormData(parseBody);
 
+      yield* checkForPermanentRejection(validatedToolSubmissionFormData.name);
+
       // Step 3: Generate presigned URLs for client-side file upload to S3.
       const {
         logoKey,
@@ -66,6 +69,14 @@ const app = new Hono<{
         const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
         return Effect.succeed(
           ctx.json({ _tag: "ParseError", issues }, { status: 400 })
+        );
+      }),
+      Effect.catchTag("ToolPermanentlyRejectedError", (error) => {
+        return Effect.succeed(
+          ctx.json(
+            { _tag: "ToolPermanentlyRejectedError", message: error.message },
+            { status: 403 }
+          )
         );
       }),
       Effect.catchAll(() => {

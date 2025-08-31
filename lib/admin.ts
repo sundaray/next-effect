@@ -5,7 +5,7 @@ import { serverRuntime } from "@/lib/server-runtime";
 import { DatabaseService } from "@/lib/services/database-service";
 import { tools, toolHistory, users } from "@/db/schema";
 import { sendSubmissionUpdateEmail } from "@/lib/send-submission-update-email";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { AuthType } from "@/lib/services/auth-service";
 import { zValidator } from "@hono/zod-validator";
 
@@ -159,7 +159,10 @@ const app = new Hono<{
         yield* dbService.use((db) =>
           db
             .update(tools)
-            .set({ adminApprovalStatus: "rejected" })
+            .set({
+              adminApprovalStatus: "rejected",
+              rejectionCount: sql`${tools.rejectionCount} + 1`,
+            })
             .where(eq(tools.id, toolId))
         );
         yield* dbService.use((db) =>

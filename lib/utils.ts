@@ -69,6 +69,8 @@ export const getStatusPillStyles = (
       return "border-amber-200 bg-amber-200 text-amber-900 rounded-full";
     case "rejected":
       return "border-red-200 bg-red-200 text-red-900 rounded-full";
+    case "permanently_rejected":
+      return "border-neutral-200 bg-neutral-200 text-neutral-900 rounded-full";
     default:
       return "border-neutral-200 bg-neutral-200 text-neutral-900 rounded-full";
   }
