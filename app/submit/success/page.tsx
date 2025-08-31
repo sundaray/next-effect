@@ -2,7 +2,7 @@ import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 export default function SubmitForReviewPage() {
   return (
-    <div className="max-w-xl mx-auto flex flex-col place-items-center text-center">
+    <div className="max-w-xl mx-auto flex flex-col place-items-center text-center my-36">
       <div>
         <CheckCircleIcon className="size-8 text-green-600" />
       </div>

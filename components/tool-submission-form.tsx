@@ -119,6 +119,9 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
           router.push(`/signin?${params.toString()}`);
         })
       ),
+      Effect.catchTag("ToolAlreadyExistsError", (error) =>
+        Effect.sync(() => setErrorMessage(error.message))
+      ),
       Effect.catchTag("InternalServerError", (error) =>
         Effect.sync(() => setErrorMessage(error.message))
       ),

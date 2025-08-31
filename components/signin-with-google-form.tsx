@@ -74,14 +74,14 @@ export function SignInWitjGoogleForm() {
 
   return (
     <div>
-      <FormMessage message={errorMessage} type="error" />
+      {errorMessage && <FormMessage message={errorMessage} type="error" />}
       <Button
         variant="ghost"
         onClick={handleSignInWithGoogle}
         disabled={isPending}
         className="w-full border border-neutral-300 h-10 hover:bg-white"
       >
-        <Icons.google className="mr-2 inline-block size-5" />
+        <Icons.google className="inline-block size-5" />
         Sign in with Google
       </Button>
     </div>

@@ -217,7 +217,7 @@ export function SignInWithEmailOtpForm() {
             className="grid"
           >
             {message && <FormMessage message={message} type={messageType} />}
-            <div className={message ? "mt-4" : ""}>
+            <div>
               <Label htmlFor="email">Email</Label>
               <Controller
                 name="email"

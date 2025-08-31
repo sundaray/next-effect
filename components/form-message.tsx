@@ -21,7 +21,7 @@ export function FormMessage({ message, type }: FormMessageProps) {
           }}
           layout
           className={cn(
-            "rounded-md px-3 py-2",
+            "rounded-md px-3 py-2 mb-4",
             type === "error" && "bg-red-100 border border-red-200",
             type === "success" && "bg-green-100 border border-green-200"
           )}

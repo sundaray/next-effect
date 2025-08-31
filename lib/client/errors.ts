@@ -29,3 +29,9 @@ export class SignInWithGoogleError extends Data.TaggedError(
 )<{
   message: string;
 }> {}
+
+export class ToolAlreadyExistsError extends Data.TaggedError(
+  "ToolAlreadyExistsError"
+)<{
+  message: string;
+}> {}

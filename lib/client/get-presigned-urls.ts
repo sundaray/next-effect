@@ -8,6 +8,7 @@ import {
   UserSessionNotFoundError,
   InternalServerError,
   NetworkError,
+  ToolAlreadyExistsError,
 } from "@/lib/client/errors";
 
 const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
@@ -18,7 +19,8 @@ type ApiErrorData =
       issues: { _tag: string; path: string[]; message: string }[];
     }
   | { _tag: "UserSessionNotFoundError"; message: string }
-  | { _tag: "InternalServerError"; message: string };
+  | { _tag: "InternalServerError"; message: string }
+  | { _tag: "ToolAlreadyExistsError"; message: string };
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled case: ${JSON.stringify(value)}`);
@@ -46,6 +48,8 @@ export function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
             return new ParseError({ issues: data.issues });
           case "InternalServerError":
             return new InternalServerError({ message: data.message });
+          case "ToolAlreadyExistsError":
+            return new ToolAlreadyExistsError({ message: data.message });
           default: {
             assertNever(tag);
           }
