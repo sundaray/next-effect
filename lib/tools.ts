@@ -7,7 +7,6 @@ import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-im
 import { saveTool } from "@/lib/server/save-tool";
 import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
 import type { AuthType } from "@/lib/services/auth-service";
-import { checkForDuplicateTool } from "@/lib/check-for-duplicate-tool";
 
 class UserSessionNotFoundError extends Data.TaggedError(
   "UserSessionNotFoundError"
@@ -37,8 +36,6 @@ const app = new Hono<{
       // Step 2: Validate the tool submission form data against the schema.
       const validatedToolSubmissionFormData =
         yield* validateToolSubmissionFormData(parseBody);
-
-      yield* checkForDuplicateTool(validatedToolSubmissionFormData.name);
 
       // Step 3: Generate presigned URLs for client-side file upload to S3.
       const {
@@ -71,14 +68,6 @@ const app = new Hono<{
           ctx.json({ _tag: "ParseError", issues }, { status: 400 })
         );
       }),
-      Effect.catchTag("ToolAlreadyExistsError", (error) =>
-        Effect.succeed(
-          ctx.json(
-            { _tag: "ToolAlreadyExistsError", message: error.message },
-            { status: 409 }
-          )
-        )
-      ),
       Effect.catchAll(() => {
         return Effect.succeed(
           ctx.json(
