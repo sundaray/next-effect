@@ -10,6 +10,18 @@ export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
   (format) => `image/${format.toLowerCase()}`
 );
 
+const ValidatedLogoFile = Schema.instanceOf(File).pipe(
+  Schema.filter((file) => file.size <= LOGO_MAX_SIZE_MB * 1024 * 1024, {
+    message: () => `Logo must be less than ${LOGO_MAX_SIZE_MB}MB`,
+  }),
+  Schema.filter((file) => SUPPORTED_MIME_TYPES.includes(file.type), {
+    message: () =>
+      `Invalid file type. Supported types are ${SUPPORTED_FILE_TYPES.join(
+        ", "
+      )}.`,
+  })
+);
+
 export const ToolSubmissionFormSchema = Schema.Struct({
   name: Schema.String.pipe(
     Schema.nonEmptyString({
@@ -68,7 +80,7 @@ export const ToolSubmissionFormSchema = Schema.Struct({
       override: true,
     }),
   }),
-  logo: Schema.optional(Schema.instanceOf(File)),
+  logo: Schema.optional(ValidatedLogoFile),
   showcaseImage: Schema.instanceOf(File)
     .annotations({ message: () => "Showcase image is required." })
     .pipe(
