@@ -15,9 +15,6 @@ export function ApprovalEmailTemplate({
     <EmailLayout
       previewText={`Your submission for ${appName} has been approved!`}
     >
-      <Heading className="text-2xl font-bold text-neutral-900">
-        Submission Approved!
-      </Heading>
       <Text className="text-base text-neutral-700">Hi,</Text>
       <Text className="text-base text-neutral-700">
         I'm excited to let you know that your submission for{" "}

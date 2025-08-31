@@ -1,5 +1,12 @@
 import React from "react";
-import { Html, Head, Preview, Body, Tailwind } from "@react-email/components";
+import {
+  Html,
+  Head,
+  Preview,
+  Body,
+  Tailwind,
+  Container,
+} from "@react-email/components";
 
 type EmailLayoutProps = {
   previewText: string;
@@ -9,13 +16,13 @@ type EmailLayoutProps = {
 export function EmailLayout({ previewText, children }: EmailLayoutProps) {
   return (
     <Html lang="en">
-      <Head />
-      <Preview>{previewText}</Preview>
       <Tailwind>
+        <Head />
+        <Preview>{previewText}</Preview>
         <Body className="bg-neutral-100 font-sans">
-          <div className="container mx-auto p-8 bg-white max-w-lg">
+          <Container className="p-8 bg-white my-8 max-w-lg">
             {children}
-          </div>
+          </Container>
         </Body>
       </Tailwind>
     </Html>
