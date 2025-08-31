@@ -7,10 +7,7 @@ import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-im
 import { saveTool } from "@/lib/server/save-tool";
 import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
 import type { AuthType } from "@/lib/services/auth-service";
-import {
-  checkForDuplicateTool,
-  ToolAlreadyExistsError,
-} from "@/lib/check-for-duplicate-tool";
+import { checkForDuplicateTool } from "@/lib/check-for-duplicate-tool";
 
 class UserSessionNotFoundError extends Data.TaggedError(
   "UserSessionNotFoundError"

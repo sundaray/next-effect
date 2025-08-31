@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ColumnDef } from "@tanstack/react-table";
@@ -247,6 +248,19 @@ export const AdminSubmissionColumns = () => {
     {
       accessorKey: "name",
       header: "App Name",
+      cell: ({ row }) => {
+        const submission = row.original;
+        return (
+          <Link
+            href={`/tools/${submission.slug}`}
+            className="font-medium text-sky-600 hover:underline hover:underline-offset-2"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {submission.name}
+          </Link>
+        );
+      },
     },
     {
       accessorKey: "submittedAt",

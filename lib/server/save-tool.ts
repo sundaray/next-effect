@@ -147,9 +147,6 @@ export function saveTool(body: saveToolPayload, userId: string) {
         })
       )
       .pipe(
-        Effect.tapError((error) =>
-          Effect.logError("Database error in saveTool transaction: ", error)
-        ),
         Effect.mapError(
           () =>
             new SaveToolError({
