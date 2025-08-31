@@ -6,10 +6,14 @@ import type { Submission } from "@/components/user/columns";
 
 interface DashboardClientProps {
   submissions: Submission[];
+  hasRejectedSubmissions: boolean;
 }
 
-export function DashboardClient({ submissions }: DashboardClientProps) {
-  const { columns, dialog } = SubmissionColumns();
+export function DashboardClient({
+  submissions,
+  hasRejectedSubmissions,
+}: DashboardClientProps) {
+  const { columns, dialog } = SubmissionColumns(hasRejectedSubmissions);
 
   return (
     <>

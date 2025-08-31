@@ -21,9 +21,10 @@ export type Submission = {
   submittedAt: Date;
   status: (typeof adminApprovalStatusEnum.enumValues)[number];
   rejectionReason: string | null;
+  rejectionCount: number;
 };
 
-export const SubmissionColumns = () => {
+export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] =
     useState<Submission | null>(null);
@@ -80,6 +81,25 @@ export const SubmissionColumns = () => {
       },
     },
   ];
+
+  if (hasRejectedSubmissions) {
+    columns.push({
+      id: "resubmissionAttempts",
+      header: "Resubmission Attempts Left",
+      cell: ({ row }) => {
+        const submission = row.original;
+        if (submission.status === "approved") {
+          return <span className="text-neutral-500">N/A</span>;
+        }
+        const REJECTION_LIMIT = 3;
+        const remaining = REJECTION_LIMIT - submission.rejectionCount;
+
+        if (remaining < 0) return 0;
+
+        return <span className=" text-neutral-900">{remaining}</span>;
+      },
+    });
+  }
 
   return {
     columns,

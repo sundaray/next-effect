@@ -6,7 +6,7 @@ import { DashboardClient } from "@/components/user/dashboard-client";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { SUBMISSION_LIMIT } from "@/config/limit";
+import { APP_SUBMISSION_LIMIT } from "@/config/limit";
 
 export default async function DashboardPage() {
   const requestHeaders = await headers();
@@ -19,16 +19,21 @@ export default async function DashboardPage() {
   const submissions = await getUserSubmissions(user.id);
 
   const submissionCount = user.submissionCount || 0;
-  const remainingSubmissions = SUBMISSION_LIMIT - submissionCount;
+  const remainingSubmissions = APP_SUBMISSION_LIMIT - submissionCount;
 
-  let submissionMessage = "";
+  let submissionMessage = `Currently, all users are allowed a maximum of ${APP_SUBMISSION_LIMIT} app submissions. `;
+
   if (remainingSubmissions > 1) {
-    submissionMessage = `You can make ${remainingSubmissions} more app submissions.`;
+    submissionMessage += `You have ${remainingSubmissions} submissions remaining.`;
   } else if (remainingSubmissions === 1) {
-    submissionMessage = `You can make 1 more app submission.`;
+    submissionMessage += `You have 1 submission remaining.`;
   } else {
-    submissionMessage = `You have reached your submission limit of ${SUBMISSION_LIMIT} apps.`;
+    submissionMessage += `You have reached your submission limit.`;
   }
+
+  const hasRejectedSubmissions = submissions.some(
+    (submission) => submission.status === "rejected"
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-4 my-36 group">
@@ -42,10 +47,22 @@ export default async function DashboardPage() {
       </div>
       {submissions.length > 0 ? (
         <>
-          <div className="mb-4 p-3 text-sm text-sky-800 bg-sky-100 border border-sky-200 rounded-md">
+          <div className="text-sm text-sky-900 bg-sky-100 border border-sky-200 px-3 py-1.5 mb-4 rounded-md text-pretty">
             {submissionMessage}
           </div>
-          <DashboardClient submissions={submissions} />
+          <DashboardClient
+            submissions={submissions}
+            hasRejectedSubmissions={hasRejectedSubmissions}
+          />
+          {hasRejectedSubmissions && (
+            <p className="mt-4 text-sm text-neutral-700 text-pretty">
+              <span className="font-semibold text-neutral-900">
+                * Resubmission Policy:{" "}
+              </span>
+              A rejected app can be resubmitted up to 2 times. After the second
+              unsuccessful resubmission, the app will be permanently rejected.
+            </p>
+          )}
         </>
       ) : (
         <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-neutral-300 rounded-md">

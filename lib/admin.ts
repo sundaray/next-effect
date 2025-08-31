@@ -10,6 +10,7 @@ import { sendPermanentRejectionEmail } from "@/lib/emails/send-permanent-rejecti
 import { eq, sql } from "drizzle-orm";
 import type { AuthType } from "@/lib/services/auth-service";
 import { zValidator } from "@hono/zod-validator";
+import { APP_RESUBMISSION_LIMIT } from "@/config/limit";
 
 const rejectSchema = z.object({
   reason: z.string().min(1, { message: "Reason for rejection is required." }),
@@ -133,7 +134,8 @@ const app = new Hono<{
         if (!toolDetails.submittedByEmail)
           return yield* Effect.fail(new SubmitterEmailNotFoundError());
 
-        const isFinalRejection = toolDetails.rejectionCount >= 3;
+        const isFinalRejection =
+          toolDetails.rejectionCount >= APP_RESUBMISSION_LIMIT;
 
         if (isFinalRejection) {
           // Permanently reject the tool

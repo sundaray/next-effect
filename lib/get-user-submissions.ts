@@ -31,6 +31,7 @@ export async function getUserSubmissions(userId: string) {
           name: tools.name,
           submittedAt: tools.submittedAt,
           status: tools.adminApprovalStatus,
+          rejectionCount: tools.rejectionCount,
           rejectionReason: sql<string | null>`${latestRejection.reason}`.as(
             "rejection_reason"
           ),
