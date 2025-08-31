@@ -60,7 +60,11 @@ export const ToolSubmissionFormSchema = Schema.Struct({
   description: Schema.String.pipe(
     Schema.nonEmptyString({ message: () => "Description is required." }),
     Schema.filter(
-      (text) => text.trim().split(/\s+/).filter(Boolean).length <= 500,
+      (html) => {
+        const plainText = html.replace(/<[^>]*>/g, " ");
+        const wordCount = plainText.trim().split(/\s+/).filter(Boolean).length;
+        return wordCount <= 500;
+      },
       {
         message: () => "Description must be 500 words or fewer.",
       }
