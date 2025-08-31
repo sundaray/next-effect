@@ -21,6 +21,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { MAX_CATEGORIES_PER_TOOL } from "@/config/limit";
 
 type CategoryInputProps<
   TFieldValues extends FieldValues,
@@ -49,7 +50,8 @@ export function CategoryInput<
   const fieldError = fieldState.error;
 
   const selectedCategories = (field.value || []) as string[];
-  const reachedMaxCategories = selectedCategories.length >= 3;
+  const reachedMaxCategories =
+    selectedCategories.length >= MAX_CATEGORIES_PER_TOOL;
 
   const isDisabled = disabled || reachedMaxCategories;
 

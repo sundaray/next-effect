@@ -282,7 +282,8 @@ export const AdminSubmissionColumns = () => {
         const submission = row.original;
         const status = submission.status;
         const isRejectedWithReason =
-          status === "rejected" && submission.rejectionReason;
+          (status === "rejected" || status === "permanently_rejected") &&
+          submission.rejectionReason;
 
         return (
           <div className="flex items-center gap-x-2">

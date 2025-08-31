@@ -3,7 +3,7 @@ import { getCategories } from "@/lib/get-categories";
 import { getUser } from "@/lib/get-user";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { SUBMISSION_LIMIT } from "@/config/limit";
+import { APP_SUBMISSION_LIMIT } from "@/config/limit";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -14,14 +14,14 @@ export default async function Submit() {
 
   const categories = await getCategories("");
 
-  if (submissionCount >= SUBMISSION_LIMIT) {
+  if (submissionCount >= APP_SUBMISSION_LIMIT) {
     return (
       <div className="max-w-xl mx-auto px-4 my-36 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
           Submission Limit Reached
         </h1>
         <p className=" text-neutral-700 mt-4">
-          You have already submitted {SUBMISSION_LIMIT} apps, which is the
+          You have already submitted {APP_SUBMISSION_LIMIT} apps, which is the
           maximum allowed.
         </p>
         <Link

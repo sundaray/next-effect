@@ -15,6 +15,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { adminApprovalStatusEnum } from "@/db/schema";
+import { APP_RESUBMISSION_LIMIT } from "@/config/limit";
 
 export type Submission = {
   name: string;
@@ -52,7 +53,8 @@ export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
         const submission = row.original;
         const status = submission.status;
         const isRejectedWithReason =
-          status === "rejected" && submission.rejectionReason;
+          (status === "rejected" || status === "permanently_rejected") &&
+          submission.rejectionReason;
 
         return (
           <div className="flex items-center gap-x-2">
@@ -91,8 +93,7 @@ export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
         if (submission.status === "approved") {
           return <span className="text-neutral-500">N/A</span>;
         }
-        const REJECTION_LIMIT = 3;
-        const remaining = REJECTION_LIMIT - submission.rejectionCount;
+        const remaining = APP_RESUBMISSION_LIMIT - submission.rejectionCount;
 
         if (remaining < 0) return 0;
 

@@ -6,7 +6,7 @@ import { DashboardClient } from "@/components/user/dashboard-client";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { APP_SUBMISSION_LIMIT } from "@/config/limit";
+import { APP_SUBMISSION_LIMIT, APP_RESUBMISSION_LIMIT } from "@/config/limit";
 
 export default async function DashboardPage() {
   const requestHeaders = await headers();
@@ -59,8 +59,9 @@ export default async function DashboardPage() {
               <span className="font-semibold text-neutral-900">
                 * Resubmission Policy:{" "}
               </span>
-              A rejected app can be resubmitted up to 2 times. After the second
-              unsuccessful resubmission, the app will be permanently rejected.
+              A rejected app can be resubmitted up to {APP_RESUBMISSION_LIMIT}{" "}
+              times. After the second unsuccessful resubmission, the app will be
+              permanently rejected.
             </p>
           )}
         </>
