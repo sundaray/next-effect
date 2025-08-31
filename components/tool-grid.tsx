@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface ToolGridProps {
   tools: Tool[];
+  isFiltered: boolean;
 }
 
 const gridVariants = {
@@ -15,7 +16,7 @@ const gridVariants = {
   exit: { opacity: 0, y: 4 },
 };
 
-export function ToolGrid({ tools }: ToolGridProps) {
+export function ToolGrid({ tools, isFiltered }: ToolGridProps) {
   const hasTools = tools.length > 0;
 
   if (!hasTools) {
@@ -30,9 +31,11 @@ export function ToolGrid({ tools }: ToolGridProps) {
           animate="visible"
           exit="exit"
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="text-neutral-700 text-sm text-center my-12"
+          className="text-neutral-700 text-sm text-center my-12 text-pretty"
         >
-          No apps found matching your filter criteria.
+          {isFiltered
+            ? "No apps found matching your filter criteria."
+            : "No apps have been approved yet. Check back soon!"}
         </motion.p>
       </AnimatePresence>
     );

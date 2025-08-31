@@ -26,6 +26,7 @@ const app = new Hono<{
   // -----------------------------------------------
   .post("/presigned-url", async (ctx) => {
     const body = await ctx.req.parseBody();
+    const user = ctx.get("user");
 
     const parseBody = {
       ...body,
@@ -34,11 +35,21 @@ const app = new Hono<{
     } as ToolSubmissionFormSchemaType;
 
     const program = Effect.gen(function* () {
+      if (!user)
+        return yield* Effect.fail(
+          new UserSessionNotFoundError({
+            message: "No active user session found.",
+          })
+        );
+
       // Step 2: Validate the tool submission form data against the schema.
       const validatedToolSubmissionFormData =
         yield* validateToolSubmissionFormData(parseBody);
 
-      yield* checkForPermanentRejection(validatedToolSubmissionFormData.name);
+      yield* checkForPermanentRejection(
+        validatedToolSubmissionFormData.name,
+        user.id
+      );
 
       // Step 3: Generate presigned URLs for client-side file upload to S3.
       const {

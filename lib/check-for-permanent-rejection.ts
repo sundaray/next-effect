@@ -2,7 +2,7 @@ import "server-only";
 import { Effect, Data } from "effect";
 import { DatabaseService } from "@/lib/services/database-service";
 import { slugify } from "@/lib/utils";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { tools } from "@/db/schema";
 
 export class ToolPermanentlyRejectedError extends Data.TaggedError(
@@ -11,14 +11,14 @@ export class ToolPermanentlyRejectedError extends Data.TaggedError(
   message: string;
 }> {}
 
-export function checkForPermanentRejection(toolName: string) {
+export function checkForPermanentRejection(toolName: string, userId: string) {
   return Effect.gen(function* () {
     const dbService = yield* DatabaseService;
     const slug = slugify(toolName);
 
     const existingTool = yield* dbService.use((db) =>
       db.query.tools.findFirst({
-        where: eq(tools.slug, slug),
+        where: and(eq(tools.slug, slug), eq(tools.submittedBy, userId)),
       })
     );
 

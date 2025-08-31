@@ -38,7 +38,7 @@ export function ToolsDisplay({
         filteredToolCount={filteredToolCount}
         paginatedToolCount={paginatedTools.length}
       />
-      <ToolGrid tools={paginatedTools} />
+      <ToolGrid tools={paginatedTools} isFiltered={isFiltered} />
       <ToolPagination totalPages={totalPages} />
     </LayoutGroup>
   );

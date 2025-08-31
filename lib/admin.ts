@@ -4,7 +4,9 @@ import { Effect, Data, pipe } from "effect";
 import { serverRuntime } from "@/lib/server-runtime";
 import { DatabaseService } from "@/lib/services/database-service";
 import { tools, toolHistory, users } from "@/db/schema";
-import { sendSubmissionUpdateEmail } from "@/lib/send-submission-update-email";
+import { sendApprovalEmail } from "@/lib/emails/send-approval-email";
+import { sendRejectionEmail } from "@/lib/emails/send-rejection-email";
+import { sendPermanentRejectionEmail } from "@/lib/emails/send-permanent-rejection-email";
 import { eq, sql } from "drizzle-orm";
 import type { AuthType } from "@/lib/services/auth-service";
 import { zValidator } from "@hono/zod-validator";
@@ -17,12 +19,6 @@ class ToolNotFoundError extends Data.TaggedError("ToolNotFoundError") {}
 class SubmitterEmailNotFoundError extends Data.TaggedError(
   "SubmitterEmailNotFoundError"
 ) {}
-
-class ApprovalSimulationError extends Data.TaggedError(
-  "ApprovalSimulationError"
-)<{
-  message: string;
-}> {}
 
 const app = new Hono<{
   Variables: AuthType;
@@ -58,7 +54,11 @@ const app = new Hono<{
       yield* dbService.use((db) =>
         db
           .update(tools)
-          .set({ adminApprovalStatus: "approved", approvedAt: new Date() })
+          .set({
+            adminApprovalStatus: "approved",
+            approvedAt: new Date(),
+            rejectionCount: 0,
+          })
           .where(eq(tools.id, toolId))
       );
       yield* dbService.use((db) =>
@@ -68,8 +68,7 @@ const app = new Hono<{
           eventType: "approved",
         })
       );
-      yield* sendSubmissionUpdateEmail({
-        type: "approval",
+      yield* sendApprovalEmail({
         to: toolDetails.submittedByEmail,
         appName: toolDetails.name,
         slug: toolDetails.slug,
@@ -79,29 +78,6 @@ const app = new Hono<{
 
     const handledProgram = pipe(
       program,
-      Effect.catchTag("ToolNotFoundError", () =>
-        Effect.succeed(
-          ctx.json(
-            {
-              _tag: "ToolNotFoundError",
-              message: "The submission could not be found. Please try again.",
-            },
-            { status: 404 }
-          )
-        )
-      ),
-      Effect.catchTag("SubmitterEmailNotFoundError", () =>
-        Effect.succeed(
-          ctx.json(
-            {
-              _tag: "SubmitterEmailNotFoundError",
-              message:
-                "Could not find the email of the user who submitted this app.",
-            },
-            { status: 404 }
-          )
-        )
-      ),
       Effect.catchAll(() =>
         Effect.succeed(
           ctx.json(
@@ -145,6 +121,7 @@ const app = new Hono<{
             .select({
               name: tools.name,
               submittedByEmail: users.email,
+              rejectionCount: tools.rejectionCount,
             })
             .from(tools)
             .leftJoin(users, eq(tools.submittedBy, users.id))
@@ -156,15 +133,40 @@ const app = new Hono<{
         if (!toolDetails.submittedByEmail)
           return yield* Effect.fail(new SubmitterEmailNotFoundError());
 
-        yield* dbService.use((db) =>
-          db
-            .update(tools)
-            .set({
-              adminApprovalStatus: "rejected",
-              rejectionCount: sql`${tools.rejectionCount} + 1`,
-            })
-            .where(eq(tools.id, toolId))
-        );
+        const isFinalRejection = toolDetails.rejectionCount >= 3;
+
+        if (isFinalRejection) {
+          // Permanently reject the tool
+          yield* dbService.use((db) =>
+            db
+              .update(tools)
+              .set({ adminApprovalStatus: "permanently_rejected" })
+              .where(eq(tools.id, toolId))
+          );
+          // Send the permanent rejection email
+          yield* sendPermanentRejectionEmail({
+            to: toolDetails.submittedByEmail,
+            appName: toolDetails.name,
+            reason: reason,
+          });
+        } else {
+          // Normal rejection: increment count and set status
+          yield* dbService.use((db) =>
+            db
+              .update(tools)
+              .set({
+                adminApprovalStatus: "rejected",
+                rejectionCount: sql`${tools.rejectionCount} + 1`,
+              })
+              .where(eq(tools.id, toolId))
+          );
+          // Send the standard rejection email
+          yield* sendRejectionEmail({
+            to: toolDetails.submittedByEmail,
+            appName: toolDetails.name,
+            reason: reason,
+          });
+        }
         yield* dbService.use((db) =>
           db.insert(toolHistory).values({
             toolId: toolId,
@@ -173,40 +175,11 @@ const app = new Hono<{
             reason: reason,
           })
         );
-        yield* sendSubmissionUpdateEmail({
-          type: "rejection",
-          to: toolDetails.submittedByEmail,
-          appName: toolDetails.name,
-          reason: reason,
-        });
 
         return ctx.json({ success: true });
       });
       const handledProgram = pipe(
         program,
-        Effect.catchTag("ToolNotFoundError", () =>
-          Effect.succeed(
-            ctx.json(
-              {
-                _tag: "ToolNotFoundError",
-                message: "The submission could not be found. Please try again.",
-              },
-              { status: 404 }
-            )
-          )
-        ),
-        Effect.catchTag("SubmitterEmailNotFoundError", () =>
-          Effect.succeed(
-            ctx.json(
-              {
-                _tag: "SubmitterEmailNotFoundError",
-                message:
-                  "Could not find the email of the user who submitted this app.",
-              },
-              { status: 404 }
-            )
-          )
-        ),
         Effect.catchAll(() =>
           Effect.succeed(
             ctx.json(
