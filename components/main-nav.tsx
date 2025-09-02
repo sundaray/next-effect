@@ -1,15 +1,19 @@
 import React from "react";
 import Link from "next/link";
+import { headers } from "next/headers";
 import { NavItem } from "@/components/nav-item";
-// import { MobileNav } from "@/components/mobile-nav";
+import { MobileNav } from "@/components/mobile-nav";
 import { UserAccountNav } from "@/components/user-account-nav";
 import type { NavItem as NavItemType } from "@/types/navigation";
+import { getUser } from "@/lib/get-user";
 
 type MainNavProps = {
   items: NavItemType[];
 };
 
-export function MainNav({ items }: MainNavProps) {
+export async function MainNav({ items }: MainNavProps) {
+  const requestHeaders = await headers();
+  const user = await getUser(requestHeaders);
   return (
     <div className="fixed inset-x-0 top-0 z-50 mx-auto flex h-20 max-w-6xl items-center justify-between px-4 bg-neutral-50">
       <Link
@@ -28,7 +32,7 @@ export function MainNav({ items }: MainNavProps) {
           ))}
         </ul>
       </nav>
-      {/* <MobileNav /> */}
+      <MobileNav user={user} />
       <UserAccountNav />
     </div>
   );
