@@ -5,6 +5,7 @@ import { MainNav } from "@/components/main-nav";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import NextTopLoader from "nextjs-toploader";
 import { RouterProvider } from "@/components/router-provider";
+import { Footer } from "@/components/footer";
 
 import "./globals.css";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
             <NuqsAdapter>{children}</NuqsAdapter>
           </RouterProvider>
         </main>
+        <Footer />
       </body>
     </html>
   );
