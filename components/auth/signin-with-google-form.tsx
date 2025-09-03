@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Effect, pipe } from "effect";
 import { Icons } from "@/components/icons";
-import { FormMessage } from "@/components/form-message";
+import { FormMessage } from "@/components/forms/form-message";
 import { signIn } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
 import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";

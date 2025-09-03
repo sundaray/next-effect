@@ -2,7 +2,7 @@ import { getTools } from "@/lib/get-tools";
 import { getCategories } from "@/lib/get-categories";
 import type { SearchParams } from "nuqs/server";
 import { toolSearchParamsCache } from "@/lib/tool-search-params";
-import { ToolHero } from "@/components/tool-hero";
+import { ToolHero } from "@/components/tools/tool-hero";
 import { ToolsDisplay } from "@/components/tools-display";
 import { headers } from "next/headers";
 import { getUser } from "@/lib/get-user";

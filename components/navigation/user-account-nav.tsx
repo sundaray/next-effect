@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { getUser } from "@/lib/get-user";
-import { UserAccountNavClient } from "@/components/user-account-nav-client";
+import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

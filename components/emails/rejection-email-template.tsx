@@ -5,6 +5,7 @@ import { EmailLayout } from "@/components/emails/email-layout";
 type RejectionEmailProps = {
   appName: string;
   reason: string;
+  dashboardLink: string;
 };
 
 export function RejectionEmailTemplate({

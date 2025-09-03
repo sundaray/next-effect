@@ -8,8 +8,8 @@ import { createSafeHtml } from "@/lib/create-safe-html";
 import { getWebPVariantUrl } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 import { ensureAbsoluteUrl } from "@/lib/utils";
-import { ToolCategories } from "@/components/tool-categories";
-import { ToolBreadcrumb } from "@/components/tool-breadcrumb";
+import { ToolCategories } from "@/components/tools/tool-categories";
+import { ToolBreadcrumb } from "@/components/tools/tool-breadcrumb";
 import { unslugify } from "@/lib/utils";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {

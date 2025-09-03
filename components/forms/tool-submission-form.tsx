@@ -11,9 +11,9 @@ import {
   pricingOptions,
 } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
-import { FormMessage } from "@/components/form-message";
-import { FormField } from "@/components/form-field";
-import { CategoryInput } from "@/components/category-input";
+import { FormMessage } from "@/components/forms/form-message";
+import { FormField } from "@/components/forms/form-field";
+import { CategoryInput } from "@/components/forms/category-input";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import {
   Select,
@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DropzoneInput } from "@/components/dropzone-input";
+import { DropzoneInput } from "@/components/forms/dropzone-input";
 import {
   LOGO_MAX_SIZE_MB,
   SCREENSHOT_MAX_SIZE_MB,

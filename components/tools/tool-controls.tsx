@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, LayoutGroup } from "motion/react";
-import { ToolSearch } from "@/components/tool-search";
-import { ToolSort } from "@/components/tool-sort";
-import { ToolFilter } from "@/components/tool-filter";
+import { ToolSearch } from "@/components/tools/tool-search";
+import { ToolSort } from "@/components/tools/tool-sort";
+import { ToolFilter } from "@/components/tools/tool-filter";
 import { ActiveFilters } from "@/components/active-filters";
 
 interface ToolControlsProps {

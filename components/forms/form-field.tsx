@@ -9,7 +9,7 @@ import {
 } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { FormFieldMessage } from "@/components/form-field-message";
+import { FormFieldMessage } from "@/components/forms/form-field-message";
 import { countWords, getFieldErrorId } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 

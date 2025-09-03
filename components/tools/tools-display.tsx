@@ -2,10 +2,10 @@
 
 import { LayoutGroup } from "motion/react";
 import type { Tool } from "@/db/schema";
-import { ToolControls } from "@/components/tool-controls";
-import { ToolFilterSummary } from "@/components/tool-filter-summary";
-import { ToolGrid } from "@/components/tool-grid";
-import { ToolPagination } from "@/components/tool-pagination";
+import { ToolControls } from "@/components/tools/tool-controls";
+import { ToolFilterSummary } from "@/components/tools/tool-filter-summary";
+import { ToolGrid } from "@/components/tools/tool-grid";
+import { ToolPagination } from "@/components/tools/tool-pagination";
 
 interface ToolsDisplayProps {
   allCategories: string[];

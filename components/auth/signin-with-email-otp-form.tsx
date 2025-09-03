@@ -10,8 +10,8 @@ import { motion, MotionConfig, AnimatePresence } from "motion/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FormMessage } from "@/components/form-message";
-import { FormFieldMessage } from "@/components/form-field-message";
+import { FormMessage } from "@/components/forms/form-message";
+import { FormFieldMessage } from "@/components/forms/form-field-message";
 import {
   InputOTP,
   InputOTPGroup,

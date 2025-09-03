@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, MotionConfig, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { navbarLinks } from "@/config/navbar";
-import { UserAccountNavClient } from "@/components/user-account-nav-client";
+import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
 import type { User } from "@/lib/services/auth-service";
 
 // ============================================================================
