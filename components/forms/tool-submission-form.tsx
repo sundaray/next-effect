@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/forms/form-message";
 import { FormField } from "@/components/forms/form-field";
 import { CategoryInput } from "@/components/forms/category-input";
-import { RichTextEditor } from "@/components/rich-text-editor";
+import { RichTextEditor } from "@/components/forms/rich-text-editor";
 import {
   Select,
   SelectContent,
@@ -45,7 +45,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
 
   const { control, handleSubmit, reset, setError, clearErrors } =
     useForm<ToolSubmissionFormSchemaType>({
-      // resolver: effectTsResolver(ToolSubmissionFormSchema),
+      resolver: effectTsResolver(ToolSubmissionFormSchema),
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
