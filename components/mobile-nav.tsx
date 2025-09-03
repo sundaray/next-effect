@@ -62,31 +62,35 @@ function MenuIcon({
         initial={false}
         animate={isOpen ? "open" : "closed"}
         onClick={onToggle}
-        className="relative z-50 [@media(pointer:fine)]:p-0 p-4"
+        className="relative z-50 flex size-8 items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
-        <div className="relative size-6">
-          <motion.div
-            variants={{
-              closed: { y: "-50%", top: "25%", rotate: 0 },
-              open: { y: "-50%", top: "50%", rotate: 45 },
-            }}
-            className="absolute h-[1.5px] w-full rounded-full bg-neutral-600"
-          />
-          <motion.div
-            variants={{
-              closed: { opacity: 1 },
-              open: { opacity: 0 },
-            }}
-            className="absolute top-1/2 h-[1.5px] w-full -translate-y-1/2 rounded-full bg-neutral-600"
-          />
-          <motion.div
-            variants={{
-              closed: { y: "50%", bottom: "25%", rotate: 0 },
-              open: { y: "50%", bottom: "50%", rotate: -45 },
-            }}
-            className="absolute h-[1.5px] w-full rounded-full bg-neutral-600"
-          />
+        <div className="relative flex size-4.5 items-center justify-center rounded-full">
+          <span className="absolute -inset-2 [@media(pointer:fine)]:hidden" />
+
+          <div className="relative size-full">
+            <motion.div
+              variants={{
+                closed: { y: "-50%", top: "25%", rotate: 0 },
+                open: { y: "-50%", top: "50%", rotate: 45 },
+              }}
+              className="absolute h-[1.5px] w-full rounded-full bg-neutral-700"
+            />
+            <motion.div
+              variants={{
+                closed: { opacity: 1 },
+                open: { opacity: 0 },
+              }}
+              className="absolute top-1/2 h-[1.5px] w-full -translate-y-1/2 rounded-full bg-neutral-700"
+            />
+            <motion.div
+              variants={{
+                closed: { y: "50%", bottom: "25%", rotate: 0 },
+                open: { y: "50%", bottom: "50%", rotate: -45 },
+              }}
+              className="absolute h-[1.5px] w-full rounded-full bg-neutral-700"
+            />
+          </div>
         </div>
       </motion.button>
     </MotionConfig>
@@ -149,7 +153,7 @@ function MenuDrawer({
           <Link
             href="/signin"
             onClick={onLinkClick}
-            className="flex w-full items-center justify-center rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-900/90"
+            className="flex w-full items-center justify-center rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-900/90"
           >
             Sign In
           </Link>

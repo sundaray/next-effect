@@ -6,7 +6,7 @@ import { useState, useId } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { motion, AnimatePresence } from "motion/react";
+import { motion, MotionConfig, AnimatePresence } from "motion/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -202,153 +202,151 @@ export function SignInWithEmailOtpForm() {
 
   return (
     <div>
-      <AnimatePresence mode="wait" initial={false}>
-        {step === "email" ? (
-          <motion.form
-            key="email-step"
-            initial={{ opacity: 0, y: 5, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: "auto" }}
-            exit={{ opacity: 0, y: -5, height: 0 }}
-            transition={{
-              ease: "easeOut",
-              duration: 0.2,
-            }}
-            onSubmit={handleSubmit(handleSendOtp)}
-            className="grid"
-          >
-            {message && <FormMessage message={message} type={messageType} />}
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id="email"
-                    type="email"
-                    className="mt-2 border-neutral-300"
-                    placeholder="john@gmail.com"
-                    disabled={isProcessing}
-                    aria-invalid={errors.email ? "true" : "false"}
-                    aria-describedby={errors.email ? fieldErrorId : undefined}
-                  />
-                )}
-              />
-              <FormFieldMessage
-                errorId={fieldErrorId}
-                errorMessage={errors.email?.message}
-              />
-            </div>
-
-            <Button type="submit" disabled={isProcessing} className="h-10 mt-2">
-              {isProcessing ? (
-                <>
-                  <Icons.spinner className="size-4 inline-block animate-spin" />
-                  Sending OTP...
-                </>
-              ) : (
-                "Send OTP"
-              )}
-            </Button>
-          </motion.form>
-        ) : (
-          <motion.form
-            key="otp-step"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{
-              ease: "easeInOut",
-              duration: 0.2,
-            }}
-            className="grid"
-          >
-            {message && <FormMessage message={message} type={messageType} />}
-
-            <div className={message ? "mt-4" : ""}>
-              <Label htmlFor="otp">OTP</Label>
-              <div className="mt-2 grid">
-                <InputOTP
-                  maxLength={6}
-                  value={otp}
-                  onChange={handleOtpChange}
-                  disabled={isProcessing}
-                  onComplete={handleVerifyOtp}
-                  containerClassName="w-full"
-                  aria-invalid={otpErrorMessage ? "true" : "false"}
-                  aria-describedby={otpErrorMessage ? otpErrorId : undefined}
-                >
-                  <InputOTPGroup className="w-full">
-                    <InputOTPSlot
-                      index={0}
-                      className="w-full border-neutral-300"
+      <MotionConfig transition={{ ease: "easeOut", duration: 0.15 }}>
+        <AnimatePresence mode="wait" initial={false}>
+          {step === "email" ? (
+            <motion.form
+              key="email-step"
+              initial={{ opacity: 0, y: 5, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, y: -5, height: 0 }}
+              onSubmit={handleSubmit(handleSendOtp)}
+              className="grid"
+            >
+              {message && <FormMessage message={message} type={messageType} />}
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="email"
+                      type="email"
+                      className="mt-2 border-neutral-300"
+                      placeholder="john@gmail.com"
+                      disabled={isProcessing}
+                      aria-invalid={errors.email ? "true" : "false"}
+                      aria-describedby={errors.email ? fieldErrorId : undefined}
                     />
-                    <InputOTPSlot
-                      index={1}
-                      className="w-full border-neutral-300"
-                    />
-                    <InputOTPSlot
-                      index={2}
-                      className="w-full border-neutral-300"
-                    />
-                    <InputOTPSlot
-                      index={3}
-                      className="w-full border-neutral-300"
-                    />
-                    <InputOTPSlot
-                      index={4}
-                      className="w-full border-neutral-300"
-                    />
-                    <InputOTPSlot
-                      index={5}
-                      className="w-full border-neutral-300"
-                    />
-                  </InputOTPGroup>
-                </InputOTP>
-                <div className="text-left">
-                  {otpErrorMessage ? (
-                    <FormFieldMessage
-                      errorId={otpErrorId}
-                      errorMessage={otpErrorMessage}
-                    />
-                  ) : (
-                    <p className="text-sm text-neutral-500 mt-1">
-                      Enter the 6-digit OTP sent to your email.
-                    </p>
                   )}
+                />
+                <FormFieldMessage
+                  errorId={fieldErrorId}
+                  errorMessage={errors.email?.message}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isProcessing}
+                className="h-10 mt-2"
+              >
+                {isProcessing ? (
+                  <>
+                    <Icons.spinner className="size-4 inline-block animate-spin" />
+                    Sending OTP...
+                  </>
+                ) : (
+                  "Send OTP"
+                )}
+              </Button>
+            </motion.form>
+          ) : (
+            <motion.form
+              key="otp-step"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="grid"
+            >
+              {message && <FormMessage message={message} type={messageType} />}
+
+              <div className={message ? "mt-4" : ""}>
+                <Label htmlFor="otp">OTP</Label>
+                <div className="mt-2 grid">
+                  <InputOTP
+                    maxLength={6}
+                    value={otp}
+                    onChange={handleOtpChange}
+                    disabled={isProcessing}
+                    onComplete={handleVerifyOtp}
+                    containerClassName="w-full"
+                    aria-invalid={otpErrorMessage ? "true" : "false"}
+                    aria-describedby={otpErrorMessage ? otpErrorId : undefined}
+                  >
+                    <InputOTPGroup className="w-full">
+                      <InputOTPSlot
+                        index={0}
+                        className="w-full border-neutral-300"
+                      />
+                      <InputOTPSlot
+                        index={1}
+                        className="w-full border-neutral-300"
+                      />
+                      <InputOTPSlot
+                        index={2}
+                        className="w-full border-neutral-300"
+                      />
+                      <InputOTPSlot
+                        index={3}
+                        className="w-full border-neutral-300"
+                      />
+                      <InputOTPSlot
+                        index={4}
+                        className="w-full border-neutral-300"
+                      />
+                      <InputOTPSlot
+                        index={5}
+                        className="w-full border-neutral-300"
+                      />
+                    </InputOTPGroup>
+                  </InputOTP>
+                  <div className="text-left">
+                    {otpErrorMessage ? (
+                      <FormFieldMessage
+                        errorId={otpErrorId}
+                        errorMessage={otpErrorMessage}
+                      />
+                    ) : (
+                      <p className="text-sm text-neutral-500 mt-1">
+                        Enter the 6-digit OTP sent to your email.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <Button
-              type="button"
-              onClick={handleVerifyOtp}
-              disabled={isProcessing || otp.length !== 6}
-              className="h-10 mt-4"
-            >
-              {isProcessing ? (
-                <>
-                  <Icons.spinner className="size-4 inline-block animate-spin" />
-                  Verifying OTP...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
+              <Button
+                type="button"
+                onClick={handleVerifyOtp}
+                disabled={isProcessing || otp.length !== 6}
+                className="h-10 mt-4"
+              >
+                {isProcessing ? (
+                  <>
+                    <Icons.spinner className="size-4 inline-block animate-spin" />
+                    Verifying OTP...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleBackToEmail}
-              disabled={isProcessing}
-              className="h-10 mt-2"
-            >
-              Back to Email
-            </Button>
-          </motion.form>
-        )}
-      </AnimatePresence>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleBackToEmail}
+                disabled={isProcessing}
+                className="h-10 mt-2"
+              >
+                Back to Email
+              </Button>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </MotionConfig>
     </div>
   );
 }
