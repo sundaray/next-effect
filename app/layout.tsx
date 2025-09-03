@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { navbarLinks } from "@/config/navbar";
-import { MainNav } from "@/components/main-nav";
+import { MainNav } from "@/components/navigation/main-nav";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import NextTopLoader from "nextjs-toploader";
 import { RouterProvider } from "@/components/router-provider";

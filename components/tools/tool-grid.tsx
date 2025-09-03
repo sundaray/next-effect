@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import type { Tool } from "@/db/schema";
-import { ToolCard } from "@/components/tool-card";
+import { ToolCard } from "@/components/tools/tool-card";
 import { cn } from "@/lib/utils";
 
 interface ToolGridProps {

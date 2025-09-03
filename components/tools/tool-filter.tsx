@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { MultiSelectCommand } from "@/components/multi-select-command";
+import { MultiSelectCommand } from "@/components/forms/multi-select-command";
 import { pricingOptions } from "@/lib/schema";
 import { useToolFilters } from "@/hooks/use-tool-filters";
 import { slugify } from "@/lib/utils";

@@ -1,4 +1,4 @@
-import { ToolSubmissionForm } from "@/components/tool-submission-form";
+import { ToolSubmissionForm } from "@/components/forms/tool-submission-form";
 import { getCategories } from "@/lib/get-categories";
 import { getUser } from "@/lib/get-user";
 import { headers } from "next/headers";

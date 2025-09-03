@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { SignInWitjGoogleForm } from "@/components/signin-with-google-form";
-import { SignInWithEmailOtpForm } from "@/components/signin-with-email-otp-form";
+import { SignInWitjGoogleForm } from "@/components/auth/signin-with-google-form";
+import { SignInWithEmailOtpForm } from "@/components/auth/signin-with-email-otp-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

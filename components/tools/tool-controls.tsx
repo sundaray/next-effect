@@ -5,7 +5,7 @@ import { AnimatePresence, LayoutGroup } from "motion/react";
 import { ToolSearch } from "@/components/tools/tool-search";
 import { ToolSort } from "@/components/tools/tool-sort";
 import { ToolFilter } from "@/components/tools/tool-filter";
-import { ActiveFilters } from "@/components/active-filters";
+import { ActiveFilters } from "@/components/tools/active-filters";
 
 interface ToolControlsProps {
   allCategories: string[];

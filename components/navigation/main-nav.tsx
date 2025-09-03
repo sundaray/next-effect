@@ -1,9 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { headers } from "next/headers";
-import { NavItem } from "@/components/nav-item";
-import { MobileNav } from "@/components/mobile-nav";
-import { UserAccountNav } from "@/components/user-account-nav";
+import { NavItem } from "@/components/navigation/nav-item";
+import { MobileNav } from "@/components/navigation/mobile-nav";
+import { UserAccountNav } from "@/components/navigation/user-account-nav";
 import type { NavItem as NavItemType } from "@/types/navigation";
 import { getUser } from "@/lib/get-user";
 
