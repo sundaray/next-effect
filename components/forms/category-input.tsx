@@ -99,7 +99,7 @@ export function CategoryInput<
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  transition={{ duration: 0.15, ease: "easeInOut" }}
                   className="flex items-center gap-x-2 rounded-full bg-neutral-200 px-2 py-1 border"
                 >
                   <span className="text-xs text-neutral-700 font-semibold">

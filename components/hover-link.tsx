@@ -27,7 +27,7 @@ export function HoverLink({ href, children, className }: HoverLinkProps) {
         className={cn(
           "ml-1 size-5",
           "opacity-0",
-          "transition-all duration-200 ease-in-out",
+          "transition-all duration-150 ease-out",
           "group-hover:opacity-100",
           "group-hover:translate-x-0.5"
         )}

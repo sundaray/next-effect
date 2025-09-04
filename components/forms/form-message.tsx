@@ -17,7 +17,7 @@ export function FormMessage({ message, type }: FormMessageProps) {
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{
             ease: "easeOut",
-            duration: 0.2,
+            duration: 0.15,
           }}
           layout
           className={cn(

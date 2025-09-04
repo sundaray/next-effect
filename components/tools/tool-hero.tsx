@@ -21,6 +21,10 @@ export function ToolHero() {
         <h1 className="text-4xl tracking-tight font-bold text-neutral-900">
           Discover AI Apps For Every Possible Industry & Use Case
         </h1>
+        <p className="mt-4 text-lg text-neutral-700 text-pretty">
+          A curated directory of AI tools for every use case. Submit your app
+          for free, find new users, and boost your SEO with a backlink.
+        </p>
       </div>
     </div>
   );

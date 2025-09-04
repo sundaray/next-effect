@@ -136,7 +136,7 @@ export function DropzoneInput<
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
             className="flex items-center justify-between rounded-md border bg-neutral-200 p-2"
           >
             {" "}
