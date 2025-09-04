@@ -10,11 +10,11 @@
 //
 // -----------------------------------------------
 
-import { createMiddleware } from "hono/factory";
-import type { Next, Context } from "hono";
-import { Effect, pipe, Option } from "effect";
-import { AuthService, AuthType } from "@/lib/services/auth-service";
 import { serverRuntime } from "@/lib/server-runtime";
+import { AuthService, AuthType } from "@/lib/services/auth-service";
+import { Effect, Option, pipe } from "effect";
+import type { Context, Next } from "hono";
+import { createMiddleware } from "hono/factory";
 
 type MiddlewareContext = Context<{
   Variables: AuthType;
@@ -26,8 +26,8 @@ export async function loadSessionHandler(ctx: MiddlewareContext, next: Next) {
 
     const sessionOption = yield* Effect.option(
       Effect.tryPromise(() =>
-        auth.api.getSession({ headers: ctx.req.raw.headers })
-      )
+        auth.api.getSession({ headers: ctx.req.raw.headers }),
+      ),
     );
 
     const session = sessionOption.pipe(Option.flatMap(Option.fromNullable));
@@ -51,10 +51,10 @@ export async function loadSessionHandler(ctx: MiddlewareContext, next: Next) {
               ctx.set("user", null);
               ctx.set("session", null);
             }),
-        })
-      )
+        }),
+      ),
     ),
-    Effect.flatMap(() => Effect.promise(() => next()))
+    Effect.flatMap(() => Effect.promise(() => next())),
   );
 
   return await serverRuntime.runPromise(handledProgram);

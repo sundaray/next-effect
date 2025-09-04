@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Html } from "@react-email/html";
 import { Tailwind } from "@react-email/tailwind";
 import { Text } from "@react-email/text";
@@ -12,7 +10,7 @@ export function EmailOtpTemplate(otp: string) {
         <Text className="text-base font-medium text-neutral-700">
           Use the following OTP to complete your sign-in:
         </Text>
-        <Text className="text-2xl font-bold text-neutral-900 tracking-wider">
+        <Text className="text-2xl font-bold tracking-wider text-neutral-900">
           {otp}
         </Text>
         <Text className="text-base font-medium text-neutral-700">

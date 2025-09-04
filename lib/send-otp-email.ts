@@ -1,13 +1,13 @@
 import "server-only";
 
-import { Effect, Config, Data } from "effect";
-import { render } from "@react-email/render";
-import { EmailService } from "@/lib/services/email-service";
 import { EmailOtpTemplate } from "@/components/email-otp-template";
+import { EmailService } from "@/lib/services/email-service";
 import { SendEmailCommand, SendEmailCommandInput } from "@aws-sdk/client-ses";
+import { render } from "@react-email/render";
+import { Config, Data, Effect } from "effect";
 
 class EmailTemplateRenderError extends Data.TaggedError(
-  "EmailTemplateRenderError"
+  "EmailTemplateRenderError",
 )<{ operation: string; cause: unknown }> {}
 
 export function sendSignInOtpEmail(email: string, otp: string) {
@@ -49,10 +49,10 @@ export function sendSignInOtpEmail(email: string, otp: string) {
   }).pipe(
     Effect.tapErrorTag("ConfigError", (error) => Effect.logError(error)),
     Effect.tapErrorTag("EmailError", (error) =>
-      Effect.logError({ error, operation: "sendSignInOtpEmail" })
+      Effect.logError({ error, operation: "sendSignInOtpEmail" }),
     ),
     Effect.tapErrorTag("EmailTemplateRenderError", (error) =>
-      Effect.logError(error)
-    )
+      Effect.logError(error),
+    ),
   );
 }

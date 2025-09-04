@@ -1,12 +1,12 @@
-import "server-only";
-import { Effect, Config, Data } from "effect";
 import { StorageService } from "@/lib/services/storage-service";
-import sharp from "sharp";
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
-  DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { Config, Data, Effect } from "effect";
+import "server-only";
+import sharp from "sharp";
 
 const breakpoints = {
   sm: 640,
@@ -38,7 +38,7 @@ class WebPConversionError extends Data.TaggedError("WebPConversionError")<{
 }> {}
 
 class ImageStreamToByteArrayConversionError extends Data.TaggedError(
-  "ImageStreamToByteArrayConversionError"
+  "ImageStreamToByteArrayConversionError",
 )<{
   cause: unknown;
   message: string;
@@ -51,7 +51,7 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
 
     const showcaseImageKeyWithoutExtension = showcaseImageKey.substring(
       0,
-      showcaseImageKey.lastIndexOf(".")
+      showcaseImageKey.lastIndexOf("."),
     );
 
     // Step 1: Download the original homepage screenshot file from S3.
@@ -61,12 +61,12 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
           new GetObjectCommand({
             Bucket: bucketName,
             Key: showcaseImageKey,
-          })
-        )
+          }),
+        ),
       )
       .pipe(
         Effect.tapErrorTag("StorageError", (error) =>
-          Effect.logError("S3ImageDownloadError:", error)
+          Effect.logError("S3ImageDownloadError:", error),
         ),
         Effect.mapError(
           (error) =>
@@ -74,8 +74,8 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
               cause: error,
               message:
                 "Failed to download the original showcase image file from S3.",
-            })
-        )
+            }),
+        ),
       );
 
     // Step 2: Convert the homepage screenshot image stream to a byte array.
@@ -83,7 +83,7 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
       try: () => showcaseImageFile.Body!.transformToByteArray(),
       catch: (error) => {
         Effect.runSync(
-          Effect.logError("ImageStreamToByteArrayConversionError: ", error)
+          Effect.logError("ImageStreamToByteArrayConversionError: ", error),
         );
         return new ImageStreamToByteArrayConversionError({
           message:
@@ -100,7 +100,7 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
     // Step 3: Helper to create a WebP variant.
     const createWebPVariantEffect = (
       width?: breakpointsWidthInPixels,
-      quality: number = 85
+      quality: number = 85,
     ) => {
       return Effect.tryPromise({
         try: () =>
@@ -149,12 +149,12 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
               Key: key,
               Body: body,
               ContentType: "image/webp",
-            })
-          )
+            }),
+          ),
         )
         .pipe(
           Effect.tapErrorTag("StorageError", (error) =>
-            Effect.logError("S3ImageUploadError:", error)
+            Effect.logError("S3ImageUploadError:", error),
           ),
           Effect.mapError(
             (error) =>
@@ -162,8 +162,8 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
                 cause: error,
                 message:
                   "Failed to upload the homepage screenshot WebP variant to S3.",
-              })
-          )
+              }),
+          ),
         );
     };
 
@@ -176,10 +176,10 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
         uploadToS3(`${showcaseImageKeyWithoutExtension}-xl.webp`, xlWebPImage),
         uploadToS3(
           `${showcaseImageKeyWithoutExtension}-original.webp`,
-          originalWebPImage
+          originalWebPImage,
         ),
       ],
-      { concurrency: 5 }
+      { concurrency: 5 },
     );
 
     // Step 7: Delete the original homepage screenshot file from S3.
@@ -189,12 +189,12 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
           new DeleteObjectCommand({
             Bucket: bucketName,
             Key: showcaseImageKey,
-          })
-        )
+          }),
+        ),
       )
       .pipe(
         Effect.tapErrorTag("StorageError", (error) =>
-          Effect.logError("S3ImageDeletionError:", error)
+          Effect.logError("S3ImageDeletionError:", error),
         ),
         Effect.mapError(
           (error) =>
@@ -202,8 +202,8 @@ export function createShowcaseImageWebPVariants(showcaseImageKey: string) {
               cause: error,
               message:
                 "Failed to delete the original showcase image file from S3.",
-            })
-        )
+            }),
+        ),
       );
   });
 }

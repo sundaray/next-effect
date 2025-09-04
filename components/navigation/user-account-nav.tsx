@@ -1,10 +1,9 @@
-import React from "react";
-import Link from "next/link";
-import { headers } from "next/headers";
-import { getUser } from "@/lib/get-user";
 import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
 import { buttonVariants } from "@/components/ui/button";
+import { getUser } from "@/lib/get-user";
 import { cn } from "@/lib/utils";
+import { headers } from "next/headers";
+import Link from "next/link";
 
 export async function UserAccountNav() {
   const requestHeaders = await headers();

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandEmpty,
@@ -10,8 +10,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 interface MultiSelectOption {
   value: string;
@@ -57,13 +57,13 @@ export function MultiSelectCommand({
                   key={option.value}
                   value={option.value}
                   onSelect={() => handleToggle(option.value)}
-                  className="cursor-pointer flex justify-between"
+                  className="flex cursor-pointer justify-between"
                 >
                   <div className="flex">
                     <Checkbox
                       id={`select-${option.value}`}
                       checked={isSelected}
-                      className="mr-2 pointer-events-none"
+                      className="pointer-events-none mr-2"
                     />
                     <Label className="font-normal">{option.label}</Label>
                   </div>

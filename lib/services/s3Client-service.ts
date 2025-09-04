@@ -1,6 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import { Config, Effect } from "effect";
 import { awsCredentialsProvider } from "@vercel/functions/oidc";
+import { Config, Effect } from "effect";
 
 export class S3ClientService extends Effect.Service<S3ClientService>()(
   "S3ClientService",
@@ -18,5 +18,5 @@ export class S3ClientService extends Effect.Service<S3ClientService>()(
         }),
       });
     }),
-  }
+  },
 ) {}

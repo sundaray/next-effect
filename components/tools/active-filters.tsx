@@ -1,12 +1,12 @@
 "use client";
 
-import { useToolFilters } from "@/hooks/use-tool-filters";
-import { toolSortOptions } from "@/config/tool-options";
 import { Icons } from "@/components/icons";
-import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { MyTagGroup, MyTag } from "@/components/ui/tag";
+import { MyTag, MyTagGroup } from "@/components/ui/tag";
+import { toolSortOptions } from "@/config/tool-options";
+import { useToolFilters } from "@/hooks/use-tool-filters";
 import { unslugify } from "@/lib/utils";
+import { AnimatePresence, motion } from "motion/react";
 import { Key } from "react";
 
 export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
@@ -73,7 +73,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
       acc[filter.group].push({ id: key, label: filter.label });
       return acc;
     },
-    {} as Record<string, { id: string; label: string }[]>
+    {} as Record<string, { id: string; label: string }[]>,
   );
 
   return (
@@ -84,9 +84,9 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="flex items-center justify-between gap-4 flex-wrap"
+          className="flex flex-wrap items-center justify-between gap-4"
         >
-          <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {Object.entries(groupedFilters).map(([groupLabel, items]) => (
               <MyTagGroup
                 key={groupLabel}
@@ -104,7 +104,7 @@ export function ActiveFilters({ onClearAll }: { onClearAll: () => void }) {
           {totalActiveFilters > 1 && (
             <Button
               onClick={handleClearAll}
-              className="shrink-0 cursor-pointer rounded-full bg-transparent border border-neutral-300 hover:bg-neutral-200 text-neutral-700 font-semibold transition-colors px-3 py-1.5 gap-x-2"
+              className="shrink-0 cursor-pointer gap-x-2 rounded-full border border-neutral-300 bg-transparent px-3 py-1.5 font-semibold text-neutral-700 transition-colors hover:bg-neutral-200"
             >
               <Icons.x className="size-4 text-neutral-500" aria-hidden="true" />
               Clear all

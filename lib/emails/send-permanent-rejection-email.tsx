@@ -1,13 +1,12 @@
-import "server-only";
-import React from "react";
-import { Effect, Config, Data } from "effect";
-import { render } from "@react-email/render";
+import { PermanentRejectionEmailTemplate } from "@/components/emails/permanent-rejection-email-template";
 import { EmailService } from "@/lib/services/email-service";
 import { SendEmailCommand, SendEmailCommandInput } from "@aws-sdk/client-ses";
-import { PermanentRejectionEmailTemplate } from "@/components/emails/permanent-rejection-email-template";
+import { render } from "@react-email/render";
+import { Config, Data, Effect } from "effect";
+import "server-only";
 
 class EmailTemplateRenderError extends Data.TaggedError(
-  "EmailTemplateRenderError"
+  "EmailTemplateRenderError",
 )<{ cause: unknown }> {}
 
 type SendPermanentRejectionEmailParams = {
@@ -17,7 +16,7 @@ type SendPermanentRejectionEmailParams = {
 };
 
 export function sendPermanentRejectionEmail(
-  params: SendPermanentRejectionEmailParams
+  params: SendPermanentRejectionEmailParams,
 ) {
   return Effect.gen(function* () {
     const emailService = yield* EmailService;
@@ -29,7 +28,7 @@ export function sendPermanentRejectionEmail(
           <PermanentRejectionEmailTemplate
             appName={params.appName}
             reason={params.reason}
-          />
+          />,
         ),
       catch: (error) => new EmailTemplateRenderError({ cause: error }),
     });

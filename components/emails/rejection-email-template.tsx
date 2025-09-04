@@ -1,6 +1,5 @@
-import React from "react";
-import { Text, Section } from "@react-email/components";
 import { EmailLayout } from "@/components/emails/email-layout";
+import { Section, Text } from "@react-email/components";
 
 type RejectionEmailProps = {
   appName: string;
@@ -23,7 +22,7 @@ export function RejectionEmailTemplate({
         following reason:
       </Text>
       <Section
-        className="my-4 text-base bg-neutral-100 p-4"
+        className="my-4 bg-neutral-100 p-4 text-base"
         style={{ borderLeft: "4px solid #a3a3a3" }}
       >
         {reason}

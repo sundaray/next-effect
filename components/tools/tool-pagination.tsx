@@ -11,9 +11,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { cn } from "@/lib/utils";
-import { calculatePaginationRange } from "@/lib/calculate-pagination-range";
 import { useToolFilters } from "@/hooks/use-tool-filters";
+import { calculatePaginationRange } from "@/lib/calculate-pagination-range";
+import { cn } from "@/lib/utils";
 
 const SIBLING_COUNT = 1; // Number of pages to show on each side of the current page
 
@@ -30,7 +30,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
   // Use the extracted pagination range calculation
   const paginationRange = useMemo(
     () => calculatePaginationRange(currentPage, totalPages, SIBLING_COUNT),
-    [currentPage, totalPages]
+    [currentPage, totalPages],
   );
 
   // Don't render if only one page
@@ -55,7 +55,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
             tabIndex={isFirstPage ? -1 : undefined}
             className={cn(
               "bg-transparent hover:bg-transparent",
-              isFirstPage && "pointer-events-none opacity-50"
+              isFirstPage && "pointer-events-none opacity-50",
             )}
             onClick={() => setFilters({ page: currentPage - 1 })}
           />
@@ -79,8 +79,8 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
             <PaginationItem key={pageNumber}>
               <PaginationLink
                 href="#"
-              isActive={isActive}
-                className={cn("text-neutral-900 border-neutral-300")}
+                isActive={isActive}
+                className={cn("border-neutral-300 text-neutral-900")}
                 onClick={() => setFilters({ page: pageNumber })}
               >
                 {pageNumber}
@@ -97,7 +97,7 @@ export function ToolPagination({ totalPages, className }: ToolPaginationProps) {
             tabIndex={isLastPage ? -1 : undefined}
             className={cn(
               "bg-transparent hover:bg-transparent",
-              isLastPage && "pointer-events-none opacity-50"
+              isLastPage && "pointer-events-none opacity-50",
             )}
             onClick={() => setFilters({ page: currentPage + 1 })}
           />

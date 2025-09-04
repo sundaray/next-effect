@@ -1,7 +1,7 @@
-import "server-only";
-import { Effect, Config, Data } from "effect";
 import { StorageService } from "@/lib/services/storage-service";
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { Config, Data, Effect } from "effect";
+import "server-only";
 
 class S3DeletionError extends Data.TaggedError("S3DeletionError")<{
   cause: unknown;
@@ -29,15 +29,15 @@ export function deleteImageAssetsFromS3(keys: string[]) {
       .use((s3Client) => s3Client.send(command))
       .pipe(
         Effect.tapErrorTag("StorageError", (error) =>
-          Effect.logError("S3 Deletion Error:", error)
+          Effect.logError("S3 Deletion Error:", error),
         ),
         Effect.mapError(
           (error) =>
             new S3DeletionError({
               cause: error,
               message: "Failed to delete old images from storage.",
-            })
-        )
+            }),
+        ),
       );
   });
 }

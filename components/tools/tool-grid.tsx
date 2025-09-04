@@ -1,9 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
-import type { Tool } from "@/db/schema";
 import { ToolCard } from "@/components/tools/tool-card";
+import type { Tool } from "@/db/schema";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "motion/react";
 
 interface ToolGridProps {
   tools: Tool[];
@@ -31,7 +31,7 @@ export function ToolGrid({ tools, isFiltered }: ToolGridProps) {
           animate="visible"
           exit="exit"
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="text-neutral-700 text-sm text-center my-12 text-pretty"
+          className="my-12 text-center text-sm text-pretty text-neutral-700"
         >
           {isFiltered
             ? "No apps found matching your filter criteria."
@@ -52,7 +52,7 @@ export function ToolGrid({ tools, isFiltered }: ToolGridProps) {
         exit="exit"
         transition={{ duration: 0.15, ease: "easeOut" }}
         className={cn(
-          "grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-12"
+          "my-12 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
         )}
       >
         {tools.map((tool) => (

@@ -1,9 +1,7 @@
-import Link from "next/link";
-import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { Tool } from "@/db/schema";
-import { slugify } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
+import Link from "next/link";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
@@ -23,7 +21,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
   const slug = slugify(tool.name);
 
   return (
-    <article className="group group-has-[[data-pending]]:pointer-events-none group-has-[[data-pending]]:opacity-50 relative flex h-full flex-col rounded-md border border-neutral-300 p-4 shadow-xs transition-all hover:scale-102 hover:shadow-lg">
+    <article className="group relative flex h-full flex-col rounded-md border border-neutral-300 p-4 shadow-xs transition-all group-has-[[data-pending]]:pointer-events-none group-has-[[data-pending]]:opacity-50 hover:scale-102 hover:shadow-lg">
       <Link
         href={`/tools/${slug}`}
         className="absolute inset-0 z-10"
@@ -39,16 +37,16 @@ export function ToolCard({ tool }: { tool: Tool }) {
             width={48}
             height={48}
             loading="eager"
-            className="size-12 object-contain rounded-md shrink-0"
+            className="size-12 shrink-0 rounded-md object-contain"
           />
         ) : (
-          <div className="flex size-12 items-center justify-center rounded-md text-2xl font-medium text-neutral-700 border border-neutral-200 bg-white">
+          <div className="flex size-12 items-center justify-center rounded-md border border-neutral-200 bg-white text-2xl font-medium text-neutral-700">
             {tool.name.charAt(0).toUpperCase()}
           </div>
         )}
 
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-bold text-neutral-900 tracking-tight">
+          <h3 className="text-lg font-bold tracking-tight text-neutral-900">
             {tool.name}
           </h3>
           <p className="text-sm text-neutral-700">{tool.websiteUrl}</p>
@@ -56,21 +54,21 @@ export function ToolCard({ tool }: { tool: Tool }) {
       </div>
 
       {/* Description */}
-      <p className="line-clamp-3 text-sm/6 text-neutral-700 mb-auto">
+      <p className="mb-auto line-clamp-3 text-sm/6 text-neutral-700">
         {tool.tagline}
       </p>
 
       {/* Footer with Pills */}
-      <div className="flex items-center justify-between gap-2 border-neutral-200 mt-4">
+      <div className="mt-4 flex items-center justify-between gap-2 border-neutral-200">
         {primaryCategory && (
-          <Badge className=" text-neutral-900 rounded-full border-neutral-200 bg-neutral-200">
+          <Badge className="rounded-full border-neutral-200 bg-neutral-200 text-neutral-900">
             {primaryCategory}
           </Badge>
         )}
         <Badge
           className={cn(
             "font-medium capitalize",
-            getPricingPillStyles(tool.pricing)
+            getPricingPillStyles(tool.pricing),
           )}
         >
           {tool.pricing}

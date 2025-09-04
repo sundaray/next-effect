@@ -1,11 +1,11 @@
 import { ToolSubmissionForm } from "@/components/forms/tool-submission-form";
+import { buttonVariants } from "@/components/ui/button";
+import { APP_SUBMISSION_LIMIT } from "@/config/limit";
 import { getCategories } from "@/lib/get-categories";
 import { getUser } from "@/lib/get-user";
+import { cn } from "@/lib/utils";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { APP_SUBMISSION_LIMIT } from "@/config/limit";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 export default async function Submit() {
   const requestHeaders = await headers();
@@ -16,11 +16,11 @@ export default async function Submit() {
 
   if (submissionCount >= APP_SUBMISSION_LIMIT) {
     return (
-      <div className="max-w-xl mx-auto px-4 my-36 text-center">
+      <div className="mx-auto my-36 max-w-xl px-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
           Submission Limit Reached
         </h1>
-        <p className=" text-neutral-700 mt-4">
+        <p className="mt-4 text-neutral-700">
           You have already submitted {APP_SUBMISSION_LIMIT} apps, which is the
           maximum allowed.
         </p>
@@ -28,7 +28,7 @@ export default async function Submit() {
           href="/dashboard"
           className={cn(
             buttonVariants({ variant: "default", size: "sm" }),
-            "mt-8"
+            "mt-8",
           )}
         >
           Go to Dashboard
@@ -37,12 +37,12 @@ export default async function Submit() {
     );
   }
   return (
-    <div className="max-w-xl mx-auto px-4 my-36">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold tracking-tight text-neutral-900 text-pretty">
+    <div className="mx-auto my-36 max-w-xl px-4">
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-pretty text-neutral-900">
           Submit your AI app for free
         </h1>
-        <p className="text-lg text-neutral-700 mt-4 text-pretty">
+        <p className="mt-4 text-lg text-pretty text-neutral-700">
           Get discovered by users and boost your SEO with a backlink.
         </p>
       </div>

@@ -1,6 +1,6 @@
+import { InternalServerError, NetworkError } from "@/lib/client/errors";
 import "client-only";
 import { Effect, pipe } from "effect";
-import { NetworkError, InternalServerError } from "@/lib/client/errors";
 
 type UploadFilesToS3Params = {
   showcaseImage: File;
@@ -32,15 +32,15 @@ export function uploadFilesToS3(params: UploadFilesToS3Params) {
                 new InternalServerError({
                   message:
                     "Tool submission failed due to a server error. Please try again.",
-                })
-              )
-        )
+                }),
+              ),
+        ),
       );
 
     const uploadEffects = [];
 
     uploadEffects.push(
-      createUploadEffect(params.showcaseImageUploadUrl, params.showcaseImage)
+      createUploadEffect(params.showcaseImageUploadUrl, params.showcaseImage),
     );
 
     if (params.logo && params.logoUploadUrl) {

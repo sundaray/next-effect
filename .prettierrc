@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "tailwindFunctions": ["cn"],
+  "tailwindStylesheet": "./app/globals.css"
+}

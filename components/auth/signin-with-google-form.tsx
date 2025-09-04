@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Effect, pipe } from "effect";
-import { Icons } from "@/components/icons";
 import { FormMessage } from "@/components/forms/form-message";
+import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
 import { ConfigError, SignInWithGoogleError } from "@/lib/client/errors";
-import { Button } from "@/components/ui/button";
+import { Effect, pipe } from "effect";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function SignInWitjGoogleForm() {
   const [isPending, setIsPending] = useState(false);
@@ -28,7 +28,7 @@ export function SignInWitjGoogleForm() {
         return yield* Effect.fail(
           new ConfigError({
             message: "NEXT_PUBLIC_BASE_URL environment variable is not found.",
-          })
+          }),
         );
       }
 
@@ -50,23 +50,23 @@ export function SignInWitjGoogleForm() {
     const handledProgram = pipe(
       program,
       Effect.tapErrorTag("ConfigError", (error) =>
-        Effect.logError("ConfigError: ", error)
+        Effect.logError("ConfigError: ", error),
       ),
       Effect.tapErrorTag("SignInWithGoogleError", (error) =>
-        Effect.logError("SignInWithGoogleError: ", error)
+        Effect.logError("SignInWithGoogleError: ", error),
       ),
       Effect.catchTag("SignInWithGoogleError", (error) =>
         Effect.sync(() => {
           setErrorMessage(error.message);
-        })
+        }),
       ),
       Effect.catchTag("ConfigError", (error) =>
         Effect.sync(() => {
           setErrorMessage(error.message);
-        })
+        }),
       ),
       Effect.ensureErrorType<never>(),
-      Effect.ensuring(Effect.sync(() => setIsPending(false)))
+      Effect.ensuring(Effect.sync(() => setIsPending(false))),
     );
 
     await clientRuntime.runPromise(handledProgram);
@@ -79,7 +79,7 @@ export function SignInWitjGoogleForm() {
         variant="ghost"
         onClick={handleSignInWithGoogle}
         disabled={isPending}
-        className="w-full border border-neutral-300 h-10 hover:bg-white"
+        className="h-10 w-full border border-neutral-300 hover:bg-white"
       >
         <Icons.google className="inline-block size-5" />
         Sign in with Google

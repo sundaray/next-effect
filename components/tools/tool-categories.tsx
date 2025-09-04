@@ -1,6 +1,6 @@
 "use client";
 
-import { MyTagGroup, MyTag } from "@/components/ui/tag";
+import { MyTag, MyTagGroup } from "@/components/ui/tag";
 import { slugify } from "@/lib/utils";
 
 export function ToolCategories({ categories }: { categories: string[] }) {
@@ -14,7 +14,7 @@ export function ToolCategories({ categories }: { categories: string[] }) {
         <MyTag
           id={item.id}
           href={`/?category=${slugify(item.id)}`}
-          className="cursor-pointer hover:bg-neutral-900 hover:text-neutral-200 transition-colors"
+          className="cursor-pointer transition-colors hover:bg-neutral-900 hover:text-neutral-200"
         >
           {item.name}
         </MyTag>

@@ -1,16 +1,18 @@
-import { notFound } from "next/navigation";
-import { getToolBySlug } from "@/lib/get-tool-by-slug";
+import { Icons } from "@/components/icons";
+import { ToolBreadcrumb } from "@/components/tools/tool-breadcrumb";
+import { ToolCategories } from "@/components/tools/tool-categories";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import type { Tool } from "@/db/schema";
 import { createSafeHtml } from "@/lib/create-safe-html";
-import { getWebPVariantUrl } from "@/lib/utils";
-import { Icons } from "@/components/icons";
-import { ensureAbsoluteUrl } from "@/lib/utils";
-import { ToolCategories } from "@/components/tools/tool-categories";
-import { ToolBreadcrumb } from "@/components/tools/tool-breadcrumb";
-import { unslugify } from "@/lib/utils";
+import { getToolBySlug } from "@/lib/get-tool-by-slug";
+import {
+  cn,
+  ensureAbsoluteUrl,
+  getWebPVariantUrl,
+  unslugify,
+} from "@/lib/utils";
+import { notFound } from "next/navigation";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
   switch (pricing) {
@@ -48,11 +50,11 @@ export default async function ToolDetailsPage({
   `;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-36 space-y-8">
+    <div className="mx-auto max-w-3xl space-y-8 px-4 py-36">
       <ToolBreadcrumb toolName={unslugify(tool.name)} />
       <article className="space-y-10">
         {/* --- Header Section --- */}
-        <header className="flex flex-col md:flex-row justify-between items-start gap-8">
+        <header className="flex flex-col items-start justify-between gap-8 md:flex-row">
           {/* Main content: Logo, Name, Tagline, and Pills */}
           <div className="flex-grow space-y-4">
             <div className="flex items-center gap-4">
@@ -63,14 +65,14 @@ export default async function ToolDetailsPage({
                   width={48}
                   height={48}
                   loading="eager"
-                  className="size-12 object-contain rounded-md shrink-0"
+                  className="size-12 shrink-0 rounded-md object-contain"
                 />
               ) : (
                 <div className="flex size-12 items-center justify-center rounded-md border border-neutral-200 bg-white text-2xl font-medium text-neutral-700">
                   {tool.name.charAt(0).toUpperCase()}
                 </div>
               )}
-              <h1 className="text-4xl font-bold tracking-tight text-neutral-900 text-pretty">
+              <h1 className="text-4xl font-bold tracking-tight text-pretty text-neutral-900">
                 {tool.name}
               </h1>
             </div>
@@ -80,8 +82,8 @@ export default async function ToolDetailsPage({
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <Badge
                 className={cn(
-                  "font-medium capitalize text-sm",
-                  getPricingPillStyles(tool.pricing)
+                  "text-sm font-medium capitalize",
+                  getPricingPillStyles(tool.pricing),
                 )}
               >
                 {tool.pricing}
@@ -102,7 +104,7 @@ export default async function ToolDetailsPage({
         </header>
 
         {/* --- Showcase Image Section --- */}
-        <div className="relative w-full aspect-[16/9] rounded-md">
+        <div className="relative aspect-[16/9] w-full rounded-md">
           <picture className="absolute inset-0 size-full">
             <source
               type="image/webp"
@@ -112,7 +114,7 @@ export default async function ToolDetailsPage({
             <img
               src={getWebPVariantUrl(tool.showcaseImageUrl, "lg")}
               alt={`${tool.name} showcase image`}
-              className="size-full object-cover rounded-md"
+              className="size-full rounded-md object-cover"
               width="1280"
               height="720"
               loading="eager"
@@ -120,7 +122,7 @@ export default async function ToolDetailsPage({
           </picture>
         </div>
 
-        <div className="prose prose-neutral prose-ul:*:my-0 prose-ol:*:my-0">
+        <div className="prose prose-neutral prose-ol:*:my-0 prose-ul:*:my-0">
           <div dangerouslySetInnerHTML={safeDescriptionHtml} />
         </div>
         {tool.categories && tool.categories.length > 0 && (

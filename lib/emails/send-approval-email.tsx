@@ -1,12 +1,12 @@
-import "server-only";
-import { Effect, Config, Data } from "effect";
-import { render } from "@react-email/render";
+import { ApprovalEmailTemplate } from "@/components/emails/approval-email-template";
 import { EmailService } from "@/lib/services/email-service";
 import { SendEmailCommand, SendEmailCommandInput } from "@aws-sdk/client-ses";
-import { ApprovalEmailTemplate } from "@/components/emails/approval-email-template";
+import { render } from "@react-email/render";
+import { Config, Data, Effect } from "effect";
+import "server-only";
 
 class EmailTemplateRenderError extends Data.TaggedError(
-  "EmailTemplateRenderError"
+  "EmailTemplateRenderError",
 )<{ cause: unknown }> {}
 
 type SendApprovalEmailParams = {
@@ -26,7 +26,10 @@ export function sendApprovalEmail(params: SendApprovalEmailParams) {
     const emailHtml = yield* Effect.tryPromise({
       try: () =>
         render(
-          <ApprovalEmailTemplate appName={params.appName} toolLink={toolLink} />
+          <ApprovalEmailTemplate
+            appName={params.appName}
+            toolLink={toolLink}
+          />,
         ),
       catch: (error) => new EmailTemplateRenderError({ cause: error }),
     });

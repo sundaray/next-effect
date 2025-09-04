@@ -1,10 +1,9 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import { MyTag, MyTagGroup } from "@/components/ui/tag";
-import { slugify } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 import { useCategoryFilters } from "@/hooks/use-category-filters";
+import { cn, slugify } from "@/lib/utils";
+import { AnimatePresence, motion } from "motion/react";
 
 interface CategoryGridProps {
   categories: Record<string, string[]>;
@@ -63,7 +62,7 @@ export function CategoryGrid({ categories, search }: CategoryGridProps) {
               >
                 {letter}
               </h2>
-              <div className="flex-grow h-px bg-neutral-200"></div>
+              <div className="h-px flex-grow bg-neutral-200"></div>
             </div>
             <div className="mt-4">
               <MyTagGroup
@@ -75,7 +74,7 @@ export function CategoryGrid({ categories, search }: CategoryGridProps) {
                   <MyTag
                     href={`/?category=${slugify(item.id)}`}
                     isDisabled={isPending}
-                    className="cursor-pointer hover:bg-neutral-900 hover:text-neutral-200 transition-colors"
+                    className="cursor-pointer transition-colors hover:bg-neutral-900 hover:text-neutral-200"
                   >
                     {item.id}
                   </MyTag>

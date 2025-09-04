@@ -1,12 +1,12 @@
-import { Effect, Config, Redacted } from "effect";
+import { sendSignInOtpEmail } from "@/lib/send-otp-email";
+import { DbClientService } from "@/lib/services/dbClient-service";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { DbClientService } from "@/lib/services/dbClient-service";
 import { emailOTP } from "better-auth/plugins/email-otp";
-import { sendSignInOtpEmail } from "@/lib/send-otp-email";
+import { Config, Effect, Redacted } from "effect";
 
 const adminEmailsConfig = Config.array(Config.string(), "ADMIN_EMAILS").pipe(
-  Config.map((emails) => emails.map((email) => email.trim().toLowerCase()))
+  Config.map((emails) => emails.map((email) => email.trim().toLowerCase())),
 );
 
 export class AuthService extends Effect.Service<AuthService>()("AuthService", {
@@ -16,10 +16,10 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
     const adminEmails = yield* adminEmailsConfig;
 
     const googleClientId = Redacted.value(
-      yield* Config.redacted("GOOGLE_CLIENT_ID")
+      yield* Config.redacted("GOOGLE_CLIENT_ID"),
     );
     const googleClientSecret = Redacted.value(
-      yield* Config.redacted("GOOGLE_CLIENT_SECRET")
+      yield* Config.redacted("GOOGLE_CLIENT_SECRET"),
     );
 
     const auth = betterAuth({

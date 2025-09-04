@@ -1,6 +1,6 @@
 import { SESClient } from "@aws-sdk/client-ses";
-import { Config, Effect } from "effect";
 import { awsCredentialsProvider } from "@vercel/functions/oidc";
+import { Config, Effect } from "effect";
 
 export class SesClientService extends Effect.Service<SesClientService>()(
   "SesClient",
@@ -18,5 +18,5 @@ export class SesClientService extends Effect.Service<SesClientService>()(
         }),
       });
     }),
-  }
+  },
 ) {}

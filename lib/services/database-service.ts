@@ -1,7 +1,7 @@
-import { Effect, Data } from "effect";
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/db/schema";
 import { DbClientService } from "@/lib/services/dbClient-service";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { Data, Effect } from "effect";
 
 class DatabaseError extends Data.TaggedError("DatabaseError")<{
   cause: unknown;
@@ -9,7 +9,7 @@ class DatabaseError extends Data.TaggedError("DatabaseError")<{
 
 type DatabaseServiceImp = {
   use: <A>(
-    f: (db: PostgresJsDatabase<typeof schema>) => Promise<A>
+    f: (db: PostgresJsDatabase<typeof schema>) => Promise<A>,
   ) => Effect.Effect<A, DatabaseError>;
 };
 
@@ -28,5 +28,5 @@ export class DatabaseService extends Effect.Service<DatabaseService>()(
       } satisfies DatabaseServiceImp;
     }),
     dependencies: [DbClientService.Default],
-  }
+  },
 ) {}

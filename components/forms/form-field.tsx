@@ -1,17 +1,16 @@
-import { useId } from "react";
-import {
-  Controller,
-  ControllerRenderProps,
-  ControllerFieldState,
-  Control,
-  FieldValues,
-  FieldPath,
-} from "react-hook-form";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormFieldMessage } from "@/components/forms/form-field-message";
-import { countWords, getFieldErrorId } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { cn, countWords, getFieldErrorId } from "@/lib/utils";
+import { useId } from "react";
+import {
+  Control,
+  Controller,
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+} from "react-hook-form";
 
 type InputProps = React.ComponentPropsWithoutRef<"input">;
 
@@ -43,7 +42,7 @@ type FormFieldProps<
   className?: string;
   control: Control<TFieldValues>;
   renderField?: (
-    props: RenderFieldProps<TFieldValues, TName>
+    props: RenderFieldProps<TFieldValues, TName>,
   ) => React.ReactNode;
   required?: boolean;
 } & Omit<InputProps, "id" | "name">;
@@ -70,7 +69,7 @@ export function FormField<
       <div className="flex justify-between">
         <Label
           htmlFor={propId}
-          className={cn(required && "after:content-['*'] after:text-red-600")}
+          className={cn(required && "after:text-red-600 after:content-['*']")}
           onClick={() => {
             if (renderField) {
               // For custom components like the RichTextEditor,
@@ -82,7 +81,7 @@ export function FormField<
           {label}
         </Label>
         {hint && (
-          <span className="text-sm text-neutral-500 font-normal">{hint}</span>
+          <span className="text-sm font-normal text-neutral-500">{hint}</span>
         )}
       </div>
       <Controller
@@ -134,14 +133,14 @@ export function FormField<
                 />
               )}
               {help && (
-                <div className="flex items-center justify-between mt-1 text-sm text-neutral-500">
+                <div className="mt-1 flex items-center justify-between text-sm text-neutral-500">
                   <span>{help.message}</span>
                   {/* Word counter */}
                   {showWordCounter && (
                     <span>
                       <span
                         className={cn(
-                          hasExceededLimit && "font-medium text-red-600"
+                          hasExceededLimit && "font-medium text-red-600",
                         )}
                       >
                         {currentWordCount}

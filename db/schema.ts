@@ -1,14 +1,14 @@
+import type { InferSelectModel } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
-  text,
-  pgEnum,
-  pgTable,
-  timestamp,
-  uuid,
   boolean,
   integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import type { InferSelectModel } from "drizzle-orm";
 
 export const pricingTypeEnum = pgEnum("pricing", ["free", "paid", "freemium"]);
 
@@ -147,9 +147,9 @@ export const verifications = pgTable("verifications", {
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").$defaultFn(
-    () => /* @__PURE__ */ new Date()
+    () => /* @__PURE__ */ new Date(),
   ),
   updatedAt: timestamp("updated_at").$defaultFn(
-    () => /* @__PURE__ */ new Date()
+    () => /* @__PURE__ */ new Date(),
   ),
 });

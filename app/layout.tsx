@@ -1,11 +1,11 @@
+import { Footer } from "@/components/footer";
+import { MainNav } from "@/components/navigation/main-nav";
+import { RouterProvider } from "@/components/router-provider";
+import { navbarLinks } from "@/config/navbar";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { navbarLinks } from "@/config/navbar";
-import { MainNav } from "@/components/navigation/main-nav";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
 import NextTopLoader from "nextjs-toploader";
-import { RouterProvider } from "@/components/router-provider";
-import { Footer } from "@/components/footer";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import "./globals.css";
 
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <NextTopLoader showSpinner={false} color="#0284c7" shadow={false} />
         <header>

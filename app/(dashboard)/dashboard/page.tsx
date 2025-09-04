@@ -1,12 +1,12 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { buttonVariants } from "@/components/ui/button";
+import { DashboardClient } from "@/components/user/dashboard-client";
+import { APP_RESUBMISSION_LIMIT, APP_SUBMISSION_LIMIT } from "@/config/limit";
 import { getUser } from "@/lib/get-user";
 import { getUserSubmissions } from "@/lib/get-user-submissions";
-import { DashboardClient } from "@/components/user/dashboard-client";
-import { buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { APP_SUBMISSION_LIMIT, APP_RESUBMISSION_LIMIT } from "@/config/limit";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const requestHeaders = await headers();
@@ -32,22 +32,22 @@ export default async function DashboardPage() {
   }
 
   const hasRejectedSubmissions = submissions.some(
-    (submission) => submission.status === "rejected"
+    (submission) => submission.status === "rejected",
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 my-36 group">
+    <div className="group mx-auto my-36 max-w-4xl px-4">
       <div className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
           My Submissions
         </h1>
-        <p className="text-neutral-700 mt-4">
+        <p className="mt-4 text-neutral-700">
           View the status of all your app submissions.
         </p>
       </div>
       {submissions.length > 0 ? (
         <>
-          <div className="text-sm text-sky-900 bg-sky-100 border border-sky-200 px-3 py-1.5 mb-4 rounded-md text-pretty">
+          <div className="mb-4 rounded-md border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm text-pretty text-sky-900">
             {submissionMessage}
           </div>
           <DashboardClient
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
             hasRejectedSubmissions={hasRejectedSubmissions}
           />
           {hasRejectedSubmissions && (
-            <p className="mt-4 text-sm text-neutral-700 text-pretty">
+            <p className="mt-4 text-sm text-pretty text-neutral-700">
               <span className="font-semibold text-neutral-900">
                 * Resubmission Policy:{" "}
               </span>
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
           )}
         </>
       ) : (
-        <div className="flex flex-col items-center justify-center text-center p-8 border border-dashed border-neutral-300 rounded-md">
+        <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-neutral-300 p-8 text-center">
           <p className="text-neutral-700">
             You have not submitted any apps yet.
           </p>

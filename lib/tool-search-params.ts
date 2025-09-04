@@ -1,11 +1,11 @@
+import { pricingOptions } from "@/lib/schema";
 import {
+  createSearchParamsCache,
+  parseAsArrayOf,
   parseAsInteger,
   parseAsString,
-  parseAsArrayOf,
   parseAsStringLiteral,
 } from "nuqs/server";
-import { pricingOptions } from "@/lib/schema";
-import { createSearchParamsCache } from "nuqs/server";
 
 export const toolSearchParams = {
   page: parseAsInteger.withDefault(1),

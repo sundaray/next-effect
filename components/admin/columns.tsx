@@ -1,26 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import { hc, parseResponse, DetailedError } from "hono/client";
 import type { ApiRoutes } from "@/app/api/[[...path]]/route";
+import { ColumnDef } from "@tanstack/react-table";
+import { DetailedError, hc, parseResponse } from "hono/client";
+import { MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Icons } from "@/components/icons";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -30,16 +18,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { cn, getStatusPillStyles } from "@/lib/utils";
-import { Icons } from "@/components/icons";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { adminApprovalStatusEnum } from "@/db/schema";
+import { cn, getStatusPillStyles } from "@/lib/utils";
 
 const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
 
@@ -73,7 +73,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
         await parseResponse(
           client.api.admin.submissions[":id"].approve.$post({
             param: { id: submission.id },
-          })
+          }),
         );
         setIsApproveDialogOpen(false);
         router.refresh();
@@ -97,7 +97,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
           client.api.admin.submissions[":id"].reject.$post({
             param: { id: submission.id },
             json: { reason },
-          })
+          }),
         );
         setIsRejectDialogOpen(false);
         setReason("");
@@ -127,7 +127,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
           <DropdownMenuSeparator />
           {submission.status !== "approved" && (
             <DropdownMenuItem
-              className="text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50"
+              className="text-emerald-600 focus:bg-emerald-50 focus:text-emerald-600"
               onSelect={() => {
                 setError(null);
                 setIsApproveDialogOpen(true);
@@ -139,7 +139,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
           )}
           {submission.status !== "rejected" && (
             <DropdownMenuItem
-              className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              className="text-red-600 focus:bg-red-50 focus:text-red-600"
               onSelect={() => {
                 setError(null);
                 setReason("");
@@ -158,7 +158,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
         onOpenChange={setIsApproveDialogOpen}
       >
         <AlertDialogContent>
-          {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Submission?</AlertDialogTitle>
             <AlertDialogDescription className="text-neutral-700">
@@ -195,7 +195,7 @@ function RowActions({ row }: { row: { original: Submission } }) {
         onOpenChange={setIsRejectDialogOpen}
       >
         <AlertDialogContent>
-          {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Submission?</AlertDialogTitle>
             <AlertDialogDescription className="text-neutral-700">
@@ -268,7 +268,7 @@ export const AdminSubmissionColumns = () => {
       header: "Submission Date",
       cell: ({ row }) =>
         new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-          row.getValue("submittedAt")
+          row.getValue("submittedAt"),
         ),
     },
     {
@@ -293,7 +293,7 @@ export const AdminSubmissionColumns = () => {
             {isRejectedWithReason && (
               <Button
                 variant="link"
-                className="h-auto p-0 text-sky-600 text-xs"
+                className="h-auto p-0 text-xs text-sky-600"
                 onClick={() => {
                   setSelectedSubmission(submission);
                   setDialogOpen(true);
@@ -319,8 +319,8 @@ export const AdminSubmissionColumns = () => {
           <DialogTitle>
             Rejection Reason for "{selectedSubmission?.name}"
           </DialogTitle>
-          <ScrollArea className="max-h-64 mt-4 pr-6">
-            <DialogDescription className="text-neutral-700 text-base">
+          <ScrollArea className="mt-4 max-h-64 pr-6">
+            <DialogDescription className="text-base text-neutral-700">
               {selectedSubmission?.rejectionReason || "No reason was provided."}
             </DialogDescription>
           </ScrollArea>

@@ -1,10 +1,10 @@
 import "server-only";
 
-import { Effect } from "effect";
-import { sql } from "drizzle-orm";
-import { DatabaseService } from "@/lib/services/database-service";
-import { serverRuntime } from "@/lib/server-runtime";
 import { tools } from "@/db/schema";
+import { serverRuntime } from "@/lib/server-runtime";
+import { DatabaseService } from "@/lib/services/database-service";
+import { sql } from "drizzle-orm";
+import { Effect } from "effect";
 
 export async function getCategories(search: string) {
   const program = Effect.gen(function* () {
@@ -24,8 +24,8 @@ export async function getCategories(search: string) {
       .use((db) => db.execute(query))
       .pipe(
         Effect.tapError((error) =>
-          Effect.logError("Database error in getCategories(): ", error)
-        )
+          Effect.logError("Database error in getCategories(): ", error),
+        ),
       );
 
     // The raw result from `db.execute` is an array of objects, e.g., [{ category: 'AI' }].

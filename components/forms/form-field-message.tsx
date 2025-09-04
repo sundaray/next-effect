@@ -8,15 +8,15 @@ export function FormFieldMessage({
   errorId,
 }: FormFieldMessageProps) {
   if (!errorMessage) {
-    return <div className="w-full min-h-6" />;
+    return <div className="min-h-6 w-full" />;
   }
 
   return (
-    <div className="w-full min-h-6 flex items-center">
+    <div className="flex min-h-6 w-full items-center">
       <p
         id={errorId}
         role="alert"
-        className="text-sm text-red-600 mt-1 ease-out animate-in fade-in-0 slide-in-from-left-2"
+        className="mt-1 animate-in text-sm text-red-600 ease-out fade-in-0 slide-in-from-left-2"
       >
         {errorMessage}
       </p>

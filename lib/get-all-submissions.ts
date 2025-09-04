@@ -1,10 +1,10 @@
 import "server-only";
 
-import { Effect } from "effect";
-import { desc, eq, and, sql } from "drizzle-orm";
-import { DatabaseService } from "@/lib/services/database-service";
+import { toolHistory, tools, users } from "@/db/schema";
 import { serverRuntime } from "@/lib/server-runtime";
-import { tools, users, toolHistory } from "@/db/schema";
+import { DatabaseService } from "@/lib/services/database-service";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { Effect } from "effect";
 
 export async function getAllSubmissions() {
   const program = Effect.gen(function* () {
@@ -18,11 +18,11 @@ export async function getAllSubmissions() {
             reason: toolHistory.reason,
             rowNumber:
               sql`ROW_NUMBER() OVER (PARTITION BY ${toolHistory.toolId} ORDER BY ${toolHistory.createdAt} DESC)`.as(
-                "rn"
+                "rn",
               ),
           })
           .from(toolHistory)
-          .where(eq(toolHistory.eventType, "rejected"))
+          .where(eq(toolHistory.eventType, "rejected")),
       );
 
       return await db
@@ -35,7 +35,7 @@ export async function getAllSubmissions() {
           status: tools.adminApprovalStatus,
           submittedByEmail: users.email,
           rejectionReason: sql<string | null>`${latestRejection.reason}`.as(
-            "rejection_reason"
+            "rejection_reason",
           ),
         })
         .from(tools)
@@ -44,16 +44,16 @@ export async function getAllSubmissions() {
           latestRejection,
           and(
             eq(tools.id, latestRejection.toolId),
-            eq(latestRejection.rowNumber, 1)
-          )
+            eq(latestRejection.rowNumber, 1),
+          ),
         )
         .orderBy(desc(tools.submittedAt));
     });
     return submissions;
   }).pipe(
     Effect.tapError((error) =>
-      Effect.logError("Database error in getAllSubmissions(): ", error)
-    )
+      Effect.logError("Database error in getAllSubmissions(): ", error),
+    ),
   );
 
   return await serverRuntime.runPromise(program);

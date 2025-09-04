@@ -1,11 +1,11 @@
-import { getTools } from "@/lib/get-tools";
-import { getCategories } from "@/lib/get-categories";
-import type { SearchParams } from "nuqs/server";
-import { toolSearchParamsCache } from "@/lib/tool-search-params";
 import { ToolHero } from "@/components/tools/tool-hero";
 import { ToolsDisplay } from "@/components/tools/tools-display";
-import { headers } from "next/headers";
+import { getCategories } from "@/lib/get-categories";
+import { getTools } from "@/lib/get-tools";
 import { getUser } from "@/lib/get-user";
+import { toolSearchParamsCache } from "@/lib/tool-search-params";
+import { headers } from "next/headers";
+import type { SearchParams } from "nuqs/server";
 
 type HomePageProps = {
   searchParams: Promise<SearchParams>;
@@ -50,7 +50,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const paginatedTools = allFilteredTools.slice(startIndex, endIndex);
 
   return (
-    <div className="mx-auto max-w-6xl group px-4">
+    <div className="group mx-auto max-w-6xl px-4">
       <ToolHero />
       <ToolsDisplay
         allCategories={categories}

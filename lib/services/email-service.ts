@@ -1,12 +1,12 @@
-import { Effect, Data } from "effect";
-import { SESClient } from "@aws-sdk/client-ses";
 import { SesClientService } from "@/lib/services/sesClient-service";
+import { SESClient } from "@aws-sdk/client-ses";
+import { Data, Effect } from "effect";
 
 class EmailError extends Data.TaggedError("EmailError")<{ cause: unknown }> {}
 
 type EmailServiceImp = {
   use: <A>(
-    f: (client: SESClient) => Promise<A>
+    f: (client: SESClient) => Promise<A>,
   ) => Effect.Effect<A, EmailError>;
 };
 
@@ -25,5 +25,5 @@ export class EmailService extends Effect.Service<EmailServiceImp>()(
       } satisfies EmailServiceImp;
     }),
     dependencies: [SesClientService.Default],
-  }
+  },
 ) {}

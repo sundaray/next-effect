@@ -1,10 +1,10 @@
-import * as React from "react";
-import Link from "next/link";
-import { MoreHorizontalIcon } from "lucide-react";
 import { Icons } from "@/components/icons";
+import { MoreHorizontalIcon } from "lucide-react";
+import Link from "next/link";
+import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -56,7 +56,7 @@ function PaginationLink({
           variant: isActive ? "outline" : "ghost",
           size,
         }),
-        className
+        className,
       )}
       {...props}
     />
@@ -75,7 +75,7 @@ function PaginationPrevious({
       {...props}
     >
       <Icons.arrowLeft
-        className="transition-transform group-hover/previous:-translate-x-1 text-neutral-500"
+        className="text-neutral-500 transition-transform group-hover/previous:-translate-x-1"
         aria-hidden="true"
       />
       <span className="hidden sm:block">Previous</span>
@@ -96,7 +96,7 @@ function PaginationNext({
     >
       <span className="hidden sm:block">Next</span>
       <Icons.arrowRight
-        className="transition-transform group-hover/next:translate-x-1 text-neutral-500"
+        className="text-neutral-500 transition-transform group-hover/next:translate-x-1"
         aria-hidden="true"
       />
     </PaginationLink>
@@ -123,9 +123,9 @@ function PaginationEllipsis({
 export {
   Pagination,
   PaginationContent,
-  PaginationLink,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
   PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
 };

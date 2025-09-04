@@ -1,12 +1,12 @@
-import { Hono } from "hono";
-import { handle } from "hono/vercel";
-import tools from "@/lib/tools";
-import auth from "@/lib/auth";
 import admin from "@/lib/admin";
+import auth from "@/lib/auth";
+import type { AuthType } from "@/lib/services/auth-service";
+import tools from "@/lib/tools";
+import { protectAdminRouteMiddleware } from "@/middlewares/protect-admin-route";
 import { protectRouteMiddleware } from "@/middlewares/protect-route";
 import { loadSessionMiddleware } from "@/middlewares/session";
-import { protectAdminRouteMiddleware } from "@/middlewares/protect-admin-route";
-import type { AuthType } from "@/lib/services/auth-service";
+import { Hono } from "hono";
+import { handle } from "hono/vercel";
 
 const app = new Hono<{
   Variables: AuthType;

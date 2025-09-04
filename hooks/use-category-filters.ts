@@ -1,10 +1,10 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useQueryStates } from "nuqs";
-import { categorySearchParams } from "@/lib/category-search-params";
 import type { CategoryFilters } from "@/lib/category-search-params";
+import { categorySearchParams } from "@/lib/category-search-params";
+import { usePathname, useRouter } from "next/navigation";
+import { useQueryStates } from "nuqs";
+import { useTransition } from "react";
 
 export function useCategoryFilters() {
   const router = useRouter();

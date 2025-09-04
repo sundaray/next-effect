@@ -9,7 +9,7 @@
 export function calculatePaginationRange(
   currentPage: number,
   totalPages: number,
-  siblingCount: number = 1
+  siblingCount: number = 1,
 ): (number | string)[] {
   const totalPageNumbers = siblingCount * 2 + 5; // first + last + current + siblings*2 + dots*2
 
@@ -41,7 +41,7 @@ export function calculatePaginationRange(
     const rightItemCount = 3 + 2 * siblingCount;
     const rightRange = Array.from(
       { length: rightItemCount },
-      (_, i) => totalPages - rightItemCount + 1 + i
+      (_, i) => totalPages - rightItemCount + 1 + i,
     );
     return [firstPageIndex, "ellipsis-left", ...rightRange];
   }
@@ -50,7 +50,7 @@ export function calculatePaginationRange(
   if (shouldShowLeftDots && shouldShowRightDots) {
     const middleRange = Array.from(
       { length: rightSiblingIndex - leftSiblingIndex + 1 },
-      (_, i) => leftSiblingIndex + i
+      (_, i) => leftSiblingIndex + i,
     );
     return [
       firstPageIndex,

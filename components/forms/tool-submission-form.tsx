@@ -1,20 +1,11 @@
 "use client";
 
-import { Effect, pipe } from "effect";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { effectTsResolver } from "@hookform/resolvers/effect-ts";
-import {
-  ToolSubmissionFormSchema,
-  ToolSubmissionFormSchemaType,
-  pricingOptions,
-} from "@/lib/schema";
-import { Button } from "@/components/ui/button";
-import { FormMessage } from "@/components/forms/form-message";
-import { FormField } from "@/components/forms/form-field";
 import { CategoryInput } from "@/components/forms/category-input";
+import { DropzoneInput } from "@/components/forms/dropzone-input";
+import { FormField } from "@/components/forms/form-field";
+import { FormMessage } from "@/components/forms/form-message";
 import { RichTextEditor } from "@/components/forms/rich-text-editor";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -22,18 +13,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DropzoneInput } from "@/components/forms/dropzone-input";
+import { clientRuntime } from "@/lib/client-runtime";
+import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
+import { saveTool } from "@/lib/client/save-tool";
+import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
 import {
   LOGO_MAX_SIZE_MB,
   SCREENSHOT_MAX_SIZE_MB,
   SUPPORTED_FILE_TYPES,
   SUPPORTED_MIME_TYPES,
+  ToolSubmissionFormSchema,
+  ToolSubmissionFormSchemaType,
+  pricingOptions,
 } from "@/lib/schema";
-import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
-import { uploadFilesToS3 } from "@/lib/client/upload-files-to-s3";
-import { saveTool } from "@/lib/client/save-tool";
-import { clientRuntime } from "@/lib/client-runtime";
-import { useRouter } from "next/navigation";
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { Effect, pipe } from "effect";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export function ToolSubmissionForm({ categories }: { categories: string[] }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -96,10 +93,10 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         Effect.sync(() => {
           reset();
           router.push("/submit/success");
-        })
+        }),
       ),
       Effect.tapError((error) =>
-        Effect.logError("Tool submission error: ", error)
+        Effect.logError("Tool submission error: ", error),
       ),
       Effect.catchTag("ParseError", (error) =>
         Effect.sync(() => {
@@ -110,26 +107,26 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
               setError(fieldName, { type: "server", message: issue.message });
             }
           });
-        })
+        }),
       ),
       Effect.catchTag("UserSessionNotFoundError", () =>
         Effect.sync(() => {
           const params = new URLSearchParams();
           params.set("next", pathname);
           router.push(`/signin?${params.toString()}`);
-        })
+        }),
       ),
       Effect.catchTag("ToolPermanentlyRejectedError", (error) =>
-        Effect.sync(() => setErrorMessage(error.message))
+        Effect.sync(() => setErrorMessage(error.message)),
       ),
       Effect.catchTag("InternalServerError", (error) =>
-        Effect.sync(() => setErrorMessage(error.message))
+        Effect.sync(() => setErrorMessage(error.message)),
       ),
       Effect.catchTag("NetworkError", (error) =>
-        Effect.sync(() => setErrorMessage(error.message))
+        Effect.sync(() => setErrorMessage(error.message)),
       ),
       Effect.ensureErrorType<never>(),
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false))),
     );
 
     await clientRuntime.runPromise(handledProgram);
@@ -240,7 +237,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
             >
               <SelectTrigger
                 id={id}
-                className="mt-2 border-neutral-300 w-full"
+                className="mt-2 w-full border-neutral-300"
                 aria-invalid={fieldError ? "true" : "false"}
                 aria-describedby={fieldError ? fieldErrorId : undefined}
               >

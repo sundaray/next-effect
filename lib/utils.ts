@@ -1,7 +1,7 @@
+import { adminApprovalStatusEnum } from "@/db/schema";
+import slugifyLib from "@sindresorhus/slugify";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import slugifyLib from "@sindresorhus/slugify";
-import { adminApprovalStatusEnum } from "@/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -38,13 +38,13 @@ export function unslugify(slug: string): string {
     .replace(/-/g, " ")
     .replace(
       /\w\S*/g,
-      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
     );
 }
 
 export function getWebPVariantUrl(
   originalUrl: string,
-  variant: "sm" | "md" | "lg" | "xl" | "original"
+  variant: "sm" | "md" | "lg" | "xl" | "original",
 ): string {
   const lastDotIndex = originalUrl.lastIndexOf(".");
   const baseUrl = originalUrl.substring(0, lastDotIndex);
@@ -60,7 +60,7 @@ export function ensureAbsoluteUrl(url: string): string {
 }
 
 export const getStatusPillStyles = (
-  status: (typeof adminApprovalStatusEnum.enumValues)[number]
+  status: (typeof adminApprovalStatusEnum.enumValues)[number],
 ) => {
   switch (status) {
     case "approved":

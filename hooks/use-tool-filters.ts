@@ -1,10 +1,10 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useQueryStates } from "nuqs";
-import { toolSearchParams } from "@/lib/tool-search-params";
 import type { ToolFilters } from "@/lib/tool-search-params";
+import { toolSearchParams } from "@/lib/tool-search-params";
+import { usePathname, useRouter } from "next/navigation";
+import { useQueryStates } from "nuqs";
+import { useTransition } from "react";
 
 export function useToolFilters() {
   const router = useRouter();

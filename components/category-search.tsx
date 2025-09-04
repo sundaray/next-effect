@@ -1,10 +1,10 @@
 "use client";
 
-import { useDebouncedCallback } from "use-debounce";
-import { useCategoryFilters } from "@/hooks/use-category-filters";
-import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
+import { Input } from "@/components/ui/input";
+import { useCategoryFilters } from "@/hooks/use-category-filters";
 import { cn } from "@/lib/utils";
+import { useDebouncedCallback } from "use-debounce";
 
 export function CategorySearch({ className }: { className?: string }) {
   const { isPending, setFilters } = useCategoryFilters();
@@ -15,21 +15,21 @@ export function CategorySearch({ className }: { className?: string }) {
 
   return (
     <div
-      className={cn("w-full group", className)}
+      className={cn("group w-full", className)}
       data-pending={isPending ? "" : undefined}
     >
-      <div className="w-full grid grid-cols-1">
+      <div className="grid w-full grid-cols-1">
         <Input
-          className="border-neutral-300 pl-8 col-start-1 row-start-1"
+          className="col-start-1 row-start-1 border-neutral-300 pl-8"
           type="search"
           placeholder="Search for a category..."
           onChange={(e) => handleSearch(e.target.value)}
           aria-label="Search for a category..."
         />
         {isPending ? (
-          <Icons.spinner className="animate-spin col-start-1 row-start-1 size-4 text-neutral-500 ml-3 self-center" />
+          <Icons.spinner className="col-start-1 row-start-1 ml-3 size-4 animate-spin self-center text-neutral-500" />
         ) : (
-          <Icons.search className="pointer-events-none col-start-1 row-start-1 size-4 text-neutral-500 ml-3 self-center" />
+          <Icons.search className="pointer-events-none col-start-1 row-start-1 ml-3 size-4 self-center text-neutral-500" />
         )}
       </div>
     </div>

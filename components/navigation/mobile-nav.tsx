@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
+import { navbarLinks } from "@/config/navbar";
+import type { User } from "@/lib/services/auth-service";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, MotionConfig, AnimatePresence } from "motion/react";
-import { cn } from "@/lib/utils";
-import { navbarLinks } from "@/config/navbar";
-import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
-import type { User } from "@/lib/services/auth-service";
+import React, { useEffect, useState } from "react";
 
 // ============================================================================
 // MobileNav
@@ -62,7 +62,7 @@ function MenuIcon({
         initial={false}
         animate={isOpen ? "open" : "closed"}
         onClick={onToggle}
-        className="relative z-50 flex size-8 items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
+        className="relative z-50 flex size-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
         <div className="relative flex size-4.5 items-center justify-center rounded-full">
@@ -130,7 +130,7 @@ function MenuDrawer({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: "-100%" }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="fixed top-20 left-0 z-40 h-[calc(100vh-5rem)] min-w-72 max-w-md bg-neutral-50 p-6 shadow-xl"
+      className="fixed top-20 left-0 z-40 h-[calc(100vh-5rem)] max-w-md min-w-72 bg-neutral-50 p-6 shadow-xl"
     >
       <nav>
         <ul className="flex flex-col space-y-2">
@@ -185,8 +185,8 @@ function MobileNavLink({
       className={cn(
         "block rounded-md px-4 py-2 text-base font-medium transition-colors",
         isActive
-          ? "text-neutral-900 font-semibold"
-          : "text-neutral-700 hover:text-neutral-900"
+          ? "font-semibold text-neutral-900"
+          : "text-neutral-700 hover:text-neutral-900",
       )}
     >
       {children}

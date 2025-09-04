@@ -1,5 +1,4 @@
-import React from "react";
-import { Heading, Text, Button, Section } from "@react-email/components";
+import { Button, Section, Text } from "@react-email/components";
 import { EmailLayout } from "./email-layout";
 
 type ApprovalEmailProps = {
@@ -23,9 +22,9 @@ export function ApprovalEmailTemplate({
       <Text className="text-base text-neutral-700">
         It is now live in our directory. You can view your listing here:
       </Text>
-      <Section className="text-center my-6">
+      <Section className="my-6 text-center">
         <Button
-          className="bg-sky-600 text-white font-semibold rounded-md px-6 py-3"
+          className="rounded-md bg-sky-600 px-6 py-3 font-semibold text-white"
           href={toolLink}
         >
           View Your Listing

@@ -1,8 +1,8 @@
+import { serverRuntime } from "@/lib/server-runtime";
+import type { AuthType } from "@/lib/services/auth-service";
+import { AuthService } from "@/lib/services/auth-service";
 import { Effect } from "effect";
 import { Hono } from "hono";
-import { serverRuntime } from "@/lib/server-runtime";
-import { AuthService } from "@/lib/services/auth-service";
-import type { AuthType } from "@/lib/services/auth-service";
 
 const app = new Hono<{ Variables: AuthType }>();
 

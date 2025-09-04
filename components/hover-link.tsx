@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 type HoverLinkProps = {
   href: string;
@@ -13,12 +13,12 @@ export function HoverLink({ href, children, className }: HoverLinkProps) {
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center text-base font-medium text-sky-600 hover:text-sky-800 transition-colors",
+        "group inline-flex items-center text-base font-medium text-sky-600 transition-colors hover:text-sky-800",
         "focus-visible:outline-none",
         "focus-visible:ring-2",
         "focus-visible:ring-sky-600",
         "focus-visible:ring-offset-4",
-        className
+        className,
       )}
     >
       <span>{children}</span>
@@ -29,7 +29,7 @@ export function HoverLink({ href, children, className }: HoverLinkProps) {
           "opacity-0",
           "transition-all duration-150 ease-out",
           "group-hover:opacity-100",
-          "group-hover:translate-x-0.5"
+          "group-hover:translate-x-0.5",
         )}
         aria-hidden="true"
       />

@@ -1,7 +1,7 @@
-import { Suspense } from "react";
-import { SignInWitjGoogleForm } from "@/components/auth/signin-with-google-form";
 import { SignInWithEmailOtpForm } from "@/components/auth/signin-with-email-otp-form";
+import { SignInWitjGoogleForm } from "@/components/auth/signin-with-google-form";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 
 export default async function SignIn() {
   return (
-    <div className="my-36 px-4 mx-auto max-w-[440px]">
+    <div className="mx-auto my-36 max-w-[440px] px-4">
       <h2 className="text-center text-4xl font-bold tracking-tight text-neutral-900">
         Welcome
       </h2>
-      <p className="text-center text-neutral-700 mt-4">
+      <p className="mt-4 text-center text-neutral-700">
         Sign in to your account
       </p>
       <Suspense>

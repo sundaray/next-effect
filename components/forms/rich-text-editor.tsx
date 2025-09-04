@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   type Editor,
   EditorContent,
@@ -5,15 +7,13 @@ import {
   useEditorState,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Bold, Italic, List, ListOrdered, Heading3 } from "lucide-react";
+import { Bold, Heading3, Italic, List, ListOrdered } from "lucide-react";
 import {
-  ControllerRenderProps,
   ControllerFieldState,
-  FieldValues,
+  ControllerRenderProps,
   FieldPath,
+  FieldValues,
 } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 const Toolbar = ({
   editor,
@@ -46,8 +46,8 @@ const Toolbar = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 border border-neutral-300 border-b-0 rounded-t-md",
-        disabled && "opacity-50"
+        "flex items-center gap-1 rounded-t-md border border-b-0 border-neutral-300 p-2",
+        disabled && "opacity-50",
       )}
     >
       {/* Bold Button */}
@@ -164,7 +164,7 @@ export function RichTextEditor<
       attributes: {
         id,
         class: cn(
-          "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[120px] rounded-b-md"
+          "prose prose-sm min-h-[120px] rounded-b-md px-3 py-2 prose-neutral outline-none",
         ),
       },
     },
@@ -176,11 +176,11 @@ export function RichTextEditor<
       <Toolbar editor={editor} disabled={!!disabled} />
       <EditorContent
         className={cn(
-          "min-h-[120px] max-h-[240px] overflow-y-auto w-full text-sm",
+          "max-h-[240px] min-h-[120px] w-full overflow-y-auto text-sm",
           "border border-neutral-300 bg-transparent shadow-xs",
           "transition-[color,box-shadow]",
           // Scrollbar styling
-          "scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full",
+          "scrollbar scrollbar-thumb-rounded-full scrollbar-w-2",
           "scrollbar-thumb-neutral-300 scrollbar-track-neutral-100",
           // Normal focus styles
           "has-[.tiptap:focus-visible]:border-ring",
@@ -191,7 +191,7 @@ export function RichTextEditor<
           fieldError && "has-[.tiptap:focus-visible]:border-destructive",
           fieldError && "has-[.tiptap:focus-visible]:ring-destructive/20",
           // Disabled styles
-          disabled && "pointer-events-none cursor-not-allowed opacity-50"
+          disabled && "pointer-events-none cursor-not-allowed opacity-50",
         )}
         editor={editor}
         aria-invalid={fieldError ? "true" : "false"}

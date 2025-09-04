@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "motion/react";
 import { MultiSelectCommand } from "@/components/forms/multi-select-command";
-import { pricingOptions } from "@/lib/schema";
 import { useToolFilters } from "@/hooks/use-tool-filters";
+import { pricingOptions } from "@/lib/schema";
 import { slugify } from "@/lib/utils";
+import { motion } from "motion/react";
 
 type Pricing = (typeof pricingOptions)[number];
 const isPricing = (v: string): v is Pricing =>
@@ -41,7 +41,7 @@ export function ToolFilter({
       animate={{ opacity: 1, scale: 1, y: 0, height: "auto" }}
       exit={{ opacity: 0, scale: 0.95, y: -4, height: 0 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="flex flex-col sm:flex-row gap-4 items-center origin-top-right"
+      className="flex origin-top-right flex-col items-center gap-4 sm:flex-row"
       data-pending={isPending ? "" : undefined}
     >
       <MultiSelectCommand

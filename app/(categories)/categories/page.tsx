@@ -1,8 +1,8 @@
-import { getCategories } from "@/lib/get-categories";
-import { CategorySearch } from "@/components/category-search";
 import { CategoryGrid } from "@/components/category-grid";
-import { type SearchParams } from "nuqs/server";
+import { CategorySearch } from "@/components/category-search";
 import { categorySearchParamsCache } from "@/lib/category-search-params";
+import { getCategories } from "@/lib/get-categories";
+import { type SearchParams } from "nuqs/server";
 
 type PageProps = {
   searchParams: Promise<SearchParams>;
@@ -23,16 +23,16 @@ export default async function Page({ searchParams }: PageProps) {
       acc[firstLetter].push(category);
       return acc;
     },
-    {} as Record<string, string[]>
+    {} as Record<string, string[]>,
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 my-36 group">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold tracking-tight text-neutral-900 text-pretty">
+    <div className="group mx-auto my-36 max-w-4xl px-4">
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-pretty text-neutral-900">
           Categories
         </h1>
-        <p className="text-lg text-neutral-700 mt-4 text-pretty">
+        <p className="mt-4 text-lg text-pretty text-neutral-700">
           Browse all categories to discover the perfect AI app for your needs.
         </p>
       </div>

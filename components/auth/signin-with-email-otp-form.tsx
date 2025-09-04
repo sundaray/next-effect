@@ -1,33 +1,32 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { Effect, Data, pipe } from "effect";
-import { useState, useId } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { Data, Effect, pipe } from "effect";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useId, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 
-import { motion, MotionConfig, AnimatePresence } from "motion/react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { FormMessage } from "@/components/forms/form-message";
 import { FormFieldMessage } from "@/components/forms/form-field-message";
+import { FormMessage } from "@/components/forms/form-message";
+import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import {
-  SignInWithEmailOtpFormSchemaType,
-  SignInWithEmailOtpFormSchema,
-} from "@/lib/schema";
-import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth/client";
 import { clientRuntime } from "@/lib/client-runtime";
-import { Icons } from "@/components/icons";
+import {
+  SignInWithEmailOtpFormSchema,
+  SignInWithEmailOtpFormSchemaType,
+} from "@/lib/schema";
+import { effectTsResolver } from "@hookform/resolvers/effect-ts";
+import { AnimatePresence, motion, MotionConfig } from "motion/react";
 
 class SendVerificationOtpError extends Data.TaggedError(
-  "SendVerificationOtpError"
+  "SendVerificationOtpError",
 )<{
   message: string;
 }> {}
@@ -91,8 +90,8 @@ export function SignInWithEmailOtpForm() {
         }),
     }).pipe(
       Effect.tapErrorTag("SendVerificationOtpError", (error) =>
-        Effect.logError("SendVerificationOtpError: ", error)
-      )
+        Effect.logError("SendVerificationOtpError: ", error),
+      ),
     );
 
     const handledProgram = pipe(
@@ -106,15 +105,15 @@ export function SignInWithEmailOtpForm() {
             setEmail(data.email);
             setStep("otp");
           }
-        })
+        }),
       ),
       Effect.catchTag("SendVerificationOtpError", (error) =>
         Effect.sync(() => {
           setErrorMessage(error.message);
-        })
+        }),
       ),
       Effect.ensureErrorType<never>(),
-      Effect.ensuring(Effect.sync(() => setIsProcessing(false)))
+      Effect.ensuring(Effect.sync(() => setIsProcessing(false))),
     );
 
     await clientRuntime.runPromise(handledProgram);
@@ -146,8 +145,8 @@ export function SignInWithEmailOtpForm() {
         }),
     }).pipe(
       Effect.tapErrorTag("VerifyOtpError", (error) =>
-        Effect.logError("VerifyOtpError: ", error)
-      )
+        Effect.logError("VerifyOtpError: ", error),
+      ),
     );
 
     const handledProgram = pipe(
@@ -157,7 +156,7 @@ export function SignInWithEmailOtpForm() {
           if (result.error) {
             if (result.error.code === "TOO_MANY_ATTEMPTS") {
               setOtpErrorMessage(
-                "Too many attempts. Please go back and request a new OTP."
+                "Too many attempts. Please go back and request a new OTP.",
               );
             } else if (result.error.code === "INVALID_OTP") {
               setOtpErrorMessage("Invalid OTP. Please try again.");
@@ -169,14 +168,14 @@ export function SignInWithEmailOtpForm() {
             router.push(next || "/");
             router.refresh();
           }
-        })
+        }),
       ),
       Effect.catchTag("VerifyOtpError", (error) =>
         Effect.sync(() => {
           setOtpErrorMessage(error.message);
-        })
+        }),
       ),
-      Effect.ensureErrorType<never>()
+      Effect.ensureErrorType<never>(),
     );
 
     await clientRuntime.runPromise(handledProgram);
@@ -241,11 +240,11 @@ export function SignInWithEmailOtpForm() {
               <Button
                 type="submit"
                 disabled={isProcessing}
-                className="h-10 mt-2"
+                className="mt-2 h-10"
               >
                 {isProcessing ? (
                   <>
-                    <Icons.spinner className="size-4 inline-block animate-spin" />
+                    <Icons.spinner className="inline-block size-4 animate-spin" />
                     Sending OTP...
                   </>
                 ) : (
@@ -310,7 +309,7 @@ export function SignInWithEmailOtpForm() {
                         errorMessage={otpErrorMessage}
                       />
                     ) : (
-                      <p className="text-sm text-neutral-500 mt-1">
+                      <p className="mt-1 text-sm text-neutral-500">
                         Enter the 6-digit OTP sent to your email.
                       </p>
                     )}
@@ -322,11 +321,11 @@ export function SignInWithEmailOtpForm() {
                 type="button"
                 onClick={handleVerifyOtp}
                 disabled={isProcessing || otp.length !== 6}
-                className="h-10 mt-4"
+                className="mt-4 h-10"
               >
                 {isProcessing ? (
                   <>
-                    <Icons.spinner className="size-4 inline-block animate-spin" />
+                    <Icons.spinner className="inline-block size-4 animate-spin" />
                     Verifying OTP...
                   </>
                 ) : (
@@ -339,7 +338,7 @@ export function SignInWithEmailOtpForm() {
                 variant="ghost"
                 onClick={handleBackToEmail}
                 disabled={isProcessing}
-                className="h-10 mt-2"
+                className="mt-2 h-10"
               >
                 Back to Email
               </Button>

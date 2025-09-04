@@ -1,16 +1,16 @@
-import { Hono } from "hono";
-import { Effect, Data, pipe, ParseResult } from "effect";
-import { serverRuntime } from "@/lib/server-runtime";
-import { validateToolSubmissionFormData } from "@/lib/server/validate-tool-submission-formdata";
-import { generatePresignedUrls } from "@/lib/server/generate-presigned-urls";
-import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-image-webp-variants";
-import { saveTool } from "@/lib/server/save-tool";
-import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
-import type { AuthType } from "@/lib/services/auth-service";
 import { checkForPermanentRejection } from "@/lib/check-for-permanent-rejection";
+import { ToolSubmissionFormSchemaType, saveToolPayload } from "@/lib/schema";
+import { serverRuntime } from "@/lib/server-runtime";
+import { createShowcaseImageWebPVariants } from "@/lib/server/create-showcase-image-webp-variants";
+import { generatePresignedUrls } from "@/lib/server/generate-presigned-urls";
+import { saveTool } from "@/lib/server/save-tool";
+import { validateToolSubmissionFormData } from "@/lib/server/validate-tool-submission-formdata";
+import type { AuthType } from "@/lib/services/auth-service";
+import { Data, Effect, ParseResult, pipe } from "effect";
+import { Hono } from "hono";
 
 class UserSessionNotFoundError extends Data.TaggedError(
-  "UserSessionNotFoundError"
+  "UserSessionNotFoundError",
 )<{
   message: string;
 }> {}
@@ -39,7 +39,7 @@ const app = new Hono<{
         return yield* Effect.fail(
           new UserSessionNotFoundError({
             message: "No active user session found.",
-          })
+          }),
         );
 
       // Step 2: Validate the tool submission form data against the schema.
@@ -48,7 +48,7 @@ const app = new Hono<{
 
       yield* checkForPermanentRejection(
         validatedToolSubmissionFormData.name,
-        user.id
+        user.id,
       );
 
       // Step 3: Generate presigned URLs for client-side file upload to S3.
@@ -73,21 +73,21 @@ const app = new Hono<{
       Effect.tapError((error) =>
         Effect.logError(
           "Tool submission error at /api/tools/presigned-url: ",
-          error
-        )
+          error,
+        ),
       ),
       Effect.catchTag("ParseError", (error) => {
         const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
         return Effect.succeed(
-          ctx.json({ _tag: "ParseError", issues }, { status: 400 })
+          ctx.json({ _tag: "ParseError", issues }, { status: 400 }),
         );
       }),
       Effect.catchTag("ToolPermanentlyRejectedError", (error) => {
         return Effect.succeed(
           ctx.json(
             { _tag: "ToolPermanentlyRejectedError", message: error.message },
-            { status: 403 }
-          )
+            { status: 403 },
+          ),
         );
       }),
       Effect.catchAll(() => {
@@ -98,11 +98,11 @@ const app = new Hono<{
               message:
                 "Tool submission failed due to a server error. Please try again.",
             },
-            { status: 500 }
-          )
+            { status: 500 },
+          ),
         );
       }),
-      Effect.ensureErrorType<never>()
+      Effect.ensureErrorType<never>(),
     );
 
     return await serverRuntime.runPromise(handledProgram);
@@ -126,7 +126,7 @@ const app = new Hono<{
           new UserSessionNotFoundError({
             message: "No active user session found.",
           }),
-          { status: 401 }
+          { status: 401 },
         );
       }
 
@@ -145,7 +145,7 @@ const app = new Hono<{
     const handledProgram = pipe(
       program,
       Effect.tapError((error) =>
-        Effect.logError("Tool submission error at /api/tools/save: ", error)
+        Effect.logError("Tool submission error at /api/tools/save: ", error),
       ),
       Effect.catchAll(() =>
         Effect.succeed(
@@ -155,11 +155,11 @@ const app = new Hono<{
               message:
                 "Tool submission failed due to a server error. Please try again.",
             },
-            { status: 500 }
-          )
-        )
+            { status: 500 },
+          ),
+        ),
       ),
-      Effect.ensureErrorType<never>()
+      Effect.ensureErrorType<never>(),
     );
 
     return await serverRuntime.runPromise(handledProgram);

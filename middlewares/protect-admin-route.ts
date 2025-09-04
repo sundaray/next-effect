@@ -1,7 +1,7 @@
-import { Data } from "effect";
-import { createMiddleware } from "hono/factory";
-import type { Next, Context } from "hono";
 import { AuthType } from "@/lib/services/auth-service";
+import { Data } from "effect";
+import type { Context, Next } from "hono";
+import { createMiddleware } from "hono/factory";
 
 type MiddlewareContext = Context<{
   Variables: AuthType;
@@ -13,7 +13,7 @@ export class AdminAccessError extends Data.TaggedError("AdminAccessError")<{
 
 export async function protectAdminRouteHandler(
   ctx: MiddlewareContext,
-  next: Next
+  next: Next,
 ) {
   const user = ctx.get("user");
 
@@ -22,7 +22,7 @@ export async function protectAdminRouteHandler(
       new AdminAccessError({
         message: "You do not have permission to perform this action.",
       }),
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -30,5 +30,5 @@ export async function protectAdminRouteHandler(
 }
 
 export const protectAdminRouteMiddleware = createMiddleware(
-  protectAdminRouteHandler
+  protectAdminRouteHandler,
 );

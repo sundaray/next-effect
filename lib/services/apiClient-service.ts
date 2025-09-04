@@ -1,5 +1,5 @@
+import { FetchHttpClient, HttpClient } from "@effect/platform";
 import { Effect } from "effect";
-import { HttpClient, FetchHttpClient } from "@effect/platform";
 
 export class ApiClientService extends Effect.Service<ApiClientService>()(
   "ApiClientService",
@@ -9,5 +9,5 @@ export class ApiClientService extends Effect.Service<ApiClientService>()(
       return client;
     }),
     dependencies: [FetchHttpClient.layer],
-  }
+  },
 ) {}

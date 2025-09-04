@@ -1,6 +1,6 @@
-import { Effect, Data } from "effect";
-import { S3Client } from "@aws-sdk/client-s3";
 import { S3ClientService } from "@/lib/services/s3Client-service";
+import { S3Client } from "@aws-sdk/client-s3";
+import { Data, Effect } from "effect";
 
 class StorageError extends Data.TaggedError("StorageError")<{
   cause: unknown;
@@ -8,7 +8,7 @@ class StorageError extends Data.TaggedError("StorageError")<{
 
 type StorageServiceImp = {
   use: <A>(
-    f: (client: S3Client) => Promise<A>
+    f: (client: S3Client) => Promise<A>,
   ) => Effect.Effect<A, StorageError>;
 };
 
@@ -29,5 +29,5 @@ export class StorageService extends Effect.Service<StorageServiceImp>()(
       } satisfies StorageServiceImp;
     }),
     dependencies: [S3ClientService.Default],
-  }
+  },
 ) {}

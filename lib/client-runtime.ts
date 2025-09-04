@@ -1,5 +1,5 @@
-import { Layer, ManagedRuntime } from "effect";
 import { ApiClientService } from "@/lib/services/apiClient-service";
+import { Layer, ManagedRuntime } from "effect";
 
 const ApiClientServiceLayer = ApiClientService.Default;
 

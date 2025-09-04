@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
-import { getStatusPillStyles } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { adminApprovalStatusEnum } from "@/db/schema";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { APP_RESUBMISSION_LIMIT } from "@/config/limit";
+import { adminApprovalStatusEnum } from "@/db/schema";
+import { cn, getStatusPillStyles } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
+import { useState } from "react";
 
 export type Submission = {
   name: string;
@@ -61,7 +60,7 @@ export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
             <Badge
               className={cn(
                 "font-medium capitalize",
-                getStatusPillStyles(status)
+                getStatusPillStyles(status),
               )}
             >
               {status}
@@ -69,7 +68,7 @@ export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
             {isRejectedWithReason && (
               <Button
                 variant="link"
-                className="h-auto p-0 text-sky-600 text-xs"
+                className="h-auto p-0 text-xs text-sky-600"
                 onClick={() => {
                   setSelectedSubmission(submission);
                   setDialogOpen(true);
@@ -97,7 +96,7 @@ export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
 
         if (remaining < 0) return 0;
 
-        return <span className=" text-neutral-900">{remaining}</span>;
+        return <span className="text-neutral-900">{remaining}</span>;
       },
     });
   }
@@ -111,8 +110,8 @@ export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
             <DialogTitle>
               Rejection Reason for "{selectedSubmission?.name}"
             </DialogTitle>
-            <ScrollArea className="max-h-64 mt-4 pr-6">
-              <DialogDescription className="text-neutral-700 text-base">
+            <ScrollArea className="mt-4 max-h-64 pr-6">
+              <DialogDescription className="text-base text-neutral-700">
                 {selectedSubmission?.rejectionReason ||
                   "No reason was provided."}
               </DialogDescription>

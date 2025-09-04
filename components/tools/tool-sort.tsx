@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { useToolFilters } from "@/hooks/use-tool-filters";
 import { toolSortOptions } from "@/config/tool-options";
+import { useToolFilters } from "@/hooks/use-tool-filters";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -18,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export function ToolSort() {
   const [open, setOpen] = useState(false);
@@ -35,7 +35,7 @@ export function ToolSort() {
           role="combobox"
           aria-expanded={open}
           data-pending={isPending ? "" : undefined}
-          className="w-full md:w-[220px] justify-between border-neutral-300 bg-transparent h-10"
+          className="h-10 w-full justify-between border-neutral-300 bg-transparent md:w-[220px]"
         >
           <span>
             <span className="text-neutral-500">Sort by: </span>
@@ -62,7 +62,7 @@ export function ToolSort() {
                       "mr-2 h-4 w-4",
                       filters.sort === option.value
                         ? "opacity-100"
-                        : "opacity-0"
+                        : "opacity-0",
                     )}
                   />
                   {option.label}

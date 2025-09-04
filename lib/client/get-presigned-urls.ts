@@ -1,15 +1,15 @@
-import "client-only";
-import { Effect } from "effect";
-import { hc, parseResponse, DetailedError } from "hono/client";
 import type { ApiRoutes } from "@/app/api/[[...path]]/route";
-import { ToolSubmissionFormSchemaType } from "@/lib/schema";
 import {
-  ParseError,
-  UserSessionNotFoundError,
   InternalServerError,
   NetworkError,
+  ParseError,
   ToolPermanentlyRejectedError,
+  UserSessionNotFoundError,
 } from "@/lib/client/errors";
+import { ToolSubmissionFormSchemaType } from "@/lib/schema";
+import "client-only";
+import { Effect } from "effect";
+import { DetailedError, hc, parseResponse } from "hono/client";
 
 const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
 
@@ -32,7 +32,7 @@ export function getPresignedUrls(data: ToolSubmissionFormSchemaType) {
       parseResponse(
         client.api.tools["presigned-url"].$post({
           form: { ...data, categories: JSON.stringify(data.categories) },
-        })
+        }),
       ),
     catch: (error) => {
       if (error instanceof DetailedError) {

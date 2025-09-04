@@ -1,9 +1,9 @@
-import { Layer, ManagedRuntime } from "effect";
+import { AuthService } from "@/lib/services/auth-service";
 import { DatabaseService } from "@/lib/services/database-service";
 import { DbClientService } from "@/lib/services/dbClient-service";
-import { StorageService } from "@/lib/services/storage-service";
-import { AuthService } from "@/lib/services/auth-service";
 import { EmailService } from "@/lib/services/email-service";
+import { StorageService } from "@/lib/services/storage-service";
+import { Layer, ManagedRuntime } from "effect";
 
 const DatabaseServiceLayer = DatabaseService.Default;
 const DbClientServiceLayer = DbClientService.Default;
@@ -16,7 +16,7 @@ const AppLayer = Layer.mergeAll(
   DbClientServiceLayer,
   StorageServiceLayer,
   AuthServiceLayer,
-  EmailServiceLayer
+  EmailServiceLayer,
 );
 
 export const serverRuntime = ManagedRuntime.make(AppLayer);

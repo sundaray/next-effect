@@ -1,5 +1,4 @@
-import { parseAsString } from "nuqs/server";
-import { createSearchParamsCache } from "nuqs/server";
+import { createSearchParamsCache, parseAsString } from "nuqs/server";
 
 export const categorySearchParams = {
   search: parseAsString.withDefault(""),

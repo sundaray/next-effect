@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/get-user";
+import { NextRequest, NextResponse } from "next/server";
 
 const guestOnlyPaths = ["/signin"];
 const adminOnlyPaths = ["/admin"];
@@ -9,14 +9,14 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   const isOnGuestPath = guestOnlyPaths.some(
-    (route) => path === route || path.startsWith(`${route}/`)
+    (route) => path === route || path.startsWith(`${route}/`),
   );
   const isOnAdminPath = adminOnlyPaths.some(
-    (route) => path === route || path.startsWith(`${route}/`)
+    (route) => path === route || path.startsWith(`${route}/`),
   );
 
   const isOnProtectedPath = protectedPaths.some(
-    (route) => path === route || path.startsWith(`${route}/`)
+    (route) => path === route || path.startsWith(`${route}/`),
   );
 
   const user = await getUser(request.headers);

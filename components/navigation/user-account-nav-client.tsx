@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Icons } from "@/components/icons";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth/client";
 import type { User } from "@/lib/services/auth-service";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 export function UserAccountNavClient({ user }: { user: User }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,7 +67,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
             {user?.email && (
               <>
                 <p className="text-xs text-neutral-500">signed in as</p>
-                <p className="w-[200px] truncate text-sm text-neutral-600 font-medium">
+                <p className="w-[200px] truncate text-sm font-medium text-neutral-600">
                   {user.email}
                 </p>
               </>
@@ -108,7 +108,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
             >
               {isPending ? (
                 <>
-                  <Icons.spinner className="size-4 inline-block animate-spin" />
+                  <Icons.spinner className="inline-block size-4 animate-spin" />
                   <p className="text-sm">Signing out...</p>
                 </>
               ) : (

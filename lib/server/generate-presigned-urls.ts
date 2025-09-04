@@ -1,17 +1,17 @@
-import "server-only";
-import { Effect, Option, Config, Data } from "effect";
-import { randomUUID } from "node:crypto";
 import { ToolSubmissionFormSchemaType } from "@/lib/schema";
+import { StorageService } from "@/lib/services/storage-service";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { StorageService } from "@/lib/services/storage-service";
+import { Config, Data, Effect, Option } from "effect";
+import { randomUUID } from "node:crypto";
+import "server-only";
 
 class PresignedUrlGenerationError extends Data.TaggedError(
-  "PresignedUrlGenerationError"
+  "PresignedUrlGenerationError",
 )<{ cause: unknown; message: string }> {}
 
 export function generatePresignedUrls(
-  validatedFormData: ToolSubmissionFormSchemaType
+  validatedFormData: ToolSubmissionFormSchemaType,
 ) {
   return Effect.gen(function* () {
     const storageService = yield* StorageService;
@@ -32,20 +32,20 @@ export function generatePresignedUrls(
             Key: showcaseImageKey,
             ContentType: showcaseImageFile.type,
           }),
-          { expiresIn: 600 } // 10 minutes
-        )
+          { expiresIn: 600 }, // 10 minutes
+        ),
       )
       .pipe(
         Effect.tapErrorTag("StorageError", (error) =>
-          Effect.logError("PresignedUrlGenerationError: ", error)
+          Effect.logError("PresignedUrlGenerationError: ", error),
         ),
         Effect.mapError(
           (error) =>
             new PresignedUrlGenerationError({
               cause: error,
               message: "Failed to generate presigned URLs. Please try again.",
-            })
-        )
+            }),
+        ),
       );
 
     // --- Generate logo upload URL (If logo is available) ---
@@ -68,20 +68,20 @@ export function generatePresignedUrls(
               Key: logoKey,
               ContentType: logoFile.type,
             }),
-            { expiresIn: 600 }
-          )
+            { expiresIn: 600 },
+          ),
         )
         .pipe(
           Effect.tapErrorTag("StorageError", (error) =>
-            Effect.logError("PresignedUrlGenerationError: ", error)
+            Effect.logError("PresignedUrlGenerationError: ", error),
           ),
           Effect.mapError(
             (error) =>
               new PresignedUrlGenerationError({
                 cause: error,
                 message: "Failed to generate presigned URLs. Please try again.",
-              })
-          )
+              }),
+          ),
         );
 
       logoUploadDetails = Option.some({ logoUploadUrl, logoKey });
@@ -94,7 +94,7 @@ export function generatePresignedUrls(
         Option.map(logoUploadDetails, (details) => ({
           logoUploadUrl: details.logoUploadUrl,
           logoKey: details.logoKey,
-        }))
+        })),
       ),
     };
   });

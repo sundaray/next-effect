@@ -1,11 +1,11 @@
-import "server-only";
-import { Effect, Config, Data } from "effect";
-import { DatabaseService } from "@/lib/services/database-service";
-import { tools, users, toolHistory } from "@/db/schema";
+import { toolHistory, tools, users } from "@/db/schema";
+import { deleteImageAssetsFromS3 } from "@/lib/delete-image-assets-from-s3";
 import { saveToolPayload } from "@/lib/schema";
+import { DatabaseService } from "@/lib/services/database-service";
 import { slugify } from "@/lib/utils";
 import { eq, sql } from "drizzle-orm";
-import { deleteImageAssetsFromS3 } from "@/lib/delete-image-assets-from-s3";
+import { Config, Data, Effect } from "effect";
+import "server-only";
 
 class SaveToolError extends Data.TaggedError("SaveToolError")<{
   message: string;
@@ -27,7 +27,7 @@ export function saveTool(body: saveToolPayload, userId: string) {
     const existingTool = yield* dbService.use((db) =>
       db.query.tools.findFirst({
         where: eq(tools.slug, baseSlug),
-      })
+      }),
     );
 
     if (existingTool) {
@@ -45,7 +45,7 @@ export function saveTool(body: saveToolPayload, userId: string) {
           const baseKeyWithExtension = urlParts.slice(-2).join("/");
           const baseKey = baseKeyWithExtension.substring(
             0,
-            baseKeyWithExtension.lastIndexOf(".")
+            baseKeyWithExtension.lastIndexOf("."),
           );
 
           // Generate all WebP variant keys to delete
@@ -94,16 +94,16 @@ export function saveTool(body: saveToolPayload, userId: string) {
               Effect.tapError((error) =>
                 Effect.logError(
                   "Database error updating rejected tool: ",
-                  error
-                )
+                  error,
+                ),
               ),
               Effect.mapError(
                 () =>
                   new SaveToolError({
                     message:
                       "Failed to update your submission. Please try again.",
-                  })
-              )
+                  }),
+              ),
             ),
           deleteImageAssetsFromS3(keysToDelete),
         ]);
@@ -119,7 +119,7 @@ export function saveTool(body: saveToolPayload, userId: string) {
       const toolWithSlug = yield* dbService.use((db) =>
         db.query.tools.findFirst({
           where: eq(tools.slug, finalSlug),
-        })
+        }),
       );
       if (!toolWithSlug) {
         break;
@@ -160,15 +160,15 @@ export function saveTool(body: saveToolPayload, userId: string) {
             .where(eq(users.id, userId));
 
           return insertedTool;
-        })
+        }),
       )
       .pipe(
         Effect.mapError(
           () =>
             new SaveToolError({
               message: "Failed to save tool to the database. Please try again.",
-            })
-        )
+            }),
+        ),
       );
 
     return result[0];

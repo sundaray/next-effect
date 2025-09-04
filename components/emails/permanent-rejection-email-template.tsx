@@ -1,4 +1,3 @@
-import React from "react";
 import { Heading, Text } from "@react-email/components";
 import { EmailLayout } from "./email-layout";
 
@@ -28,17 +27,17 @@ export function PermanentRejectionEmailTemplate({
         reached the maximum number of resubmissions allowed. As a result, it is
         now considered permanently rejected and can no longer be updated.
       </Text>
-      <Text className="text-base text-neutral-700 mt-4">
+      <Text className="mt-4 text-base text-neutral-700">
         <strong>Final reason for rejection:</strong>
       </Text>
-      <Text className="text-base italic bg-neutral-100 p-4 border-l-4 border-neutral-300 my-4">
+      <Text className="my-4 border-l-4 border-neutral-300 bg-neutral-100 p-4 text-base italic">
         {reason}
       </Text>
       <Text className="text-base text-neutral-700">
         We appreciate your interest and effort. You are welcome to submit other
         new tools that meet our guidelines in the future.
       </Text>
-      <Text className="text-base text-neutral-700 mt-4">
+      <Text className="mt-4 text-base text-neutral-700">
         Best,
         <br />
         Hemanta Sundaray

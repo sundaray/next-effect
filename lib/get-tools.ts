@@ -1,16 +1,16 @@
 import "server-only";
 
-import { Effect } from "effect";
-import { desc, and, ilike, inArray, arrayOverlaps, SQL, eq } from "drizzle-orm";
-import { DatabaseService } from "@/lib/services/database-service";
-import { serverRuntime } from "@/lib/server-runtime";
 import { tools } from "@/db/schema";
-import { unslugify } from "@/lib/utils";
+import { serverRuntime } from "@/lib/server-runtime";
+import { DatabaseService } from "@/lib/services/database-service";
 import type { ToolFilters } from "@/lib/tool-search-params";
+import { unslugify } from "@/lib/utils";
+import { and, arrayOverlaps, desc, eq, ilike, inArray, SQL } from "drizzle-orm";
+import { Effect } from "effect";
 
 export async function getTools(
   filters: Partial<ToolFilters>,
-  userRole: string | null
+  userRole: string | null,
 ) {
   // This array will hold all the WHERE clauses for our final query
   const conditions: SQL[] = [];
@@ -30,7 +30,7 @@ export async function getTools(
   // Category condition
   if (categories.length > 0) {
     const originalCategoryNames = categories.map((category) =>
-      unslugify(category)
+      unslugify(category),
     );
     conditions.push(arrayOverlaps(tools.categories, originalCategoryNames));
   }
@@ -66,12 +66,12 @@ export async function getTools(
         .select()
         .from(tools)
         .where(and(...conditions))
-        .orderBy(orderByClause)
+        .orderBy(orderByClause),
     );
 
     return filteredTools;
   }).pipe(
-    Effect.tapError((error) => Effect.logError("Error at getTools(): ", error))
+    Effect.tapError((error) => Effect.logError("Error at getTools(): ", error)),
   );
 
   return await serverRuntime.runPromise(program);

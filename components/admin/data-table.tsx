@@ -8,6 +8,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -16,8 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -42,7 +42,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="rounded-md border border-neutral-300 overflow-hidden">
+      <div className="overflow-hidden rounded-md border border-neutral-300">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -53,7 +53,7 @@ export function DataTable<TData, TValue>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
             disabled={!table.getCanPreviousPage()}
           >
             <Icons.arrowLeft
-              className="transition-transform group-hover/previous:-translate-x-1 text-neutral-500"
+              className="text-neutral-500 transition-transform group-hover/previous:-translate-x-1"
               aria-hidden="true"
             />
             <span className="hidden sm:block">Previous</span>
@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
           >
             <span className="hidden sm:block">Next</span>
             <Icons.arrowRight
-              className="transition-transform group-hover/next:translate-x-1 text-neutral-500"
+              className="text-neutral-500 transition-transform group-hover/next:translate-x-1"
               aria-hidden="true"
             />
           </Button>

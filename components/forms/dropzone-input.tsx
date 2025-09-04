@@ -1,17 +1,17 @@
-import { motion, AnimatePresence } from "motion/react";
-import { useDropzone, FileRejection } from "react-dropzone";
-import {
-  ControllerRenderProps,
-  ControllerFieldState,
-  FieldValues,
-  FieldPath,
-  UseFormSetError,
-  UseFormClearErrors,
-} from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
-import { FileImage as FileImageIcon, X } from "lucide-react";
 import { PhotoIcon } from "@heroicons/react/24/solid";
+import { FileImage as FileImageIcon, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { FileRejection, useDropzone } from "react-dropzone";
+import {
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+  UseFormClearErrors,
+  UseFormSetError,
+} from "react-hook-form";
 
 type DropzoneInputProps<
   TFieldValues extends FieldValues,
@@ -54,7 +54,7 @@ export function DropzoneInput<
         message = `File size must be less than ${maxSizeInMb}MB.`;
       } else if (firstError.code === "file-invalid-type") {
         message = `Invalid file type. Supported types are ${supportedFileTypes.join(
-          ", "
+          ", ",
         )}.`;
       }
 
@@ -89,7 +89,7 @@ export function DropzoneInput<
           acc[mimeType] = [];
           return acc;
         },
-        {} as Record<string, string[]>
+        {} as Record<string, string[]>,
       ),
       maxSize: maxSizeInBytes,
     });
@@ -110,10 +110,10 @@ export function DropzoneInput<
           "aria-invalid": fieldError ? "true" : "false",
           "aria-describedby": fieldError ? fieldErrorId : undefined,
           className: cn(
-            "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed aria-invalid:border-destructive aria-invalid:ring-destructive/20 border-neutral-300 p-12 text-center transition-colors",
+            "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed border-neutral-300 p-12 text-center transition-colors aria-invalid:border-destructive aria-invalid:ring-destructive/20",
             isDragActive && !isDragReject && "border-green-500",
             isDragReject && "border-red-500",
-            disabled && "cursor-not-allowed pointer-events-none opacity-50"
+            disabled && "pointer-events-none cursor-not-allowed opacity-50",
           ),
         })}
       >
@@ -155,7 +155,7 @@ export function DropzoneInput<
               type="button"
               size="icon"
               variant="ghost"
-              className="size-10 rounded-full text-neutral-500 hover:text-neutral-700 hover:bg-neutral-300/50"
+              className="size-10 rounded-full text-neutral-500 hover:bg-neutral-300/50 hover:text-neutral-700"
               onClick={handleRemoveFile}
               disabled={disabled}
             >

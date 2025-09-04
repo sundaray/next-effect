@@ -9,7 +9,7 @@ export class NetworkError extends Data.TaggedError("NetworkError")<{
 }> {}
 
 export class InternalServerError extends Data.TaggedError(
-  "InternalServerError"
+  "InternalServerError",
 )<{
   message: string;
 }> {}
@@ -19,19 +19,19 @@ export class ParseError extends Data.TaggedError("ParseError")<{
 }> {}
 
 export class UserSessionNotFoundError extends Data.TaggedError(
-  "UserSessionNotFoundError"
+  "UserSessionNotFoundError",
 )<{
   message: string;
 }> {}
 
 export class SignInWithGoogleError extends Data.TaggedError(
-  "SignInWithGoogleError"
+  "SignInWithGoogleError",
 )<{
   message: string;
 }> {}
 
 export class ToolPermanentlyRejectedError extends Data.TaggedError(
-  "ToolPermanentlyRejectedError"
+  "ToolPermanentlyRejectedError",
 )<{
   message: string;
 }> {}
