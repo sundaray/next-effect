@@ -43,7 +43,7 @@ function MyTag({ children, className, ref, ...props }: MyTagProps) {
           {allowsRemoving && (
             <Button
               slot="remove"
-              className="p-1 group h-auto text-neutral-500 transition-colors  data-[hovered]:text-neutral-700 data-[hovered]:bg-neutral-300/50 rounded-full"
+              className="p-1 group h-auto text-neutral-500 transition-colors  data-[hovered]:text-neutral-700 data-[hovered]:bg-neutral-300/50 rounded-full cursor-pointer"
             >
               <Icons.x className="size-4" />
             </Button>

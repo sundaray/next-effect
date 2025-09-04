@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { AnimatePresence, LayoutGroup } from "motion/react";
+import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { ToolSearch } from "@/components/tools/tool-search";
 import { ToolSort } from "@/components/tools/tool-sort";
 import { ToolFilter } from "@/components/tools/tool-filter";
@@ -41,7 +41,7 @@ export function ToolControls({
   }, [showFilters]);
 
   return (
-    <LayoutGroup>
+    <>
       <ActiveFilters onClearAll={() => setShowFilters(false)} />
       <div className="mt-8 mb-12 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
         <div className="space-y-1" ref={controlsRef}>
@@ -61,6 +61,6 @@ export function ToolControls({
         </div>
         <ToolSort />
       </div>
-    </LayoutGroup>
+    </>
   );
 }
