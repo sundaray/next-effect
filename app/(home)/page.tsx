@@ -4,8 +4,15 @@ import { getCategories } from "@/lib/get-categories";
 import { getTools } from "@/lib/get-tools";
 import { getUser } from "@/lib/get-user";
 import { toolSearchParamsCache } from "@/lib/tool-search-params";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import type { SearchParams } from "nuqs/server";
+
+export const metadata: Metadata = {
+  title: "INDIEAITOOLS",
+  description:
+    "A curated directory of AI apps for every use case. Submit your app for free, find new users, and boost your SEO with a backlink.",
+};
 
 type HomePageProps = {
   searchParams: Promise<SearchParams>;
