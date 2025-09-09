@@ -35,16 +35,11 @@ export default async function RootLayout({
   const requestHeaders = await headers();
   const sessionPayload = await getSession(requestHeaders);
 
-  console.log(
-    "Current Session Payload:",
-    JSON.stringify(sessionPayload, null, 2),
-  );
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <ImpersonationBanner sessionPayload={sessionPayload} />
         <NextTopLoader showSpinner={false} color="#0284c7" shadow={false} />
         <header>
           <MainNav items={siteConfig.mainNav} />
@@ -56,6 +51,7 @@ export default async function RootLayout({
           </RouterProvider>
         </main>
         <Footer />
+        <ImpersonationBanner sessionPayload={sessionPayload} />
       </body>
     </html>
   );

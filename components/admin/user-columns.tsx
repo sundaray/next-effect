@@ -1,5 +1,5 @@
 "use client";
-
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,18 +11,27 @@ import { authClient } from "@/lib/auth/client";
 import type { UserForAdminTable } from "@/lib/get-all-users";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
+import { useState } from "react";
 import { Badge } from "../ui/badge";
 
 const UserActions = ({ row }: { row: { original: UserForAdminTable } }) => {
+  const [isImpersonating, setIsImpersonating] = useState(false);
   const user = row.original;
   const router = useRouter();
 
   const handleImpersonate = async () => {
-    await authClient.admin.impersonateUser({ userId: user.id });
-    router.refresh();
+    setIsImpersonating(true);
+    try {
+      await authClient.admin.impersonateUser({ userId: user.id });
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to impersonate user:", error);
+    } finally {
+      setIsImpersonating(false);
+    }
   };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,8 +41,16 @@ const UserActions = ({ row }: { row: { original: UserForAdminTable } }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleImpersonate}>
-          Impersonate User
+        <DropdownMenuItem
+          onClick={handleImpersonate}
+          onSelect={(e) => {
+            e.preventDefault();
+            handleImpersonate();
+          }}
+          disabled={isImpersonating}
+        >
+          {isImpersonating && <Icons.spinner className="size-4 animate-spin" />}
+          {isImpersonating ? "Impersonating..." : "Impersonate User"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
