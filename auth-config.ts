@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP } from "better-auth/plugins/email-otp";
+import { admin, emailOTP } from "better-auth/plugins";
 
 export const auth = betterAuth({
   database: drizzleAdapter(undefined as any, {
@@ -16,6 +16,7 @@ export const auth = betterAuth({
   },
 
   plugins: [
+    admin(),
     emailOTP({
       async sendVerificationOTP({ email, otp }) {},
     }),

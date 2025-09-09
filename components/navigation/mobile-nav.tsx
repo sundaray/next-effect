@@ -1,7 +1,7 @@
 "use client";
 
 import { UserAccountNavClient } from "@/components/navigation/user-account-nav-client";
-import { navbarLinks } from "@/config/navbar";
+import { siteConfig } from "@/config/navbar";
 import type { User } from "@/lib/services/auth-service";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
@@ -134,7 +134,7 @@ function MenuDrawer({
     >
       <nav>
         <ul className="flex flex-col space-y-2">
-          {navbarLinks.main.map((item) => (
+          {siteConfig.mainNav.map((item) => (
             <li key={item.href}>
               <MobileNavLink href={item.href} onClick={onLinkClick}>
                 {item.title}

@@ -2,7 +2,7 @@ import { sendSignInOtpEmail } from "@/lib/send-otp-email";
 import { DbClientService } from "@/lib/services/dbClient-service";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP } from "better-auth/plugins/email-otp";
+import { admin, emailOTP } from "better-auth/plugins";
 import { Config, Effect, Redacted } from "effect";
 
 const adminEmailsConfig = Config.array(Config.string(), "ADMIN_EMAILS").pipe(
@@ -38,6 +38,7 @@ export class AuthService extends Effect.Service<AuthService>()("AuthService", {
         },
       },
       plugins: [
+        admin(),
         emailOTP({
           async sendVerificationOTP({ email, otp }) {
             const { serverRuntime } = await import("@/lib/server-runtime");
@@ -102,3 +103,8 @@ export type AuthType = {
 };
 
 export type User = typeof AuthService.Service.$Infer.Session.user | null;
+export type Session = typeof AuthService.Service.$Infer.Session.session | null;
+export type SessionPayload = {
+  session: Session;
+  user: User;
+} | null;

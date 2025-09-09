@@ -1,8 +1,11 @@
-import { AdminClient } from "@/components/admin/dashboard-client";
+import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import { getAllSubmissions } from "@/lib/get-all-submissions";
+import { getAllUsers } from "@/lib/get-all-users";
+import { Suspense } from "react";
 
 export default async function AdminPage() {
   const submissions = await getAllSubmissions();
+  const users = await getAllUsers();
 
   return (
     <div className="group mx-auto my-36 max-w-4xl px-4">
@@ -11,11 +14,12 @@ export default async function AdminPage() {
           Admin Dashboard
         </h1>
         <p className="mt-4 text-neutral-700">
-          Review and manage all app submissions.
+          Review and manage all app submissions and users.
         </p>
       </div>
-
-      <AdminClient submissions={submissions} />
+      <Suspense>
+        <AdminDashboard submissions={submissions} users={users} />
+      </Suspense>
     </div>
   );
 }
