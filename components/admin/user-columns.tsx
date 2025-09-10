@@ -1,5 +1,7 @@
 "use client";
+
 import { Icons } from "@/components/icons";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,10 +15,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
 import { useState } from "react";
-import { Badge } from "../ui/badge";
 
 const UserActions = ({ row }: { row: { original: UserForAdminTable } }) => {
   const [isImpersonating, setIsImpersonating] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = row.original;
   const router = useRouter();
 
@@ -30,10 +32,11 @@ const UserActions = ({ row }: { row: { original: UserForAdminTable } }) => {
       console.error("Failed to impersonate user:", error);
     } finally {
       setIsImpersonating(false);
+      setIsMenuOpen(false);
     }
   };
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="size-8 p-0">
           <span className="sr-only">Open menu</span>
@@ -42,7 +45,6 @@ const UserActions = ({ row }: { row: { original: UserForAdminTable } }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
-          onClick={handleImpersonate}
           onSelect={(e) => {
             e.preventDefault();
             handleImpersonate();
@@ -79,6 +81,7 @@ export const userColumns: ColumnDef<UserForAdminTable>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: UserActions,
   },
 ];
