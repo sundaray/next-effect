@@ -1,12 +1,16 @@
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
+import { UserDashboard } from "@/components/dashboard/user-dashboard";
 import { buttonVariants } from "@/components/ui/button";
-import { DashboardClient } from "@/components/user/dashboard-client";
 import { APP_RESUBMISSION_LIMIT, APP_SUBMISSION_LIMIT } from "@/config/limit";
+import { getAllSubmissions } from "@/lib/get-all-submissions";
+import { getAllUsers } from "@/lib/get-all-users";
 import { getUser } from "@/lib/get-user";
 import { getUserSubmissions } from "@/lib/get-user-submissions";
 import { cn } from "@/lib/utils";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function DashboardPage() {
   const requestHeaders = await headers();
@@ -14,6 +18,33 @@ export default async function DashboardPage() {
 
   if (!user) {
     redirect("/signin");
+  }
+
+  if (user.role === "admin") {
+    const allSubmissions = await getAllSubmissions();
+    const allUsers = await getAllUsers();
+    const mySubmissions = await getUserSubmissions(user.id);
+
+    return (
+      <div className="group mx-auto my-36 max-w-4xl px-4">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
+            Admin Dashboard
+          </h1>
+          <p className="mt-4 text-neutral-700">
+            Review and manage all app submissions and users.
+          </p>
+        </div>
+        <Suspense>
+          <AdminDashboard
+            allSubmissions={allSubmissions}
+            allUsers={allUsers}
+            mySubmissions={mySubmissions}
+            user={user}
+          />
+        </Suspense>
+      </div>
+    );
   }
 
   const submissions = await getUserSubmissions(user.id);
@@ -50,7 +81,7 @@ export default async function DashboardPage() {
           <div className="mb-4 rounded-md border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm text-pretty text-sky-900">
             {submissionMessage}
           </div>
-          <DashboardClient
+          <UserDashboard
             submissions={submissions}
             hasRejectedSubmissions={hasRejectedSubmissions}
           />

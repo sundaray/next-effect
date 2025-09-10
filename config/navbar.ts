@@ -11,7 +11,8 @@ export const siteConfig: SiteConfig = {
     { title: "Categories", href: "/categories" },
   ],
   adminNav: [
-    { id: "submissions", title: "User Submissions" },
-    { id: "users", title: "User Management" },
+    { id: "submission-management", title: "Submission Management" },
+    { id: "user-management", title: "User Management" },
+    { id: "my-submissions", title: "My Submissions" },
   ],
 };

@@ -24,7 +24,7 @@ export type Submission = {
   rejectionCount: number;
 };
 
-export const SubmissionColumns = (hasRejectedSubmissions: boolean) => {
+export const MySubmissionsTableColumns = (hasRejectedSubmissions: boolean) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] =
     useState<Submission | null>(null);

@@ -1,4 +1,4 @@
-import { ImpersonationBanner } from "@/components/admin/impersonation-banner";
+import { ImpersonationBanner } from "@/components/auth/impersonation-banner";
 import { Footer } from "@/components/footer";
 import { MainNav } from "@/components/navigation/main-nav";
 import { RouterProvider } from "@/components/router-provider";

@@ -84,7 +84,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
-        {user?.role === "admin" && (
+        {/* {user?.role === "admin" && (
           <DropdownMenuItem asChild>
             <Link href="/admin">
               <Icons.lock
@@ -94,7 +94,7 @@ export function UserAccountNavClient({ user }: { user: User }) {
               <span>Admin</span>
             </Link>
           </DropdownMenuItem>
-        )}
+        )} */}
         <DropdownMenuSeparator />
         <div className="px-2 py-1">
           <div className="flex w-full flex-col items-center">

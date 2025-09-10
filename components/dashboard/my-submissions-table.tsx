@@ -4,15 +4,15 @@ import { DataTable } from "@/components/dashboard/data-table";
 import type { Submission } from "@/components/dashboard/my-submissions-table-columns";
 import { MySubmissionsTableColumns } from "@/components/dashboard/my-submissions-table-columns";
 
-interface UserDashboardProps {
+interface MySubmissionsTableProps {
   submissions: Submission[];
   hasRejectedSubmissions: boolean;
 }
 
-export function UserDashboard({
+export function MySubmissionsTable({
   submissions,
   hasRejectedSubmissions,
-}: UserDashboardProps) {
+}: MySubmissionsTableProps) {
   const { columns, dialog } = MySubmissionsTableColumns(hasRejectedSubmissions);
 
   return (

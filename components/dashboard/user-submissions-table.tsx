@@ -1,7 +1,10 @@
 "use client";
 
-import { AdminSubmissionColumns, Submission } from "@/components/admin/columns";
-import { DataTable } from "@/components/admin/data-table";
+import { DataTable } from "@/components/dashboard/data-table";
+import {
+  AdminSubmissionColumns,
+  Submission,
+} from "@/components/dashboard/user-submissions-table-columns";
 
 interface AdminClientProps {
   submissions: Submission[];

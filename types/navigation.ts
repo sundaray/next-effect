@@ -4,6 +4,6 @@ export type NavItem = {
 };
 
 export type AdminNavItem = {
-  id: "submissions" | "users";
+  id: "submission-management" | "user-management" | "my-submissions";
   title: string;
 };

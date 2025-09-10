@@ -1,22 +1,49 @@
 "use client";
-
+import { MySubmissionsTable } from "@/components/dashboard/my-submissions-table";
+import type { Submission as MySubmissionsType } from "@/components/dashboard/my-submissions-table-columns";
 import { UserManagementTable } from "@/components/dashboard/user-management-table";
 import { UserSubmissionsTable } from "@/components/dashboard/user-submissions-table";
-import type { Submission } from "@/components/dashboard/user-submissions-table-columns";
-
+import type { Submission as AllSubmissionsType } from "@/components/dashboard/user-submissions-table-columns";
+import { APP_SUBMISSION_LIMIT } from "@/config/limit";
 import { siteConfig } from "@/config/navbar";
-import { adminSearchParams } from "@/lib/admin-search-params";
+import { dashboardSearchParams } from "@/lib/dashboard-search-params";
 import { UserForAdminTable } from "@/lib/get-all-users";
+import type { User } from "@/lib/services/auth-service";
 import { cn } from "@/lib/utils";
 import { useQueryState } from "nuqs";
 
 interface AdminDashboardProps {
-  submissions: Submission[];
-  users: UserForAdminTable[];
+  allSubmissions: AllSubmissionsType[];
+  allUsers: UserForAdminTable[];
+  mySubmissions: MySubmissionsType[];
+  user: User;
 }
 
-export function AdminDashboard({ submissions, users }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useQueryState("tab", adminSearchParams.tab);
+export function AdminDashboard({
+  allSubmissions,
+  allUsers,
+  mySubmissions,
+  user,
+}: AdminDashboardProps) {
+  const [activeTab, setActiveTab] = useQueryState(
+    "tab",
+    dashboardSearchParams.tab,
+  );
+
+  const hasRejectedSubmissions = mySubmissions.some(
+    (submission) => submission.status === "rejected",
+  );
+
+  const submissionCount = user?.submissionCount || 0;
+  const remainingSubmissions = APP_SUBMISSION_LIMIT - submissionCount;
+  let submissionMessage = `As a user, you are allowed a maximum of ${APP_SUBMISSION_LIMIT} app submissions. `;
+  if (remainingSubmissions > 1) {
+    submissionMessage += `You can make ${remainingSubmissions} more submissions.`;
+  } else if (remainingSubmissions === 1) {
+    submissionMessage += `You can make 1 more submission.`;
+  } else {
+    submissionMessage += `You have reached your submission limit.`;
+  }
 
   return (
     <div>
@@ -39,10 +66,23 @@ export function AdminDashboard({ submissions, users }: AdminDashboardProps) {
         </nav>
       </div>
       <div className="mt-8">
-        {activeTab === "submissions" && (
-          <UserSubmissionsTable submissions={submissions} />
+        {activeTab === "submission-management" && (
+          <UserSubmissionsTable submissions={allSubmissions} />
         )}
-        {activeTab === "users" && <UserManagementTable users={users} />}
+        {activeTab === "user-management" && (
+          <UserManagementTable users={allUsers} />
+        )}
+        {activeTab === "my-submissions" && (
+          <>
+            <div className="mb-4 rounded-md border border-sky-200 bg-sky-100 px-3 py-1.5 text-sm text-pretty text-sky-900">
+              {submissionMessage}
+            </div>
+            <MySubmissionsTable
+              submissions={mySubmissions}
+              hasRejectedSubmissions={hasRejectedSubmissions}
+            />
+          </>
+        )}
       </div>
     </div>
   );
