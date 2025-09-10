@@ -1,8 +1,9 @@
 "use client";
 
-import type { Submission } from "@/components/admin/columns";
-import { SubmissionsClient } from "@/components/admin/submissions-client";
-import { UserManagementClient } from "@/components/admin/user-management-client";
+import { UserManagementTable } from "@/components/dashboard/user-management-table";
+import { UserSubmissionsTable } from "@/components/dashboard/user-submissions-table";
+import type { Submission } from "@/components/dashboard/user-submissions-table-columns";
+
 import { siteConfig } from "@/config/navbar";
 import { adminSearchParams } from "@/lib/admin-search-params";
 import { UserForAdminTable } from "@/lib/get-all-users";
@@ -39,9 +40,9 @@ export function AdminDashboard({ submissions, users }: AdminDashboardProps) {
       </div>
       <div className="mt-8">
         {activeTab === "submissions" && (
-          <SubmissionsClient submissions={submissions} />
+          <UserSubmissionsTable submissions={submissions} />
         )}
-        {activeTab === "users" && <UserManagementClient users={users} />}
+        {activeTab === "users" && <UserManagementTable users={users} />}
       </div>
     </div>
   );

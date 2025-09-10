@@ -13,7 +13,7 @@ export default async function AdminPage() {
         <h1 className="text-4xl font-bold tracking-tight text-neutral-900">
           Admin Dashboard
         </h1>
-        <p className="mt-4 text-neutral-700">
+        <p className="mt-4 text-lg font-medium text-neutral-700">
           Review and manage all app submissions and users.
         </p>
       </div>

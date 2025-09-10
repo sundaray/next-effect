@@ -59,7 +59,7 @@ const UserActions = ({ row }: { row: { original: UserForAdminTable } }) => {
   );
 };
 
-export const userColumns: ColumnDef<UserForAdminTable>[] = [
+export const userManagementTableColumns: ColumnDef<UserForAdminTable>[] = [
   {
     accessorKey: "email",
     header: "Email",

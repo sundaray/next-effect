@@ -7,7 +7,7 @@ interface AdminClientProps {
   submissions: Submission[];
 }
 
-export function SubmissionsClient({ submissions }: AdminClientProps) {
+export function UserSubmissionsTable({ submissions }: AdminClientProps) {
   const { columns, dialog } = AdminSubmissionColumns();
 
   return (
