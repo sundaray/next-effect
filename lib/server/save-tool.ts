@@ -27,6 +27,7 @@ export function saveTool(body: saveToolPayload, user: User) {
       const [existingTool] = yield* dbService.use((db) =>
         db
           .select({
+            name: tools.name,
             logoUrl: tools.logoUrl,
             showcaseImageUrl: tools.showcaseImageUrl,
           })
@@ -69,6 +70,29 @@ export function saveTool(body: saveToolPayload, user: User) {
           // Only add image URLs to the update object if new image keys were provided from the form.
           // This prevents overwriting existing URLs with null/undefined.
 
+          // Update the slug if the name has changed.
+          if (existingTool && body.name !== existingTool.name) {
+            // Generate a new slug from the updated name.
+            const baseSlug = slugify(body.name);
+            let finalSlug = baseSlug;
+            let counter = 2;
+
+            // Ensure the new slug is unique before saving.
+            while (true) {
+              const toolWithSlug = await tx.query.tools.findFirst({
+                where: eq(tools.slug, finalSlug),
+              });
+              // If the slug doesn't exist, we can use it.
+              if (!toolWithSlug) {
+                break;
+              }
+              // Otherwise, append a number and check again (e.g., "makeaudio-2").
+              finalSlug = `${baseSlug}-${counter}`;
+              counter++;
+            }
+            // Add the new unique slug to the fields we are updating.
+            fieldsToUpdate.slug = finalSlug;
+          }
           if (body.logoKey) {
             fieldsToUpdate.logoUrl = `${s3BaseUrl}/${body.logoKey}`;
           }
