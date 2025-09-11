@@ -1,5 +1,4 @@
 "use client";
-
 import type { ApiRoutes } from "@/app/api/[[...path]]/route";
 import { ColumnDef } from "@tanstack/react-table";
 import { DetailedError, hc, parseResponse } from "hono/client";
@@ -52,7 +51,6 @@ export type Submission = {
   rejectionReason: string | null;
 };
 
-// --- RowActions Component ---
 function RowActions({ row }: { row: { original: Submission } }) {
   const submission = row.original;
   const [reason, setReason] = useState("");
