@@ -26,6 +26,7 @@ import {
   ToolSubmissionFormSchemaType,
   pricingOptions,
 } from "@/lib/schema";
+import type { User } from "@/lib/services/auth-service";
 import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import { Effect, pipe } from "effect";
 import { usePathname, useRouter } from "next/navigation";
@@ -35,13 +36,13 @@ import { useForm } from "react-hook-form";
 interface ToolSubmissionFormProps {
   categories: string[];
   initialData?: Tool | null;
-  userRole: string;
+  user: User | null;
 }
 
 export function ToolSubmissionForm({
   categories,
   initialData,
-  userRole,
+  user,
 }: ToolSubmissionFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -68,7 +69,6 @@ export function ToolSubmissionForm({
     });
 
   async function onSubmit(data: ToolSubmissionFormSchemaType) {
-    console.log("Form data: ", data);
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -79,14 +79,22 @@ export function ToolSubmissionForm({
         showcaseImageKey,
         logoUploadUrl,
         showcaseImageUploadUrl,
-      } = yield* getPresignedUrls(data);
-
-      yield* uploadFilesToS3({
-        logoUploadUrl,
-        showcaseImageUploadUrl,
-        logo: data.logo,
-        showcaseImage: data.showcaseImage,
+      } = yield* getPresignedUrls({
+        ...data,
+        ...(initialData?.id && { toolId: initialData.id }),
       });
+
+      if (
+        (data.logo && logoUploadUrl) ||
+        (data.showcaseImage && showcaseImageUploadUrl)
+      ) {
+        yield* uploadFilesToS3({
+          logoUploadUrl,
+          showcaseImageUploadUrl,
+          logo: data.logo,
+          showcaseImage: data.showcaseImage,
+        });
+      }
 
       const { logo, showcaseImage, ...toolData } = data;
 
@@ -103,7 +111,7 @@ export function ToolSubmissionForm({
       Effect.tap(() =>
         Effect.sync(() => {
           reset();
-          if (initialData && userRole === "admin") {
+          if (initialData && user?.role === "admin") {
             router.push("/submit/edit-success");
           } else {
             router.push("/submit/success");

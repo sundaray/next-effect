@@ -27,10 +27,13 @@ const app = new Hono<{
   .post("/presigned-url", async (ctx) => {
     const body = await ctx.req.parseBody();
     const user = ctx.get("user");
+    const toolId = body.toolId as string | undefined;
 
     const parseBody = {
       ...body,
       logo: body.logo === "undefined" ? undefined : body.logo,
+      showcaseImage:
+        body.showcaseImage === "undefined" ? undefined : body.showcaseImage,
       categories: JSON.parse(body.categories as string),
     } as ToolSubmissionFormSchemaType;
 
@@ -42,7 +45,22 @@ const app = new Hono<{
           }),
         );
 
-      // Step 2: Validate the tool submission form data against the schema.
+      // Check if the image is required based on user role and edit mode
+      const isAdminEditing = user.role === "admin" && !!toolId;
+      const isShowcaseImageRequired = !isAdminEditing;
+
+      if (isShowcaseImageRequired && !parseBody.showcaseImage) {
+        const issues = [
+          {
+            _tag: "ParseError",
+            path: ["showcaseImage"],
+            message: "Showcase image is required.",
+          },
+        ];
+        return ctx.json({ _tag: "ParseError", issues }, { status: 400 });
+      }
+
+      // Validate the tool submission form data against the schema.
       const validatedToolSubmissionFormData =
         yield* validateToolSubmissionFormData(parseBody);
 
@@ -130,13 +148,15 @@ const app = new Hono<{
         );
       }
 
-      // Step 2: Create and upload WebP variants of the homepage screenshot.
-      yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
+      // Create and upload WebP variants of the homepage screenshot.
+      if (body.showcaseImageKey) {
+        yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
+      }
 
-      // Step 3: Save the final tool submission details to the database.
+      // Save the final tool submission details to the database.
       const tool = yield* saveTool(body, user);
 
-      // Step 4: Return the newly created tool record to the client.
+      // Return the newly created tool record to the client.
       return ctx.json({
         tool,
       });

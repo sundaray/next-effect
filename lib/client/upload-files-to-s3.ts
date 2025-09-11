@@ -3,8 +3,8 @@ import "client-only";
 import { Effect, pipe } from "effect";
 
 type UploadFilesToS3Params = {
-  showcaseImage: File;
-  showcaseImageUploadUrl: string;
+  showcaseImage?: File;
+  showcaseImageUploadUrl?: string;
   logo?: File;
   logoUploadUrl?: string;
 };
@@ -39,9 +39,11 @@ export function uploadFilesToS3(params: UploadFilesToS3Params) {
 
     const uploadEffects = [];
 
-    uploadEffects.push(
-      createUploadEffect(params.showcaseImageUploadUrl, params.showcaseImage),
-    );
+    if (params.showcaseImage && params.showcaseImageUploadUrl) {
+      uploadEffects.push(
+        createUploadEffect(params.showcaseImageUploadUrl, params.showcaseImage),
+      );
+    }
 
     if (params.logo && params.logoUploadUrl) {
       uploadEffects.push(createUploadEffect(params.logoUploadUrl, params.logo));

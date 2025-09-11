@@ -85,9 +85,8 @@ export const ToolSubmissionFormSchema = Schema.Struct({
     }),
   }),
   logo: Schema.optional(ValidatedLogoFile),
-  showcaseImage: Schema.instanceOf(File)
-    .annotations({ message: () => "Showcase image is required." })
-    .pipe(
+  showcaseImage: Schema.optional(
+    Schema.instanceOf(File).pipe(
       Schema.filter(
         (file) => file.size <= SCREENSHOT_MAX_SIZE_MB * 1024 * 1024,
         {
@@ -102,6 +101,7 @@ export const ToolSubmissionFormSchema = Schema.Struct({
           )}.`,
       }),
     ),
+  ),
 })
   .annotations({ identifier: "ToolSubmissionFormSchema" })
   .pipe(Schema.annotations({ parseOptions: { errors: "all" } }));
@@ -131,6 +131,6 @@ export type saveToolPayload = Omit<
   "logo" | "showcaseImage"
 > & {
   logoKey?: string;
-  showcaseImageKey: string;
+  showcaseImageKey?: string;
   toolId?: string;
 };

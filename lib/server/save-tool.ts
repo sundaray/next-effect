@@ -20,12 +20,10 @@ export function saveTool(body: saveToolPayload, user: User) {
     const awsRegion = yield* Config.string("AWS_REGION");
 
     const s3BaseUrl = `https://${s3BucketName}.s3.${awsRegion}.amazonaws.com`;
-    const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
-    const showcaseImageUrl = `${s3BaseUrl}/${body.showcaseImageKey}`;
-
     const userId = user!.id;
 
     if (body.toolId) {
+      // First, get the URLs of the images currently in the database.
       const [existingTool] = yield* dbService.use((db) =>
         db
           .select({
@@ -36,12 +34,14 @@ export function saveTool(body: saveToolPayload, user: User) {
           .where(eq(tools.id, body.toolId!)),
       );
 
+      // If the tool exists, check if we need to clean up old images from S3.
       if (existingTool) {
         const keysToDelete: string[] = [];
-        if (existingTool.logoUrl) {
+        // Only delete old images if new ones are being uploaded to replace them.
+        if (body.logoKey && existingTool.logoUrl) {
           keysToDelete.push(existingTool.logoUrl.replace(`${s3BaseUrl}/`, ""));
         }
-        if (existingTool.showcaseImageUrl) {
+        if (body.showcaseImageKey && existingTool.showcaseImageUrl) {
           const baseKey = existingTool.showcaseImageUrl
             .replace(`${s3BaseUrl}/`, "")
             .replace(/-original\.webp$/, "");
@@ -49,35 +49,46 @@ export function saveTool(body: saveToolPayload, user: User) {
             keysToDelete.push(`${baseKey}-${variant}.webp`);
           });
         }
-        yield* deleteImageAssetsFromS3(keysToDelete);
+        // If there are images to delete, call the S3 deletion function.
+        if (keysToDelete.length > 0) {
+          yield* deleteImageAssetsFromS3(keysToDelete);
+        }
       }
 
       const [updatedTool] = yield* dbService.use((db) =>
         db.transaction(async (tx) => {
-          const fieldsToUpdate = {
+          // Build the update object dynamically with only the text fields first.
+          const fieldsToUpdate: Record<string, any> = {
             name: body.name,
             websiteUrl: body.websiteUrl,
             tagline: body.tagline,
             description: body.description,
             categories: [...body.categories],
             pricing: body.pricing,
-            logoUrl,
-            showcaseImageUrl,
           };
+          // Only add image URLs to the update object if new image keys were provided from the form.
+          // This prevents overwriting existing URLs with null/undefined.
 
+          if (body.logoKey) {
+            fieldsToUpdate.logoUrl = `${s3BaseUrl}/${body.logoKey}`;
+          }
+          if (body.showcaseImageKey) {
+            fieldsToUpdate.showcaseImageUrl = `${s3BaseUrl}/${body.showcaseImageKey}`;
+          }
+          // If a regular user edits their submission, it must be re-approved.
           if (user?.role !== "admin") {
             Object.assign(fieldsToUpdate, {
               adminApprovalStatus: "pending",
               submittedAt: new Date(),
             });
           }
-
+          // Execute the database update.
           const result = await tx
             .update(tools)
             .set(fieldsToUpdate)
             .where(eq(tools.id, body.toolId!))
             .returning({ id: tools.id });
-
+          // Log this update event in the tool's history.
           await tx.insert(toolHistory).values({
             toolId: body.toolId!,
             userId: userId,
@@ -88,10 +99,11 @@ export function saveTool(body: saveToolPayload, user: User) {
       );
       return updatedTool;
     } else {
+      // This block handles CREATING a new tool submission.
+      // Generate a unique slug for the tool to avoid URL conflicts.
       const baseSlug = slugify(body.name);
       let finalSlug = baseSlug;
       let counter = 2;
-
       while (true) {
         const toolWithSlug = yield* dbService.use((db) =>
           db.query.tools.findFirst({
@@ -105,8 +117,14 @@ export function saveTool(body: saveToolPayload, user: User) {
         counter++;
       }
 
+      const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
+      const showcaseImageUrl = body.showcaseImageKey
+        ? `${s3BaseUrl}/${body.showcaseImageKey}`
+        : undefined;
+      // Insert the new tool in a transaction.
       const [insertedTool] = yield* dbService.use((db) =>
         db.transaction(async (tx) => {
+          // Insert the new tool data.
           const result = await tx
             .insert(tools)
             .values({
@@ -118,18 +136,18 @@ export function saveTool(body: saveToolPayload, user: User) {
               categories: [...body.categories],
               pricing: body.pricing,
               logoUrl,
-              showcaseImageUrl,
+              showcaseImageUrl: showcaseImageUrl!,
               adminApprovalStatus: "pending",
               submittedBy: userId,
             })
             .returning({ id: tools.id });
-
+          // Log the initial submission event.
           await tx.insert(toolHistory).values({
             toolId: result[0].id,
             userId: userId,
             eventType: "submitted",
           });
-
+          // Increment the user's total submission count.
           await tx
             .update(users)
             .set({ submissionCount: sql`${users.submissionCount} + 1` })

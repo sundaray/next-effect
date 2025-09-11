@@ -78,7 +78,7 @@ export default async function Submit(props: PageProps<"/submit">) {
       <ToolSubmissionForm
         categories={categories}
         initialData={initialData}
-        userRole={user.role}
+        user={user}
       />
     </div>
   );

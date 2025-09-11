@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import type { Tool } from "@/db/schema";
-import { cn, slugify } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const getPricingPillStyles = (pricing: Tool["pricing"]) => {
@@ -18,12 +18,11 @@ const getPricingPillStyles = (pricing: Tool["pricing"]) => {
 
 export function ToolCard({ tool }: { tool: Tool }) {
   const primaryCategory = tool.categories[0];
-  const slug = slugify(tool.name);
 
   return (
     <article className="group relative flex h-full flex-col rounded-md border border-neutral-300 p-4 shadow-xs transition-all group-has-[[data-pending]]:pointer-events-none group-has-[[data-pending]]:opacity-50 hover:scale-102 hover:shadow-lg">
       <Link
-        href={`/tools/${slug}`}
+        href={`/tools/${tool.slug}`}
         className="absolute inset-0 z-10"
         aria-label={`Learn more about ${tool.name}`}
       />
