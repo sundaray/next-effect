@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +14,12 @@ import { APP_RESUBMISSION_LIMIT } from "@/config/limit";
 import { adminApprovalStatusEnum } from "@/db/schema";
 import { cn, getStatusPillStyles } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 import { useState } from "react";
 
 export type Submission = {
   name: string;
+  slug: string;
   submittedAt: Date;
   status: (typeof adminApprovalStatusEnum.enumValues)[number];
   rejectionReason: string | null;
@@ -92,7 +94,8 @@ export const MySubmissionsTableColumns = (hasRejectedSubmissions: boolean) => {
         if (submission.status === "approved") {
           return <span className="text-neutral-500">N/A</span>;
         }
-        const remaining = APP_RESUBMISSION_LIMIT - submission.rejectionCount;
+        const remaining =
+          APP_RESUBMISSION_LIMIT - (submission.rejectionCount - 1);
 
         if (remaining < 0) return 0;
 
@@ -100,6 +103,27 @@ export const MySubmissionsTableColumns = (hasRejectedSubmissions: boolean) => {
       },
     });
   }
+
+  columns.push({
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const submission = row.original;
+
+      if (submission.status === "rejected") {
+        return (
+          <Link
+            href={`/submit?edit=${submission.slug}`}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            Edit
+          </Link>
+        );
+      }
+
+      return null;
+    },
+  });
 
   return {
     columns,

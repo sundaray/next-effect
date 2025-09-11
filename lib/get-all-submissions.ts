@@ -31,6 +31,7 @@ export async function getAllSubmissions() {
           id: tools.id,
           name: tools.name,
           slug: tools.slug,
+          slug: tools.slug,
           submittedAt: tools.submittedAt,
           status: tools.adminApprovalStatus,
           submittedByEmail: users.email,

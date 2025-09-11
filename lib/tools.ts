@@ -134,7 +134,7 @@ const app = new Hono<{
       yield* createShowcaseImageWebPVariants(body.showcaseImageKey);
 
       // Step 3: Save the final tool submission details to the database.
-      const tool = yield* saveTool(body, user.id);
+      const tool = yield* saveTool(body, user);
 
       // Step 4: Return the newly created tool record to the client.
       return ctx.json({

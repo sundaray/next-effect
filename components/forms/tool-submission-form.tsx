@@ -1,5 +1,4 @@
 "use client";
-
 import { CategoryInput } from "@/components/forms/category-input";
 import { DropzoneInput } from "@/components/forms/dropzone-input";
 import { FormField } from "@/components/forms/form-field";
@@ -13,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Tool } from "@/db/schema";
 import { clientRuntime } from "@/lib/client-runtime";
 import { getPresignedUrls } from "@/lib/client/get-presigned-urls";
 import { saveTool } from "@/lib/client/save-tool";
@@ -32,7 +32,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export function ToolSubmissionForm({ categories }: { categories: string[] }) {
+interface ToolSubmissionFormProps {
+  categories: string[];
+  initialData?: Tool | null;
+}
+
+export function ToolSubmissionForm({
+  categories,
+  initialData,
+}: ToolSubmissionFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -46,12 +54,12 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
       mode: "onTouched",
       reValidateMode: "onChange",
       defaultValues: {
-        name: "",
-        websiteUrl: "",
-        tagline: "",
-        description: "",
-        categories: [],
-        pricing: undefined,
+        name: initialData?.name ?? "",
+        websiteUrl: initialData?.websiteUrl ?? "",
+        tagline: initialData?.tagline ?? "",
+        description: initialData?.description ?? "",
+        categories: initialData?.categories ?? [],
+        pricing: initialData?.pricing ?? undefined,
         logo: undefined,
         showcaseImage: undefined,
       },
@@ -84,6 +92,7 @@ export function ToolSubmissionForm({ categories }: { categories: string[] }) {
         ...toolData,
         logoKey,
         showcaseImageKey,
+        toolId: initialData?.id,
       });
     });
 

@@ -29,6 +29,7 @@ export async function getUserSubmissions(userId: string) {
         .with(latestRejection)
         .select({
           name: tools.name,
+          slug: tools.slug,
           submittedAt: tools.submittedAt,
           status: tools.adminApprovalStatus,
           rejectionCount: tools.rejectionCount,

@@ -31,6 +31,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
@@ -121,6 +122,10 @@ function RowActions({ row }: { row: { original: Submission } }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link href={`/submit?edit=${submission.slug}`}>Edit</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {submission.status !== "approved" && (
             <DropdownMenuItem
               className="text-emerald-600 focus:bg-emerald-50 focus:text-emerald-600"

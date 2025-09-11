@@ -1,6 +1,6 @@
 import "server-only";
 
-import { EmailOtpTemplate } from "@/components/email-otp-template";
+import { EmailOtpTemplate } from "@/components/emails/email-otp-template";
 import { EmailService } from "@/lib/services/email-service";
 import { SendEmailCommand, SendEmailCommandInput } from "@aws-sdk/client-ses";
 import { render } from "@react-email/render";

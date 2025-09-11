@@ -1,6 +1,7 @@
 import { toolHistory, tools, users } from "@/db/schema";
 import { deleteImageAssetsFromS3 } from "@/lib/delete-image-assets-from-s3";
 import { saveToolPayload } from "@/lib/schema";
+import type { User } from "@/lib/services/auth-service";
 import { DatabaseService } from "@/lib/services/database-service";
 import { slugify } from "@/lib/utils";
 import { eq, sql } from "drizzle-orm";
@@ -11,7 +12,7 @@ class SaveToolError extends Data.TaggedError("SaveToolError")<{
   message: string;
 }> {}
 
-export function saveTool(body: saveToolPayload, userId: string) {
+export function saveTool(body: saveToolPayload, user: User) {
   return Effect.gen(function* () {
     const dbService = yield* DatabaseService;
 
@@ -22,116 +23,91 @@ export function saveTool(body: saveToolPayload, userId: string) {
     const logoUrl = body.logoKey ? `${s3BaseUrl}/${body.logoKey}` : null;
     const showcaseImageUrl = `${s3BaseUrl}/${body.showcaseImageKey}`;
 
-    const baseSlug = slugify(body.name);
+    const userId = user!.id;
 
-    const existingTool = yield* dbService.use((db) =>
-      db.query.tools.findFirst({
-        where: eq(tools.slug, baseSlug),
-      }),
-    );
+    if (body.toolId) {
+      const [existingTool] = yield* dbService.use((db) =>
+        db
+          .select({
+            logoUrl: tools.logoUrl,
+            showcaseImageUrl: tools.showcaseImageUrl,
+          })
+          .from(tools)
+          .where(eq(tools.id, body.toolId!)),
+      );
 
-    if (existingTool) {
-      if (
-        existingTool.submittedBy === userId &&
-        existingTool.adminApprovalStatus === "rejected"
-      ) {
-        // MODIFICATION START: Improved logic to delete all old S3 objects
+      if (existingTool) {
         const keysToDelete: string[] = [];
-        const variants = ["sm", "md", "lg", "xl", "original"];
-
-        // Extract and process the old showcase image key from its URL
+        if (existingTool.logoUrl) {
+          keysToDelete.push(existingTool.logoUrl.replace(`${s3BaseUrl}/`, ""));
+        }
         if (existingTool.showcaseImageUrl) {
-          const urlParts = existingTool.showcaseImageUrl.split("/");
-          const baseKeyWithExtension = urlParts.slice(-2).join("/");
-          const baseKey = baseKeyWithExtension.substring(
-            0,
-            baseKeyWithExtension.lastIndexOf("."),
-          );
-
-          // Generate all WebP variant keys to delete
-          variants.forEach((variant) => {
+          const baseKey = existingTool.showcaseImageUrl
+            .replace(`${s3BaseUrl}/`, "")
+            .replace(/-original\.webp$/, "");
+          ["sm", "md", "lg", "xl", "original"].forEach((variant) => {
             keysToDelete.push(`${baseKey}-${variant}.webp`);
           });
         }
-        // Extract the old logo key from its URL (logos are not resized, so it's a direct key)
-        if (existingTool.logoUrl) {
-          const urlParts = existingTool.logoUrl.split("/");
-          keysToDelete.push(urlParts.slice(-2).join("/"));
-        }
-
-        // Run the database update and S3 deletion in parallel
-        const [updateResult] = yield* Effect.all([
-          dbService
-            .use(async (db) => {
-              return await db.transaction(async (tx) => {
-                const updatedTool = await tx
-                  .update(tools)
-                  .set({
-                    name: body.name,
-                    websiteUrl: body.websiteUrl,
-                    tagline: body.tagline,
-                    description: body.description,
-                    categories: [...body.categories],
-                    pricing: body.pricing,
-                    logoUrl,
-                    showcaseImageUrl,
-                    adminApprovalStatus: "pending",
-                    submittedAt: new Date(),
-                  })
-                  .where(eq(tools.id, existingTool.id))
-                  .returning({ id: tools.id });
-
-                await tx.insert(toolHistory).values({
-                  toolId: existingTool.id,
-                  userId: userId,
-                  eventType: "updated",
-                });
-
-                return updatedTool;
-              });
-            })
-            .pipe(
-              Effect.tapError((error) =>
-                Effect.logError(
-                  "Database error updating rejected tool: ",
-                  error,
-                ),
-              ),
-              Effect.mapError(
-                () =>
-                  new SaveToolError({
-                    message:
-                      "Failed to update your submission. Please try again.",
-                  }),
-              ),
-            ),
-          deleteImageAssetsFromS3(keysToDelete),
-        ]);
-
-        return updateResult[0];
+        yield* deleteImageAssetsFromS3(keysToDelete);
       }
-    }
 
-    let finalSlug = baseSlug;
-    let counter = 2;
+      const [updatedTool] = yield* dbService.use((db) =>
+        db.transaction(async (tx) => {
+          const fieldsToUpdate = {
+            name: body.name,
+            websiteUrl: body.websiteUrl,
+            tagline: body.tagline,
+            description: body.description,
+            categories: [...body.categories],
+            pricing: body.pricing,
+            logoUrl,
+            showcaseImageUrl,
+          };
 
-    while (true) {
-      const toolWithSlug = yield* dbService.use((db) =>
-        db.query.tools.findFirst({
-          where: eq(tools.slug, finalSlug),
+          if (user?.role !== "admin") {
+            Object.assign(fieldsToUpdate, {
+              adminApprovalStatus: "pending",
+              submittedAt: new Date(),
+            });
+          }
+
+          const result = await tx
+            .update(tools)
+            .set(fieldsToUpdate)
+            .where(eq(tools.id, body.toolId!))
+            .returning({ id: tools.id });
+
+          await tx.insert(toolHistory).values({
+            toolId: body.toolId!,
+            userId: userId,
+            eventType: "updated",
+          });
+          return result;
         }),
       );
-      if (!toolWithSlug) {
-        break;
-      }
-      finalSlug = `${baseSlug}-${counter}`;
-      counter++;
-    }
+      return updatedTool;
+    } else {
+      const baseSlug = slugify(body.name);
+      let finalSlug = baseSlug;
+      let counter = 2;
 
-    const result = yield* dbService
-      .use((db) =>
+      while (true) {
+        const toolWithSlug = yield* dbService.use((db) =>
+          db.query.tools.findFirst({
+            where: eq(tools.slug, finalSlug),
+          }),
+        );
+        if (!toolWithSlug) {
+          break;
+        }
+        finalSlug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+
+      const [insertedTool] = yield* dbService.use((db) =>
         db.transaction(async (tx) => {
-          const insertedTool = await tx
+          const result = await tx
             .insert(tools)
             .values({
               name: body.name,
@@ -149,7 +125,7 @@ export function saveTool(body: saveToolPayload, userId: string) {
             .returning({ id: tools.id });
 
           await tx.insert(toolHistory).values({
-            toolId: insertedTool[0].id,
+            toolId: result[0].id,
             userId: userId,
             eventType: "submitted",
           });
@@ -158,19 +134,17 @@ export function saveTool(body: saveToolPayload, userId: string) {
             .update(users)
             .set({ submissionCount: sql`${users.submissionCount} + 1` })
             .where(eq(users.id, userId));
-
-          return insertedTool;
+          return result;
         }),
-      )
-      .pipe(
-        Effect.mapError(
-          () =>
-            new SaveToolError({
-              message: "Failed to save tool to the database. Please try again.",
-            }),
-        ),
       );
-
-    return result[0];
-  });
+      return insertedTool;
+    }
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new SaveToolError({
+          message: "Failed to save tool to the database. Please try again.",
+        }),
+    ),
+  );
 }

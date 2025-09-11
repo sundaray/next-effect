@@ -132,4 +132,5 @@ export type saveToolPayload = Omit<
 > & {
   logoKey?: string;
   showcaseImageKey: string;
+  toolId?: string;
 };
