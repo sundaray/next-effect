@@ -2,7 +2,7 @@ import { getUser } from "@/lib/get-user";
 import { NextRequest, NextResponse } from "next/server";
 
 const guestOnlyPaths = ["/signin"];
-const adminOnlyPaths = ["/admin"];
+const adminOnlyPaths = ["/submit/edit-success"];
 const protectedPaths = ["/submit", "/dashboard"];
 
 export async function middleware(request: NextRequest) {

@@ -35,11 +35,13 @@ import { useForm } from "react-hook-form";
 interface ToolSubmissionFormProps {
   categories: string[];
   initialData?: Tool | null;
+  userRole: string;
 }
 
 export function ToolSubmissionForm({
   categories,
   initialData,
+  userRole,
 }: ToolSubmissionFormProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -101,7 +103,11 @@ export function ToolSubmissionForm({
       Effect.tap(() =>
         Effect.sync(() => {
           reset();
-          router.push("/submit/success");
+          if (initialData && userRole === "admin") {
+            router.push("/submit/edit-success");
+          } else {
+            router.push("/submit/success");
+          }
         }),
       ),
       Effect.tapError((error) =>

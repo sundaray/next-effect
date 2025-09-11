@@ -3,6 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { APP_SUBMISSION_LIMIT } from "@/config/limit";
 import type { Tool } from "@/db/schema";
 import { getCategories } from "@/lib/get-categories";
+import { getToolBySlug } from "@/lib/get-tool-by-slug";
 import { getToolForEdit } from "@/lib/get-tool-for-edit";
 import { getUser } from "@/lib/get-user";
 import { cn } from "@/lib/utils";
@@ -25,7 +26,11 @@ export default async function Submit(props: PageProps<"/submit">) {
     typeof searchParams.edit === "string" ? searchParams.edit : undefined;
 
   if (editSlug) {
-    initialData = await getToolForEdit(editSlug, user.id);
+    if (user.role === "admin") {
+      initialData = await getToolBySlug(editSlug);
+    } else {
+      initialData = await getToolForEdit(editSlug, user.id);
+    }
 
     if (!initialData) {
       redirect("/dashboard");
@@ -70,7 +75,11 @@ export default async function Submit(props: PageProps<"/submit">) {
             : "Get discovered by users and boost your SEO with a backlink."}
         </p>
       </div>
-      <ToolSubmissionForm categories={categories} initialData={initialData} />
+      <ToolSubmissionForm
+        categories={categories}
+        initialData={initialData}
+        userRole={user.role}
+      />
     </div>
   );
 }

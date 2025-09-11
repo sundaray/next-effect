@@ -298,7 +298,7 @@ export const AdminSubmissionColumns = () => {
                   setDialogOpen(true);
                 }}
               >
-                Read Reason
+                Reason
               </Button>
             )}
           </div>
