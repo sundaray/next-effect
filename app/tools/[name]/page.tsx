@@ -125,9 +125,11 @@ export default async function ToolDetailsPage({
         <div className="prose prose-neutral prose-ol:*:my-0 prose-ul:*:my-0">
           <div dangerouslySetInnerHTML={safeDescriptionHtml} />
         </div>
-        {tool.categories && tool.categories.length > 0 && (
-          <ToolCategories categories={tool.categories} />
-        )}
+        <div className="border-t pt-4">
+          {tool.categories && tool.categories.length > 0 && (
+            <ToolCategories categories={tool.categories} />
+          )}
+        </div>
       </article>
     </div>
   );
