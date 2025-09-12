@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth/client";
 import type { UserForAdminTable } from "@/lib/get-all-users";
+import { cn, getPillStyles } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
@@ -70,12 +71,7 @@ export const userManagementTableColumns: ColumnDef<UserForAdminTable>[] = [
     cell: ({ row }) => {
       const role = row.original.role;
       return (
-        <Badge
-          variant={role === "admin" ? "default" : "secondary"}
-          className="capitalize"
-        >
-          {role}
-        </Badge>
+        <Badge className={cn("capitalize", getPillStyles(role))}>{role}</Badge>
       );
     },
   },

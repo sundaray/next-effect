@@ -55,9 +55,9 @@ export default async function DashboardPage() {
   let submissionMessage = `Currently, all users are allowed a maximum of ${APP_SUBMISSION_LIMIT} app submissions. `;
 
   if (remainingSubmissions > 1) {
-    submissionMessage += `You have ${remainingSubmissions} submissions remaining.`;
+    submissionMessage += `You can make ${remainingSubmissions} more submissions.`;
   } else if (remainingSubmissions === 1) {
-    submissionMessage += `You have 1 submission remaining.`;
+    submissionMessage += `You can make 1 more submission.`;
   } else {
     submissionMessage += `You have reached your submission limit.`;
   }
@@ -88,11 +88,11 @@ export default async function DashboardPage() {
           {hasRejectedSubmissions && (
             <p className="mt-4 text-sm text-pretty text-neutral-700">
               <span className="font-semibold text-neutral-900">
-                * Resubmission Policy:{" "}
+                * Edit Policy:{" "}
               </span>
-              A rejected app can be resubmitted up to {APP_RESUBMISSION_LIMIT}{" "}
-              times. After the second unsuccessful resubmission, the app will be
-              permanently rejected.
+              A rejected app can be edited and resubmitted up to{" "}
+              {APP_RESUBMISSION_LIMIT} times. After the second unsuccessful
+              resubmission, the app will be permanently rejected.
             </p>
           )}
         </>

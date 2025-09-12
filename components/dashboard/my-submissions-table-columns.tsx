@@ -12,7 +12,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { APP_RESUBMISSION_LIMIT } from "@/config/limit";
 import { adminApprovalStatusEnum } from "@/db/schema";
-import { cn, getStatusPillStyles } from "@/lib/utils";
+import { cn, getPillStyles } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useState } from "react";
@@ -60,10 +60,7 @@ export const MySubmissionsTableColumns = (hasRejectedSubmissions: boolean) => {
         return (
           <div className="flex items-center gap-x-2">
             <Badge
-              className={cn(
-                "font-medium capitalize",
-                getStatusPillStyles(status),
-              )}
+              className={cn("font-medium capitalize", getPillStyles(status))}
             >
               {status}
             </Badge>
@@ -76,7 +73,7 @@ export const MySubmissionsTableColumns = (hasRejectedSubmissions: boolean) => {
                   setDialogOpen(true);
                 }}
               >
-                Read Reason
+                Reason
               </Button>
             )}
           </div>
@@ -88,7 +85,7 @@ export const MySubmissionsTableColumns = (hasRejectedSubmissions: boolean) => {
   if (hasRejectedSubmissions) {
     columns.push({
       id: "resubmissionAttempts",
-      header: "Resubmission Attempts Left",
+      header: "No. of Edits Left",
       cell: ({ row }) => {
         const submission = row.original;
         if (submission.status === "approved") {

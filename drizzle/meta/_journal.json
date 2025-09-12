@@ -8,6 +8,13 @@
       "when": 1757441763703,
       "tag": "0000_flaky_firelord",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1757612285912,
+      "tag": "0001_worthless_overlord",
+      "breakpoints": true
     }
   ]
 }

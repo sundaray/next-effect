@@ -37,7 +37,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { adminApprovalStatusEnum } from "@/db/schema";
-import { cn, getStatusPillStyles } from "@/lib/utils";
+import { cn, getPillStyles } from "@/lib/utils";
 
 const client = hc<ApiRoutes>(process.env.NEXT_PUBLIC_BASE_URL!);
 
@@ -286,7 +286,7 @@ export const AdminSubmissionColumns = () => {
 
         return (
           <div className="flex items-center gap-x-2">
-            <Badge className={cn("capitalize", getStatusPillStyles(status))}>
+            <Badge className={cn("capitalize", getPillStyles(status))}>
               {status}
             </Badge>
             {isRejectedWithReason && (

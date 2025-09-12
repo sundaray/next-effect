@@ -1,0 +1,1 @@
+ALTER TABLE "tools" ALTER COLUMN "approved_at" DROP DEFAULT;

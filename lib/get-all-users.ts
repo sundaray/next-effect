@@ -9,7 +9,7 @@ import { Effect } from "effect";
 export type UserForAdminTable = {
   id: string;
   email: string;
-  role: string;
+  role: "admin" | "user";
 };
 
 export async function getAllUsers() {

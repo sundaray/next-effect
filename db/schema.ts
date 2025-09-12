@@ -62,7 +62,7 @@ export const tools = pgTable("tools", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
-  approvedAt: timestamp("approved_at", { withTimezone: true }).defaultNow(),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
 
   rejectionCount: integer("rejection_count").notNull().default(0),
   bookmarkCount: integer("bookmark_count").notNull().default(0),

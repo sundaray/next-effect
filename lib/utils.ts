@@ -59,8 +59,11 @@ export function ensureAbsoluteUrl(url: string): string {
   return `https://${url}`;
 }
 
-export const getStatusPillStyles = (
-  status: (typeof adminApprovalStatusEnum.enumValues)[number],
+export const getPillStyles = (
+  status:
+    | (typeof adminApprovalStatusEnum.enumValues)[number]
+    | "admin"
+    | "user",
 ) => {
   switch (status) {
     case "approved":
@@ -69,6 +72,9 @@ export const getStatusPillStyles = (
       return "border-amber-200 bg-amber-200 text-amber-900 rounded-full";
     case "rejected":
       return "border-red-200 bg-red-200 text-red-900 rounded-full";
+    case "admin":
+      return "border-sky-200 bg-sky-200 text-sky-900 rounded-full";
+    case "user":
     case "permanently_rejected":
       return "border-neutral-200 bg-neutral-200 text-neutral-900 rounded-full";
     default:
